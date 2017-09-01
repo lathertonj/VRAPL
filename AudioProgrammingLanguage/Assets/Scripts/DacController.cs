@@ -125,6 +125,11 @@ public class DacController : MonoBehaviour , ILanguageObjectListener , IControll
         // don't care
     }
 
+    public void TouchpadTransform( Transform t )
+    {
+        // don't care
+    }
+
     public string VisibleName()
     {
         return myText.text;

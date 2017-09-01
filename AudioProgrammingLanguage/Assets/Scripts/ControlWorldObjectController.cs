@@ -239,6 +239,11 @@ public class ControlWorldObjectController : MonoBehaviour , ILanguageObjectListe
         // don't care
     }
 
+    public void TouchpadTransform( Transform t )
+    {
+        // don't care
+    }
+
     public string VisibleName()
     {
         return myText.text;

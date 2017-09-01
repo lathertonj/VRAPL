@@ -45,7 +45,7 @@ public class LaserPointer : MonoBehaviour {
 	}
 	
 	private void Update () {
-		if( Controller.GetPress( SteamVR_Controller.ButtonMask.Touchpad ) && !myGrabber.UsingTrackpad() )
+		if( Controller.GetPress( SteamVR_Controller.ButtonMask.Touchpad ) && !myGrabber.UsingTouchpad() )
         {
             RaycastHit hit;
 
@@ -71,7 +71,7 @@ public class LaserPointer : MonoBehaviour {
             teleportTarget.SetActive( false );
         }
 
-        if( Controller.GetPressUp( SteamVR_Controller.ButtonMask.Touchpad ) && shouldTeleport && !myGrabber.UsingTrackpad() )
+        if( Controller.GetPressUp( SteamVR_Controller.ButtonMask.Touchpad ) && shouldTeleport && !myGrabber.UsingTouchpad() )
         {
             Teleport();
         }

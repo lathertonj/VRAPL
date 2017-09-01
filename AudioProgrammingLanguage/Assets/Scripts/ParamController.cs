@@ -184,6 +184,11 @@ public class ParamController : MonoBehaviour , ILanguageObjectListener, IControl
     {
         // don't care
     }
+
+    public void TouchpadTransform( Transform t )
+    {
+        // don't care
+    }
     
     public string VisibleName()
     {

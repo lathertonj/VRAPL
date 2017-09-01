@@ -20,6 +20,8 @@ public class PickUpObjects : MonoBehaviour {
     private GameObject objectInHand = null;
     private GameObject grippedObject = null;
     private GameObject objectBeingScaled = null;
+    private IControllerInputAcceptor touchpadObject = null;
+    private GameObject touchpadGameObject = null;
     private Vector3 scaleStartDifference;
     private Vector3 scaleInitialLocalTransformPosition;
     private float scaleStart;
@@ -297,6 +299,7 @@ public class PickUpObjects : MonoBehaviour {
 
     public void Update()
     {
+        // continue scaling or stop scaling the object
         if( objectBeingScaled )
         {
             // check if it's still being moved by the other controller. if it isn't, stop scaling it too
@@ -312,12 +315,14 @@ public class PickUpObjects : MonoBehaviour {
             }
         }
 
+        // move the object
         if( objectMovingItself != null )
         {
             objectMovingItself.Move( colliderMovingItself, initialMovePosition, transform.position );
         }
 
 
+        // grab and move or scale an object
         if( Controller.GetHairTriggerDown() )
         {
             if( collidingObject )
@@ -346,6 +351,7 @@ public class PickUpObjects : MonoBehaviour {
             }
         }
 
+        // stop moving or scaling
         if( Controller.GetHairTriggerUp() )
         {
             if( objectInHand )
@@ -358,40 +364,42 @@ public class PickUpObjects : MonoBehaviour {
             }
         }
 
+        // send touchpad events
         if( Controller.GetPressDown( SteamVR_Controller.ButtonMask.Touchpad ) )
         {
-            if( collidingObject )
+            if( CollidingWithTouchpadReceiver() )
             {
-                IControllerInputAcceptor inputAcceptor = (IControllerInputAcceptor) collidingObject.GetComponent(typeof(IControllerInputAcceptor));
-                if( inputAcceptor != null )
-                {
-                    // only send info if it's being rendered right now
-                    RendererController canRender = collidingObject.GetComponent<RendererController>();
-                    if( canRender == null || canRender.beingRendered )
-                    {
-                        inputAcceptor.TouchpadDown();
-                    }
-                }
+                touchpadObject = GetTouchpadReceiver();
+                touchpadGameObject = collidingObject;
+                touchpadObject.TouchpadDown();
             }
         }
 
+        // stop sending touchpad events if the touchpad is no longer being clicked
         if( Controller.GetPressUp( SteamVR_Controller.ButtonMask.Touchpad ) )
         {
-            if( collidingObject )
+            if( touchpadObject != null )
             {
-                IControllerInputAcceptor inputAcceptor = (IControllerInputAcceptor) collidingObject.GetComponent(typeof(IControllerInputAcceptor));
-                if( inputAcceptor != null )
-                {
-                    // only send info if it's being rendered right now
-                    RendererController canRender = collidingObject.GetComponent<RendererController>();
-                    if( canRender == null || canRender.beingRendered )
-                    {
-                        inputAcceptor.TouchpadUp();
-                    }
-                }
+                touchpadObject.TouchpadUp();
+                touchpadObject = null;
+                touchpadGameObject = null;
             }
         }
 
+        // stop sending touchpad events if it's no longer being rendered
+        if( touchpadObject != null)
+        {
+            RendererController canRender = touchpadGameObject.GetComponent<RendererController>();
+            if( canRender != null && !canRender.beingRendered )
+            {
+                touchpadObject.TouchpadUp();
+                touchpadObject = null;
+                touchpadGameObject = null;
+            }
+
+        }
+
+        // grip an object to copy it
         if( Controller.GetPressDown( SteamVR_Controller.ButtonMask.Grip ) )
         {
             if( collidingObject != null )
@@ -404,6 +412,8 @@ public class PickUpObjects : MonoBehaviour {
             }
         }
 
+
+        // release the gripped object
         if( Controller.GetPressUp( SteamVR_Controller.ButtonMask.Grip ) )
         {
             if( grippedObject )
@@ -412,35 +422,41 @@ public class PickUpObjects : MonoBehaviour {
             }
         }
 
+        // send continuous info - touchpad 
         if( Controller.GetAxis() != Vector2.zero )
-        {
-            if( collidingObject )
+        { 
+            if( touchpadObject != null )
             {
-                IControllerInputAcceptor inputAcceptor = (IControllerInputAcceptor) collidingObject.GetComponent(typeof(IControllerInputAcceptor));
-                if( inputAcceptor != null )
-                {
-                    // only send info if it's being rendered right now
-                    RendererController canRender = collidingObject.GetComponent<RendererController>();
-                    if( canRender == null || canRender.beingRendered )
-                    {
-                        inputAcceptor.TouchpadAxis( Controller.GetAxis() );
-                    }
-                }
+                touchpadObject.TouchpadAxis( Controller.GetAxis() );
             }
+            else if( CollidingWithTouchpadReceiver() )
+            {
+                GetTouchpadReceiver().TouchpadAxis( Controller.GetAxis() );
+            }
+        }
+        
+        // send continuous info - transform
+        if( touchpadObject != null )
+        {
+            touchpadObject.TouchpadTransform( transform );
         }
 
         
     }
 
-    public bool UsingTrackpad()
+    public bool UsingTouchpad()
+    {
+        return ( touchpadObject != null ) || CollidingWithTouchpadReceiver();
+    }
+
+    private bool CollidingWithTouchpadReceiver()
     {
         if( collidingObject )
         {
-            // only sending info if we're intersecting an object that can receive info
-            IControllerInputAcceptor inputAcceptor = (IControllerInputAcceptor) collidingObject.GetComponent(typeof(IControllerInputAcceptor));
+            IControllerInputAcceptor inputAcceptor = GetTouchpadReceiver();
             if( inputAcceptor != null )
             {
-                // only sending info if it's being rendered right now
+                // only send info if it's being rendered right now
                 RendererController canRender = collidingObject.GetComponent<RendererController>();
                 if( canRender == null || canRender.beingRendered )
                 {
@@ -450,7 +466,13 @@ public class PickUpObjects : MonoBehaviour {
         }
         return false;
     }
+
+    private IControllerInputAcceptor GetTouchpadReceiver()
+    {
+        return (IControllerInputAcceptor) collidingObject.GetComponent(typeof(IControllerInputAcceptor));
+    }
 }
+
 
 
 public interface IMoveMyself

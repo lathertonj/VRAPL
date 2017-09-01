@@ -216,6 +216,11 @@ public class DataReporter : MonoBehaviour , ILanguageObjectListener , IDataSourc
         // don't care
     }
 
+    public void TouchpadTransform( Transform t )
+    {
+        // don't care
+    }
+
     public void RespondToEvent( float intensity )
     {
         lastCollisionIntensity = intensity;

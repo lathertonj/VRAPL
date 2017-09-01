@@ -403,4 +403,9 @@ public class ADSRController : MonoBehaviour , ILanguageObjectListener, IParamAcc
     {
         // don't care
     }
+
+    public void TouchpadTransform( Transform t )
+    {
+        // don't care
+    }
 }

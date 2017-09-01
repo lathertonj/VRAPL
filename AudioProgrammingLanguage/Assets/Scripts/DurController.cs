@@ -72,6 +72,11 @@ public class DurController : MonoBehaviour , ILanguageObjectListener , IControll
         // don't care
     }
 
+    public void TouchpadTransform( Transform t )
+    {
+        // don't care
+    }
+
     public bool AcceptableChild(LanguageObject other, Collider collisionWith)
     {
         if( myNumber == null && other.GetComponent<NumberController>() != null )

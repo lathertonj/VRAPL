@@ -15,11 +15,14 @@ public class NumberController : MonoBehaviour , ILanguageObjectListener , IContr
     private bool touchpadPressed = false;
     private float myNumber = 1.0f;
     private float myChangeSensitivity = 0.01f;
+    private Vector3 startTransformPosition = Vector3.zero;
+    private bool usingAxisRegion = true;
 
     private Color originalTextColor;
     private Color originalBodyColor;
 
     private ILanguageObjectListener myParent = null;
+
 
     // Use this for initialization
     void Start () {
@@ -30,7 +33,7 @@ public class NumberController : MonoBehaviour , ILanguageObjectListener , IContr
 	
 	// Update is called once per frame
 	void Update () {
-		myChangeSensitivity = 0.01f + 3 * ( GetComponent<MovableController>().myScale - 1 );
+		//myChangeSensitivity = 0.01f + 3 * ( GetComponent<MovableController>().myScale - 1 );
 	}
 
     public void SetColors( Color body, Color text )
@@ -139,24 +142,71 @@ public class NumberController : MonoBehaviour , ILanguageObjectListener , IContr
     public void TouchpadUp()
     {
         touchpadPressed = false;
+        startTransformPosition = Vector3.zero;
     }
 
-    public void TouchpadAxis(Vector2 pos)
+    public void TouchpadAxis( Vector2 pos )
     {
-        if( touchpadPressed )
+        /*if( touchpadPressed && usingAxisRegion )
         {
-            myNumber += pos.y * myChangeSensitivity;
-            UpdateMyNumber();
+            IncrementMyNumber( pos.y * myChangeSensitivity );
+        }*/
+    }
+
+    public void TouchpadTransform( Transform t )
+    {
+        if( startTransformPosition == Vector3.zero )
+        {
+            startTransformPosition = t.position;
         }
+        else
+        {
+            float distanceChange = t.position.y - startTransformPosition.y;
+            float distanceDirection = Mathf.Sign( distanceChange );
+            float noSensitivityRegion = 0.03f;
+            float midSensitivityRegion = 0.05f;
+            // subtract out the no sensitivity region
+            float distanceMagnitude = Mathf.Max( Mathf.Abs( distanceChange ) - midSensitivityRegion, 0 );
+
+            float baseRate = myChangeSensitivity * distanceDirection * 0.05f;
+
+            if( Mathf.Abs( distanceChange ) < noSensitivityRegion )
+            {
+                // we are inside the safe zone. do not alter number, and allow axis to alter number.
+                usingAxisRegion = true;
+            }
+            else if( Mathf.Abs( distanceChange ) < midSensitivityRegion )
+            {
+                // change number at a constant rate
+                // TODO: bug where if the existing number already has a big magnitude, then adding this to it
+                // does nothing. I think this is to do with limitations of floats.
+                // Should the display update (i.e. keep track of integer and decimal separately)
+                // even when that number would be inaccurate?
+                usingAxisRegion = false;
+                IncrementMyNumber( baseRate );
+            }
+            else
+            {
+                // we are outside the safe zone. alter number by transform distance, not axis.
+                usingAxisRegion = false;
+                IncrementMyNumber( baseRate + myChangeSensitivity * distanceDirection * Mathf.Pow( distanceMagnitude, 6 ) * 10000 );
+            }
+        }
+    }
+
+    void IncrementMyNumber( float inc )
+    {
+        myNumber += inc;
+        UpdateMyNumber();
     }
 
     void UpdateMyNumber()
     {
-        // TODO: should the number itself be rounded?
-        // myNumber = (float) Math.Round( myNumber, 2, MidpointRounding.AwayFromZero );
+        // round number in display
         myText.GetComponent<TextMesh>().text = myNumber.ToString("0.00");
         if( GetChuck() != null )
         {
+            // round number in chuck as well
             GetChuck().RunCode(string.Format(@"
                 {0} => {1}.next;
                 ",

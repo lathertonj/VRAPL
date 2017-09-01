@@ -244,6 +244,11 @@ public class PointController : MonoBehaviour , IMoveMyself , IControllerInputAcc
         }
     }
 
+    public void TouchpadTransform( Transform t )
+    {
+        // don't care
+    }
+
     public string[] AcceptableControls()
     {
         return myAcceptableControls;

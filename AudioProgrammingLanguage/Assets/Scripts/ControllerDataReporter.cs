@@ -203,6 +203,11 @@ public class ControllerDataReporter : MonoBehaviour , ILanguageObjectListener , 
         // don't care
     }
 
+    public void TouchpadTransform( Transform t )
+    {
+        // don't care
+    }
+
     public float CurrentValue()
     {
         return myCurrent;
