@@ -1,0 +1,144 @@
+fileFormatVersion: 2
+guid: 171b66168c4244a44a998d975942a47a
+timeCreated: 1499370178
+licenseType: Free
+ModelImporter:
+  serializedVersion: 19
+  fileIDToRecycleName:
+    100000: Loft01
+    100002: Loft02
+    100004: Loft03
+    100006: Loft04
+    100008: Loft05
+    100010: Loft06
+    100012: madera ho0
+    100014: madera hor
+    100016: madera ver
+    100018: membrana i
+    100020: membrana s
+    100022: plastico 0
+    100024: plastico b
+    100026: //RootNode
+    400000: Loft01
+    400002: Loft02
+    400004: Loft03
+    400006: Loft04
+    400008: Loft05
+    400010: Loft06
+    400012: madera ho0
+    400014: madera hor
+    400016: madera ver
+    400018: membrana i
+    400020: membrana s
+    400022: plastico 0
+    400024: plastico b
+    400026: //RootNode
+    2300000: Loft01
+    2300002: Loft02
+    2300004: Loft03
+    2300006: Loft04
+    2300008: Loft05
+    2300010: Loft06
+    2300012: madera ho0
+    2300014: madera hor
+    2300016: madera ver
+    2300018: membrana i
+    2300020: membrana s
+    2300022: plastico 0
+    2300024: plastico b
+    3300000: Loft01
+    3300002: Loft02
+    3300004: Loft03
+    3300006: Loft04
+    3300008: Loft05
+    3300010: Loft06
+    3300012: madera ho0
+    3300014: madera hor
+    3300016: madera ver
+    3300018: membrana i
+    3300020: membrana s
+    3300022: plastico 0
+    3300024: plastico b
+    4300000: plastico b
+    4300002: membrana i
+    4300004: madera hor
+    4300006: plastico 0
+    4300008: madera ho0
+    4300010: madera ver
+    4300012: membrana s
+    4300014: Loft01
+    4300016: Loft02
+    4300018: Loft03
+    4300020: Loft04
+    4300022: Loft05
+    4300024: Loft06
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
