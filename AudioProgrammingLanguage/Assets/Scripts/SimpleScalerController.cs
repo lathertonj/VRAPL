@@ -8,9 +8,6 @@ using UnityEngine;
 public class SimpleScalerController : MonoBehaviour , ILanguageObjectListener
 {
 
-    public Collider myMinCollider;
-    public Collider myMaxCollider;
-
     public TextMesh myMinText;
     public TextMesh myMaxText;
     public MeshRenderer[] myParentConnections;
@@ -27,21 +24,21 @@ public class SimpleScalerController : MonoBehaviour , ILanguageObjectListener
     private string myExitEvent;
 
 
-    public bool AcceptableChild( LanguageObject other, Collider mine )
+    public bool AcceptableChild( LanguageObject other )
     {
-        // accept numbers in myMin/MaxCollider
-        if( mine == myMinCollider || mine == myMaxCollider )
-        {
-            if( other.GetComponent<NumberController>() != null )
-            {
-                return true;
-            }
-        }
-        // accept IDataSources in other colliders of mine that aren't myMin/MaxCollider
-        else if( other.GetComponent(typeof(IDataSource)) != null )
+        // accept numbers if either my min or max is empty
+        if( other.GetComponent<NumberController>() != null && 
+            ( myMinNumber == null || myMaxNumber == null ) )
         {
             return true;
         }
+        // accept data sources if my data source is empty
+        else if( other.GetComponent(typeof(IDataSource)) != null &&
+                 myDataSource == null )
+        {
+            return true;
+        }
+
         return false;
     }
 
@@ -89,19 +86,39 @@ public class SimpleScalerController : MonoBehaviour , ILanguageObjectListener
         return InputConnection();
     }
 
-    public void NewChild( LanguageObject child, Collider mine )
+    public void NewChild( LanguageObject child )
     {
         if( child.GetComponent<NumberController>() != null )
         {
-            if( mine == myMinCollider )
+            // try assigning min number
+            if( myMinNumber == null )
             {
                 myMinNumber = child.GetComponent<NumberController>();
-                child.GetComponent<NumberController>().SetColors( myMinText.color, Color.white );
+                // don't set color until have both
+                // child.GetComponent<NumberController>().SetColors( myMinText.color, Color.white );
             }
-            else if( mine == myMaxCollider )
+            // assign max number, then see if they need to switch
+            else if( myMaxNumber == null )
             {
                 myMaxNumber = child.GetComponent<NumberController>();
-                child.GetComponent<NumberController>().SetColors( myMaxText.color, Color.white );
+
+                // use global height to determine which is the min and which is the max
+                // can't use localPosition -- when NewChild is called, it hasn't been set to my child yet.
+                if( myMaxNumber.transform.position.y < myMinNumber.transform.position.y )
+                {
+                    NumberController temp = myMinNumber;
+                    myMinNumber = myMaxNumber;
+                    myMaxNumber = temp;
+
+                }
+
+                // set colors
+                myMinNumber.SetColors( myMinText.color, Color.white );
+                myMaxNumber.SetColors( myMaxText.color, Color.white );
+            }
+            else
+            {
+                Debug.LogError( "SimpleScaler received more than two numbers, something went wrong with AcceptableChild" );
             }
         }
         IDataSource possibleDataSource = (IDataSource) child.GetComponent(typeof(IDataSource));
@@ -125,10 +142,19 @@ public class SimpleScalerController : MonoBehaviour , ILanguageObjectListener
         if( child.GetComponent<NumberController>() == myMinNumber )
         {
             myMinNumber = null;
+            // if there's only one number, it should always be min
+            if( myMaxNumber != null )
+            {
+                myMinNumber = myMaxNumber;
+                myMaxNumber = null;
+                myMinNumber.SetColors( Color.black, Color.white );
+            }
         }
         else if( child.GetComponent<NumberController>() == myMaxNumber )
         {
             myMaxNumber = null;
+            // reset color of myMinNumber
+            myMinNumber.SetColors( Color.black, Color.white );
         }
         IDataSource possibleDataSource = (IDataSource) child.GetComponent(typeof(IDataSource));
         if( possibleDataSource == myDataSource )
@@ -258,7 +284,7 @@ public class SimpleScalerController : MonoBehaviour , ILanguageObjectListener
         return "scaler";
     }
 
-    public void CloneYourselfFrom(LanguageObject original, LanguageObject newParent)
+    public void CloneYourselfFrom( LanguageObject original, LanguageObject newParent )
     {
         // nothing to copy over
     }

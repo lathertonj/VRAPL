@@ -180,7 +180,7 @@ public class LanguageObject : MonoBehaviour {
             ChuckInstance theirChuck = entering.GetChuck();
 
             if( ! ( ( (ILanguageObjectListener) entering.GetComponent( typeof(ILanguageObjectListener) ) )
-                .AcceptableChild( GetComponent<LanguageObject>(), collisionWith ) ) )
+                .AcceptableChild( GetComponent<LanguageObject>() ) ) )
             {
                 // "entering" will not consider me as a child
 
@@ -188,7 +188,7 @@ public class LanguageObject : MonoBehaviour {
                 // TODO: in this region, should "collisionWith" be passed as null? because the relationship
                 // is flipped so I don't know what the actual collision on the parent was?
                 if( ( ( (ILanguageObjectListener) GetComponent( typeof(ILanguageObjectListener) ) )
-                .AcceptableChild( entering, collisionWith ) ) && entering.myParent == null )
+                .AcceptableChild( entering ) ) && entering.myParent == null )
                 {
                     // I am entering's parent
                     entering.myParent = GetComponent<LanguageObject>();
@@ -200,7 +200,7 @@ public class LanguageObject : MonoBehaviour {
                     // Signal to outside entering has parent now
                     ( (ILanguageObjectListener) entering.GetComponent( typeof(ILanguageObjectListener) ) ).NewParent( GetComponent<LanguageObject>() );
                     // Signal to outside-me that I have a new child, which is entering
-                    ( (ILanguageObjectListener) GetComponent( typeof(ILanguageObjectListener) ) ).NewChild( entering.GetComponent<LanguageObject>(), collisionWith );
+                    ( (ILanguageObjectListener) GetComponent( typeof(ILanguageObjectListener) ) ).NewChild( entering.GetComponent<LanguageObject>() );
                     
                     // entering has become my child.
                     if( myChuck != null && theirChuck == null )
@@ -221,7 +221,7 @@ public class LanguageObject : MonoBehaviour {
                 // Signal to outside I have a parent now
                 ( (ILanguageObjectListener) GetComponent( typeof(ILanguageObjectListener) ) ).NewParent( myParent );
                 // Signal to outside that it has a new child, me.
-                ( (ILanguageObjectListener) entering.GetComponent( typeof(ILanguageObjectListener) ) ).NewChild( GetComponent<LanguageObject>(), collisionWith );
+                ( (ILanguageObjectListener) entering.GetComponent( typeof(ILanguageObjectListener) ) ).NewChild( GetComponent<LanguageObject>() );
                 
                 // I have become entering's child
                 if( myChuck == null && theirChuck != null )
@@ -366,8 +366,7 @@ public class LanguageObject : MonoBehaviour {
 
             // notify the objects
             copyListener.NewParent( parent );
-            // TODO: what to do about the collider :(((( how to tell which one it was originally from?
-            parentListener.NewChild( copy, null );
+            parentListener.NewChild( copy );
         }
 
         // clone object-specific settings
@@ -390,10 +389,10 @@ public class LanguageObject : MonoBehaviour {
 
 public interface ILanguageObjectListener
 {
-    bool AcceptableChild( LanguageObject other, Collider collisionWith );
+    bool AcceptableChild( LanguageObject other );
     void NewParent( LanguageObject parent );
     void ParentDisconnected( LanguageObject parent );
-    void NewChild( LanguageObject child, Collider collisionWith );
+    void NewChild( LanguageObject child );
     void ChildDisconnected( LanguageObject child );
     string InputConnection();
     string OutputConnection();

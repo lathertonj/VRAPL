@@ -42,7 +42,7 @@ public class OscController : MonoBehaviour , ILanguageObjectListener, IParamAcce
         }
     }
     
-    public bool AcceptableChild(LanguageObject other, Collider mine)
+    public bool AcceptableChild( LanguageObject other )
     {
         // allow params to be my child
         if( other.GetComponent<ParamController>() != null )
@@ -235,12 +235,12 @@ public class OscController : MonoBehaviour , ILanguageObjectListener, IParamAcce
         chuck.BroadcastEvent( myExitEvent );
     }
 
-    public void NewChild(LanguageObject child, Collider mine)
+    public void NewChild( LanguageObject child )
     {
         // don't care
     }
 
-    public void ChildDisconnected(LanguageObject child)
+    public void ChildDisconnected( LanguageObject child )
     {
         // don't care
     }

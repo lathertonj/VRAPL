@@ -114,7 +114,7 @@ public class ControlWorldObjectController : MonoBehaviour , ILanguageObjectListe
     }
 
     // ILanguageObjectListener
-    public bool AcceptableChild( LanguageObject other, Collider collisionWith )
+    public bool AcceptableChild( LanguageObject other )
     {
         if( other.GetComponent<SoundProducer>() != null ||
             other.GetComponent<NumberProducer>() != null )
@@ -147,7 +147,7 @@ public class ControlWorldObjectController : MonoBehaviour , ILanguageObjectListe
         return InputConnection();
     }
 
-    public void NewChild( LanguageObject child, Collider collisionWith )
+    public void NewChild( LanguageObject child )
     {
         // don't care
     }

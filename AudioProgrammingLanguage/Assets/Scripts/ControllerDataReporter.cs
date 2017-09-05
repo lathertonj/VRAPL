@@ -130,23 +130,23 @@ public class ControllerDataReporter : MonoBehaviour , ILanguageObjectListener , 
         }
     }
 
-    public bool AcceptableChild(LanguageObject other, Collider collisionWith)
+    public bool AcceptableChild( LanguageObject other )
     {
         // no children for me!
         return false;
     }
 
-    public void ChildDisconnected(LanguageObject child)
+    public void ChildDisconnected( LanguageObject child )
     {
         // don't care
     }
 
-    public void GotChuck(ChuckInstance chuck)
+    public void GotChuck( ChuckInstance chuck )
     {
         // don't care
     }
 
-    public void LosingChuck(ChuckInstance chuck)
+    public void LosingChuck( ChuckInstance chuck )
     {
         // don't care
     }
@@ -162,7 +162,7 @@ public class ControllerDataReporter : MonoBehaviour , ILanguageObjectListener , 
         return InputConnection();
     }
 
-    public void NewChild(LanguageObject child, Collider collisionWith)
+    public void NewChild( LanguageObject child )
     {
         // don't care
     }

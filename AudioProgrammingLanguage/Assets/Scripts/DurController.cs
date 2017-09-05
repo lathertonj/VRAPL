@@ -77,7 +77,7 @@ public class DurController : MonoBehaviour , ILanguageObjectListener , IControll
         // don't care
     }
 
-    public bool AcceptableChild(LanguageObject other, Collider collisionWith)
+    public bool AcceptableChild( LanguageObject other )
     {
         if( myNumber == null && other.GetComponent<NumberController>() != null )
         {
@@ -86,7 +86,7 @@ public class DurController : MonoBehaviour , ILanguageObjectListener , IControll
         return false;
     }
 
-    public void NewParent(LanguageObject parent)
+    public void NewParent( LanguageObject parent )
     {
         ILanguageObjectListener lo = (ILanguageObjectListener) parent.GetComponent( typeof( ILanguageObjectListener ) );
         if( lo != null )
@@ -96,7 +96,7 @@ public class DurController : MonoBehaviour , ILanguageObjectListener , IControll
         }
     }
 
-    public void ParentDisconnected(LanguageObject parent)
+    public void ParentDisconnected( LanguageObject parent )
     {
         ILanguageObjectListener lo = (ILanguageObjectListener) parent.GetComponent( typeof( ILanguageObjectListener ) );
         if( lo == myParent )
@@ -106,7 +106,7 @@ public class DurController : MonoBehaviour , ILanguageObjectListener , IControll
         }
     }
 
-    public void NewChild(LanguageObject child, Collider collisionWith)
+    public void NewChild( LanguageObject child )
     {
         NumberController nc = child.GetComponent<NumberController>();
         if( nc != null )

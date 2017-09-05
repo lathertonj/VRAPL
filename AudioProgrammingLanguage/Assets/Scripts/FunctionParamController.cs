@@ -35,7 +35,7 @@ public class FunctionParamController : MonoBehaviour , ILanguageObjectListener
         myShape.material.color = temp;
     }
 
-    public bool AcceptableChild( LanguageObject other, Collider collisionWith )
+    public bool AcceptableChild( LanguageObject other )
     {
         return false;
     }
@@ -62,7 +62,7 @@ public class FunctionParamController : MonoBehaviour , ILanguageObjectListener
         }
     }
 
-    public void NewChild( LanguageObject child, Collider collisionWith )
+    public void NewChild( LanguageObject child )
     {
         // don't care
     }

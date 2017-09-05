@@ -249,7 +249,7 @@ public class ADSRController : MonoBehaviour , ILanguageObjectListener, IParamAcc
         }
     }
 
-    public bool AcceptableChild( LanguageObject other, Collider collisionWith )
+    public bool AcceptableChild( LanguageObject other )
     {
         if( other.GetComponent<ParamController>() != null ||
             other.GetComponent<EventNotifyController>() != null ||
@@ -280,7 +280,7 @@ public class ADSRController : MonoBehaviour , ILanguageObjectListener, IParamAcc
         }
     }
 
-    public void NewChild( LanguageObject child, Collider collisionWith )
+    public void NewChild( LanguageObject child )
     {
         EventNotifyController nc = child.GetComponent<EventNotifyController>();
         if( nc != null )

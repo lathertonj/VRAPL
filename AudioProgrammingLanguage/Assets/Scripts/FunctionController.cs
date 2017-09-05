@@ -257,7 +257,7 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
         }
     }
 
-    public bool AcceptableChild(LanguageObject other, Collider collisionWith)
+    public bool AcceptableChild( LanguageObject other )
     {
         if( other.GetComponent<SoundProducer>() != null || 
             ( other.GetComponent<ParamController>() != null && myParams.Count > 0 ) )
@@ -290,7 +290,7 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
         }
     }
     
-    public void NewChild( LanguageObject child, Collider collisionWith )
+    public void NewChild( LanguageObject child )
     {
         // TODO: If child is Param, it might need to be hooked up to be the child of the specific param
         // or else it will GotChuck too soon and try to connect to things that are not initialized yet...

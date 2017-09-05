@@ -23,7 +23,7 @@ public class DacController : MonoBehaviour , ILanguageObjectListener , IControll
         // at the moment, dacs cannot be the children of anything
     }
 
-    public bool AcceptableChild( LanguageObject other, Collider mine )
+    public bool AcceptableChild( LanguageObject other )
     {
         // only accept things that can make sound
         if( other.GetComponent<SoundProducer>() != null )
@@ -87,7 +87,7 @@ public class DacController : MonoBehaviour , ILanguageObjectListener , IControll
         // don't care
     }
 
-    public void NewChild(LanguageObject child, Collider mine)
+    public void NewChild( LanguageObject child )
     {
         // don't care
     }

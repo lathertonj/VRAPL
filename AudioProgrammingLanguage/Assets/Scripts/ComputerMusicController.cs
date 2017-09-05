@@ -52,7 +52,7 @@ public class ComputerMusicController : MonoBehaviour , ILanguageObjectListener
         return GetComponent<LanguageObject>().GetChuck();
     }
 
-    public bool AcceptableChild( LanguageObject other, Collider mine )
+    public bool AcceptableChild( LanguageObject other )
     {
         // computer music cannot have any children.
         return false;
@@ -105,7 +105,7 @@ public class ComputerMusicController : MonoBehaviour , ILanguageObjectListener
         chuck.BroadcastEvent( myExitEvent );
     }
 
-    public void NewChild( LanguageObject child, Collider mine )
+    public void NewChild( LanguageObject child )
     {
         // don't care
     }

@@ -160,12 +160,12 @@ public class DataReporter : MonoBehaviour , ILanguageObjectListener , IDataSourc
         return Mathf.Clamp01( ( myCurrent - myMin ) / ( myMax - myMin ) );
     }
 
-    public bool AcceptableChild( LanguageObject other, Collider collisionWith )
+    public bool AcceptableChild( LanguageObject other )
     {
         return false;
     }
 
-    public void NewChild( LanguageObject child, Collider collisionWith )
+    public void NewChild( LanguageObject child )
     {
         // don't care
     }

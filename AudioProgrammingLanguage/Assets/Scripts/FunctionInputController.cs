@@ -34,12 +34,12 @@ public class FunctionInputController : MonoBehaviour , ILanguageObjectListener
         myBox.material.color = temp;
     }
 
-    public bool AcceptableChild(LanguageObject other, Collider collisionWith)
+    public bool AcceptableChild( LanguageObject other )
     {
         return false;
     }
 
-    public void NewParent(LanguageObject parent)
+    public void NewParent( LanguageObject parent )
     {
         ILanguageObjectListener newParent = (ILanguageObjectListener) parent.GetComponent(typeof(ILanguageObjectListener));
         if( newParent != null )
@@ -50,7 +50,7 @@ public class FunctionInputController : MonoBehaviour , ILanguageObjectListener
         
     }
 
-    public void ParentDisconnected(LanguageObject parent)
+    public void ParentDisconnected( LanguageObject parent )
     {
         ILanguageObjectListener losingParent = (ILanguageObjectListener) parent.GetComponent(typeof(ILanguageObjectListener));
         if( losingParent == myParent )
@@ -60,12 +60,12 @@ public class FunctionInputController : MonoBehaviour , ILanguageObjectListener
         }
     }
     
-    public void NewChild(LanguageObject child, Collider collisionWith)
+    public void NewChild( LanguageObject child )
     {
         // don't care
     }
 
-    public void ChildDisconnected(LanguageObject child)
+    public void ChildDisconnected( LanguageObject child )
     {
         // don't care
     }

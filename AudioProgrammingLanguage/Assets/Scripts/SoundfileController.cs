@@ -175,7 +175,7 @@ public class SoundfileController : MonoBehaviour , ILanguageObjectListener, IPar
         
     }
 
-    public bool AcceptableChild( LanguageObject other, Collider collisionWith )
+    public bool AcceptableChild( LanguageObject other )
     {
         if( other.GetComponent<ParamController>() != null )
         {
@@ -208,7 +208,7 @@ public class SoundfileController : MonoBehaviour , ILanguageObjectListener, IPar
         }
     }
 
-    public void NewChild( LanguageObject child, Collider collisionWith )
+    public void NewChild( LanguageObject child )
     {
         EventNotifyController nc = child.GetComponent<EventNotifyController>();
         if( nc != null )

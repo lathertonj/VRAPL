@@ -50,14 +50,14 @@ public class NumberController : MonoBehaviour , ILanguageObjectListener , IContr
     }
 
     
-    public bool AcceptableChild(LanguageObject other, Collider mine)
+    public bool AcceptableChild( LanguageObject other )
     {
         return false;
     }
 
-    public void NewChild(LanguageObject child, Collider mine)
+    public void NewChild( LanguageObject child )
     {
-        // ???
+        // don't care
     }
 
     public void NewParent(LanguageObject parent)

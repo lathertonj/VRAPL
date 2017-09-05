@@ -34,7 +34,7 @@ public class FunctionOutputController : MonoBehaviour , ILanguageObjectListener
         myBox.material.color = temp;
     }
 
-    public bool AcceptableChild(LanguageObject other, Collider collisionWith)
+    public bool AcceptableChild( LanguageObject other )
     {
         if( other.GetComponent<SoundProducer>() != null )
         {
@@ -44,17 +44,17 @@ public class FunctionOutputController : MonoBehaviour , ILanguageObjectListener
         return false;
     }
 
-    public void NewParent(LanguageObject parent)
+    public void NewParent( LanguageObject parent )
     {
         // don't care
     }
 
-    public void ParentDisconnected(LanguageObject parent)
+    public void ParentDisconnected( LanguageObject parent )
     {
         // don't care
     }
     
-    public void NewChild(LanguageObject child, Collider collisionWith)
+    public void NewChild( LanguageObject child )
     {
         numChildren++;
         if( numChildren == 1 )
@@ -63,7 +63,7 @@ public class FunctionOutputController : MonoBehaviour , ILanguageObjectListener
         }
     }
 
-    public void ChildDisconnected(LanguageObject child)
+    public void ChildDisconnected( LanguageObject child )
     {
         numChildren--;
         if( numChildren == 0 )

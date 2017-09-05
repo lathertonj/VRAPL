@@ -36,7 +36,7 @@ public class ParamController : MonoBehaviour , ILanguageObjectListener, IControl
         myShape.GetComponent<Renderer>().material.color = tempColor;
     }
 
-    public bool AcceptableChild( LanguageObject other, Collider mine )
+    public bool AcceptableChild( LanguageObject other )
     {
         // todo: accept others?
         if( other.GetComponent<NumberProducer>() != null ||
@@ -74,7 +74,7 @@ public class ParamController : MonoBehaviour , ILanguageObjectListener, IControl
         }
     }
 
-    public void NewChild( LanguageObject child, Collider mine )
+    public void NewChild( LanguageObject child )
     {
         myNumChildren++;
         // if I got my first child after I was already hooked up to a chuck,
