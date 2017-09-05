@@ -175,4 +175,15 @@ public class DurController : MonoBehaviour , ILanguageObjectListener , IControll
     {
         return myText.text;
     }
+
+    public void CloneYourselfFrom( LanguageObject original, LanguageObject newParent )
+    {
+        DurController other = original.GetComponent<DurController>();
+
+        // simulate touchpad presses until state matches
+        while( myCurrentIndex != other.myCurrentIndex )
+        {
+            TouchpadDown();
+        }
+    }
 }

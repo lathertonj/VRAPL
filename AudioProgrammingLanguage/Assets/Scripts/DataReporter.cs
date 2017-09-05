@@ -230,4 +230,14 @@ public class DataReporter : MonoBehaviour , ILanguageObjectListener , IDataSourc
     {
         return myText.text;
     }
+
+    public void CloneYourselfFrom( LanguageObject original, LanguageObject newParent )
+    {
+        DataReporter other = original.GetComponent<DataReporter>();
+        // simulate touchpad presses until we match the mode of the original
+        while( currentModeIndex != other.currentModeIndex )
+        {
+            TouchpadDown();
+        }
+    }
 }

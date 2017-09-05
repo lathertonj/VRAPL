@@ -105,13 +105,18 @@ public class ComputerMusicController : MonoBehaviour , ILanguageObjectListener
         chuck.BroadcastEvent( myExitEvent );
     }
 
-    public void NewChild(LanguageObject child, Collider mine)
+    public void NewChild( LanguageObject child, Collider mine )
     {
         // don't care
     }
 
-    public void ChildDisconnected(LanguageObject child)
+    public void ChildDisconnected( LanguageObject child )
     {
         // don't care
+    }
+
+    public void CloneYourselfFrom( LanguageObject original, LanguageObject newParent )
+    {
+        // no state to copy
     }
 }

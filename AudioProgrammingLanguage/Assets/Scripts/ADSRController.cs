@@ -408,4 +408,9 @@ public class ADSRController : MonoBehaviour , ILanguageObjectListener, IParamAcc
     {
         // don't care
     }
+
+    public void CloneYourselfFrom( LanguageObject original, LanguageObject newParent )
+    {
+        // no settings to be copied over
+    }
 }

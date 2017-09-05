@@ -238,4 +238,9 @@ public class UGenController : MonoBehaviour , ILanguageObjectListener, IParamAcc
     {
         return myText.GetComponent<TextMesh>().text;
     }
+
+    public void CloneYourselfFrom( LanguageObject original, LanguageObject newParent )
+    {
+        // nothing to copy over
+    }
 }

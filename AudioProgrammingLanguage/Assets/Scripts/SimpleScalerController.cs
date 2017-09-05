@@ -258,4 +258,8 @@ public class SimpleScalerController : MonoBehaviour , ILanguageObjectListener
         return "scaler";
     }
 
+    public void CloneYourselfFrom(LanguageObject original, LanguageObject newParent)
+    {
+        // nothing to copy over
+    }
 }

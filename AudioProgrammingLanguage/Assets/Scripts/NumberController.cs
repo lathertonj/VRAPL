@@ -224,4 +224,12 @@ public class NumberController : MonoBehaviour , ILanguageObjectListener , IContr
     {
         return myText.GetComponent<TextMesh>().text;
     }
+
+    public void CloneYourselfFrom( LanguageObject original, LanguageObject newParent )
+    {
+        NumberController other = original.GetComponent< NumberController >();
+
+        myNumber = other.myNumber;
+        UpdateMyNumber();
+    }
 }

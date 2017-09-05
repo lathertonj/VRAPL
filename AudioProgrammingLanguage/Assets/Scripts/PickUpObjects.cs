@@ -84,6 +84,13 @@ public class PickUpObjects : MonoBehaviour {
         {
             // make a copy
             objectInHand = generator.GetCopy();
+
+            // if it's a language object, let it know what prefab it came from
+            LanguageObject lo = objectInHand.GetComponent<LanguageObject>();
+            if( lo != null )
+            {
+                lo.prefabGeneratedFrom = generator.prefab;
+            }
             
             // if we're in a function, parent it to the function
             if( TheRoom.InAFunction() )
@@ -165,22 +172,8 @@ public class PickUpObjects : MonoBehaviour {
         // only allow duplication if colliding language object has no chuck
         if( collidingLanguageObject != null && collidingLanguageObject.GetChuck() == null )
         {
-            // special handling for functions -- call Clone instead of Instantiate
-            FunctionController maybeFunction = collidingLanguageObject.GetComponent< FunctionController >();
-            if( maybeFunction )
-            {
-                grippedObject = maybeFunction.Clone();
-            }
-            else
-            {
-                grippedObject = Instantiate( collidingLanguageObject.gameObject );
-                RendererController renderer = grippedObject.GetComponent< RendererController >();
-                if( renderer != null )
-                {
-                    renderer.Restart();
-                }
-            }
 
+            grippedObject = collidingLanguageObject.GetClone().gameObject;
 
             collidingObject = null;
 

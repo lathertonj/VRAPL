@@ -134,4 +134,10 @@ public class DacController : MonoBehaviour , ILanguageObjectListener , IControll
     {
         return myText.text;
     }
+
+    public void CloneYourselfFrom( LanguageObject original, LanguageObject newParent )
+    {
+        DacController other = original.GetComponent<DacController>();
+        enabled = other.enabled;
+    }
 }

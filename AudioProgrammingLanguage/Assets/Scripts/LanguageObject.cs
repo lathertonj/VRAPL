@@ -11,6 +11,7 @@ public class LanguageObject : MonoBehaviour {
 
     public ArrayList myChildren;
     public LanguageObject myParent = null;
+    public GameObject prefabGeneratedFrom;
 
     private Dictionary<LanguageObject, int> currentCollisionCounts;
     private Dictionary<LanguageObject, int> enteringDebounceObjects;
@@ -33,6 +34,7 @@ public class LanguageObject : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+
 	}
 
     void EnsureTriggerBehavior( Transform self )
@@ -338,6 +340,51 @@ public class LanguageObject : MonoBehaviour {
         }
         ((ILanguageObjectListener) GetComponent(typeof(ILanguageObjectListener))).LosingChuck( chuck );
     }
+
+    public LanguageObject GetClone()
+    {
+        return GetCloneHelper( null, null );
+    }
+
+    private LanguageObject GetCloneHelper( LanguageObject parent, ILanguageObjectListener parentListener )
+    {
+        // copy myself
+        GameObject copyGameObject = Instantiate( prefabGeneratedFrom, transform.position, transform.rotation );
+        LanguageObject copy = copyGameObject.GetComponent<LanguageObject>();
+        copy.prefabGeneratedFrom = prefabGeneratedFrom;
+        ILanguageObjectListener copyListener = (ILanguageObjectListener) copy.GetComponent( typeof(ILanguageObjectListener) );
+        
+        // make it a child of the parent
+        if( parent != null )
+        {
+            // LanguageObject storage
+            copy.myParent = parent;
+            parent.myChildren.Add( copy );
+
+            // Unity transform tree
+            copy.transform.parent = parent.transform;
+
+            // notify the objects
+            copyListener.NewParent( parent );
+            // TODO: what to do about the collider :(((( how to tell which one it was originally from?
+            parentListener.NewChild( copy, null );
+        }
+
+        // clone object-specific settings
+        copyListener.CloneYourselfFrom( this, parent );
+        
+        // clone other settings such as size from MovableController and what else?
+        copy.GetComponent< MovableController >().CloneFrom( this.GetComponent< MovableController >() );
+
+        // clone each of my children and for each clone, make it be a child of copy
+        foreach( LanguageObject child in myChildren )
+        {
+            LanguageObject clonedChild = child.GetCloneHelper( copy, copyListener );
+        }
+
+        return copy;
+    }
+
 }
 
 
@@ -353,6 +400,7 @@ public interface ILanguageObjectListener
     string VisibleName();
     void GotChuck( ChuckInstance chuck );
     void LosingChuck( ChuckInstance chuck );
+    void CloneYourselfFrom( LanguageObject original, LanguageObject newParent );
 }
 
 public interface IDataSource

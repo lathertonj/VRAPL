@@ -169,11 +169,6 @@ public class OscController : MonoBehaviour , ILanguageObjectListener, IParamAcce
         SwitchColors();
     }
 
-    bool IsDac( LanguageObject other )
-    {
-        return ( other.GetComponent<ChuckInstance>() != null );
-    }
-
     public ChuckInstance GetChuck()
     {
         return GetComponent<LanguageObject>().GetChuck();
@@ -253,5 +248,10 @@ public class OscController : MonoBehaviour , ILanguageObjectListener, IParamAcce
     public string VisibleName()
     {
         return myText.GetComponent<TextMesh>().text;
+    }
+
+    public void CloneYourselfFrom(LanguageObject original, LanguageObject newParent)
+    {
+        // nothing to copy over
     }
 }

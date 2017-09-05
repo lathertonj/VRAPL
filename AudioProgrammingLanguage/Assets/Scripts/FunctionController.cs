@@ -84,6 +84,7 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
         me.myChildren.Remove( output );
     }
 
+    /*
     public GameObject Clone()
     {
         if( myFunctionId == -1 )
@@ -102,6 +103,26 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
 
         return copy;
     }
+    */
+
+    public void CloneYourselfFrom( LanguageObject original, LanguageObject newParent )
+    {
+        FunctionController other = original.GetComponent< FunctionController >();
+
+        if( other.myFunctionId == -1 )
+        {
+            other.myFunctionId = currentFunctionId;
+            currentFunctionId++;
+            allFunctions[ other.myFunctionId ] = new List< FunctionController >();
+            allFunctions[ myFunctionId ].Add( other );
+        }
+        this.myFunctionId = other.myFunctionId;
+        allFunctions[ myFunctionId ].Add( this );
+
+        // call UpdateClones... on other; all functions with the same ID as other
+        // will get their insides replicated
+        other.UpdateClonesInnerBlocks();
+    }
 
     private void SwitchColors()
     {
@@ -116,16 +137,6 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
     public void EnterFunction()
     {
         insideFunction = true; 
-
-        // make myself bigger
-        // transform.localScale = 10 * Vector3.one;
-        // PROBLEM: if you make the camera smaller, then things don't work to see things very up close... >_<
-        // make camera smaller instead
-        // TheRoom.theRoom.localScale = 0.1f * Vector3.one;
-
-        // raise myself up into the air 
-        // lastPosition = transform.position;
-        // transform.position = lastPosition + 50 * Vector3.up;
 
         enterDirection = transform.position - TheRoom.theEye.position;
         
@@ -154,14 +165,6 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
     {
         insideFunction = false;
 
-        // make myself smaller
-        // transform.localScale = Vector3.one;
-        // make camera bigger instead
-        // TheRoom.theRoom.localScale = Vector3.one;
-
-        // lower myself back down
-        // transform.position = lastPosition;
-
         // make world smaller
         WorldSize.changeWorldSize( 0.1f );
 
@@ -174,13 +177,6 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
         // turn off my light
         myLight.enabled = false;
         
-        // reposition person back to ground
-        /*Vector3 movementAdjustment = TheRoom.theEye.localPosition - lastHeadPosition;
-        movementAdjustment.y = 0;
-        // come back 75% of the way so that head doesn't immediately enter again
-        TheRoom.theRoom.position = lastRoomPosition - ( 0.75f * movementAdjustment );
-        */
-
         // position person back in front of the function
         Vector3 newPosition = transform.position - 3 * enterDirection - TheRoom.theEye.localPosition;
         newPosition.y = lastRoomPosition.y;
@@ -215,7 +211,17 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
     {
         UnhookOutput();
         Destroy( myBlocks );
-        myBlocks = Instantiate( newInnerBlocks, myBlocksHolder );
+        myBlocks = new GameObject();
+        myBlocks.transform.parent = myBlocksHolder;
+        // myBlocks = Instantiate( newInnerBlocks, myBlocksHolder );
+        foreach( Transform childBlock in newInnerBlocks.transform )
+        {
+            LanguageObject clonedChild = childBlock.GetComponent< LanguageObject >().GetClone();
+            // put it in the same position but inside me
+            clonedChild.transform.parent = myBlocks.transform;
+            clonedChild.transform.localPosition = childBlock.transform.localPosition;
+            clonedChild.transform.localRotation = childBlock.transform.localRotation;
+        }
         FindOutput();
         HookUpOutput();
     }

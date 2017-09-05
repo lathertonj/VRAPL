@@ -194,4 +194,15 @@ public class ParamController : MonoBehaviour , ILanguageObjectListener, IControl
     {
         return myText.GetComponent<TextMesh>().text;
     }
+
+    public void CloneYourselfFrom( LanguageObject original, LanguageObject newParent )
+    {
+        ParamController other = original.GetComponent< ParamController >();
+
+        // simulate touchpad presses until our state matches
+        while( myParamIndex != other.myParamIndex )
+        {
+            TouchpadDown();
+        }
+    }
 }

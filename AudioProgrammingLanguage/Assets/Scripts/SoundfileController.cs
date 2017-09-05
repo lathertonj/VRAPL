@@ -32,7 +32,7 @@ public class SoundfileController : MonoBehaviour , ILanguageObjectListener, IPar
     private Dictionary<EventNotifyController, bool> myNotifiers;
 
     // Use this for initialization
-    void Start () {
+    void Awake () {
 		myAcceptableParams = new string[] { "rate", "gain" };
         numParamConnections = new Dictionary<string, int>();
         for( int i = 0; i < myAcceptableParams.Length; i++ )
@@ -327,5 +327,17 @@ public class SoundfileController : MonoBehaviour , ILanguageObjectListener, IPar
     public string VisibleName()
     {
         return myText.text;
+    }
+
+    public void CloneYourselfFrom( LanguageObject original, LanguageObject newParent )
+    {
+        SoundfileController other = original.GetComponent< SoundfileController >();
+
+        // simulate button presses until the state matches
+        lastAxis.y = 1;
+        while( myFilenameIndex != other.myFilenameIndex )
+        {
+            TouchpadDown();
+        }
     }
 }

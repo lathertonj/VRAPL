@@ -238,4 +238,16 @@ public class ControllerDataReporter : MonoBehaviour , ILanguageObjectListener , 
     {
         return myText.text;
     }
+
+    public void CloneYourselfFrom( LanguageObject original, LanguageObject newParent )
+    {
+        ControllerDataReporter other = original.GetComponent<ControllerDataReporter>();
+        currentModeIndex = other.currentModeIndex;
+        currentMode = other.currentMode;
+        myText.text = currentMode;
+        UpdateMinAndMax();
+
+        myController = other.myController;
+        myControllerPosition = other.myControllerPosition;
+    }
 }

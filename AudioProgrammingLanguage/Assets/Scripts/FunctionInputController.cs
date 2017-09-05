@@ -113,4 +113,8 @@ public class FunctionInputController : MonoBehaviour , ILanguageObjectListener
         return myText.text;
     }
 
+    public void CloneYourselfFrom( LanguageObject original, LanguageObject newParent )
+    {
+        // nothing to copy over
+    }
 }

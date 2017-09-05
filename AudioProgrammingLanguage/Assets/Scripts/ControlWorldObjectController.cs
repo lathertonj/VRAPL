@@ -6,9 +6,6 @@ using UnityEngine;
 [RequireComponent(typeof(LanguageObject))]
 public class ControlWorldObjectController : MonoBehaviour , ILanguageObjectListener , IDataSource , IControllerInputAcceptor
 {
-    // TODO: don't just "control height" -- make an interface for the WorldObject sayings what things can be controlled by it.
-    // or have it just be something present on worldobjects, editable with public variables
-
     public MeshRenderer myShape;
     public TextMesh myText;
 
@@ -247,5 +244,15 @@ public class ControlWorldObjectController : MonoBehaviour , ILanguageObjectListe
     public string VisibleName()
     {
         return myText.text;
+    }
+
+    public void CloneYourselfFrom( LanguageObject original, LanguageObject newParent )
+    {
+        ControlWorldObjectController other = original.GetComponent<ControlWorldObjectController>();
+        // simulate touchpad presses until we are on the correct control
+        while( myControl != other.myControl )
+        {
+            TouchpadDown();
+        }
     }
 }

@@ -19,7 +19,7 @@ public class MovableController : MonoBehaviour {
     private Transform[] myInitialChildren;
     private Vector3[] myInitialChildrenBaseScales;
 
-    private void Start()
+    private void Awake()
     {
         myInitialChildren = new Transform[transform.childCount];
         myInitialChildrenBaseScales = new Vector3[transform.childCount];
@@ -47,6 +47,12 @@ public class MovableController : MonoBehaviour {
     public float GetScale()
     {
         return myScale;
+    }
+
+    public void CloneFrom( MovableController other )
+    {
+        myScale = other.myScale;
+        myMinScale = other.myMinScale;
     }
 
 }

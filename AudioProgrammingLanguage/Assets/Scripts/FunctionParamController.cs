@@ -112,4 +112,9 @@ public class FunctionParamController : MonoBehaviour , ILanguageObjectListener
     {
         return "input param";
     }
+
+    public void CloneYourselfFrom(LanguageObject original, LanguageObject newParent)
+    {
+        // nothing to copy over
+    }
 }
