@@ -22,7 +22,8 @@ public class DurController : MonoBehaviour , ILanguageObjectListener , IControll
     private ChuckInstance myChuck = null;
 
 	// Use this for initialization
-	void Start () {
+	void Awake() 
+    {
 		myDurTypes = new string[] { "ms", "second", "sample" };
         myCurrentIndex = 0;
         myCurrentDurType = myDurTypes[myCurrentIndex];
@@ -30,7 +31,8 @@ public class DurController : MonoBehaviour , ILanguageObjectListener , IControll
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	void Update() 
+    {
 		
 	}
 
