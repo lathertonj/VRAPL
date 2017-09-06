@@ -24,7 +24,8 @@ public class ControllerDataReporter : MonoBehaviour , ILanguageObjectListener , 
     public Transform myControllerPosition = null;
 
     // Use this for initialization
-    void Start () {
+    void Awake()
+    {
 		modes = new string[] { "position: x", "position: y", "position: z",
                                "movement: x", "movement: y", "movement: z", "movement: any",
                                "rotation: x", "rotation: y", "rotation: z", "rotation: any" };
@@ -40,7 +41,8 @@ public class ControllerDataReporter : MonoBehaviour , ILanguageObjectListener , 
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	void Update() 
+    {
         if( myController != null && myControllerPosition != null )
         {
             // if( myController.angularVelocity.magnitude > 2.0f )
@@ -242,10 +244,12 @@ public class ControllerDataReporter : MonoBehaviour , ILanguageObjectListener , 
     public void CloneYourselfFrom( LanguageObject original, LanguageObject newParent )
     {
         ControllerDataReporter other = original.GetComponent<ControllerDataReporter>();
-        currentModeIndex = other.currentModeIndex;
-        currentMode = other.currentMode;
-        myText.text = currentMode;
-        UpdateMinAndMax();
+
+        // simulate touchpad presses until it matches
+        while( currentModeIndex != other.currentModeIndex )
+        {
+            TouchpadDown();
+        }
 
         myController = other.myController;
         myControllerPosition = other.myControllerPosition;
