@@ -114,7 +114,7 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
             other.myFunctionId = currentFunctionId;
             currentFunctionId++;
             allFunctions[ other.myFunctionId ] = new List< FunctionController >();
-            allFunctions[ myFunctionId ].Add( other );
+            allFunctions[ other.myFunctionId ].Add( other );
         }
         this.myFunctionId = other.myFunctionId;
         allFunctions[ myFunctionId ].Add( this );
@@ -213,17 +213,23 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
         Destroy( myBlocks );
         myBlocks = new GameObject();
         myBlocks.transform.parent = myBlocksHolder;
+        // center and correct size it
+        myBlocks.transform.localScale = Vector3.one;
+        myBlocks.transform.localEulerAngles = Vector3.zero;
+        myBlocks.transform.localPosition = Vector3.zero;
         // myBlocks = Instantiate( newInnerBlocks, myBlocksHolder );
         foreach( Transform childBlock in newInnerBlocks.transform )
         {
             LanguageObject clonedChild = childBlock.GetComponent< LanguageObject >().GetClone();
-            // put it in the same position but inside me
+            // put it in the same position and same size but inside me
             clonedChild.transform.parent = myBlocks.transform;
             clonedChild.transform.localPosition = childBlock.transform.localPosition;
             clonedChild.transform.localRotation = childBlock.transform.localRotation;
+            clonedChild.transform.localScale = childBlock.transform.localScale;
         }
         FindOutput();
         HookUpOutput();
+        FindInput();
     }
 
     private void FindOutput()
@@ -234,6 +240,21 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
             if( maybeOutput != null )
             {
                 myOutput = maybeOutput;
+                myOutput.myFunction = this;
+                return;
+            }
+        }
+    }
+
+    private void FindInput()
+    {
+        foreach( Transform child in myBlocks.transform )
+        {
+            FunctionInputController maybeInput = child.GetComponent< FunctionInputController >();
+            if( maybeInput != null )
+            {
+                myInput = maybeInput;
+                myInput.myFunction = this;
                 return;
             }
         }
@@ -304,6 +325,12 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
     public void GotChuck( ChuckInstance chuck )
     {
         myChuck = chuck;
+        Debug.Log("I am " + gameObject.name);
+        Debug.Log("my children who will be getting chuck are:");
+        foreach( LanguageObject child in GetComponent<LanguageObject>().myChildren)
+        {
+            Debug.Log(child.gameObject.name );
+        }
     }
 
     public void LosingChuck( ChuckInstance chuck )

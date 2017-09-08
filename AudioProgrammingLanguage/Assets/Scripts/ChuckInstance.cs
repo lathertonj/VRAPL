@@ -123,7 +123,6 @@ public class ChuckInstance : MonoBehaviour {
 
 	public bool RunCode( string code )
 	{
-        Debug.Log( code );
 		return Chuck.Manager.RunCode( myChuckId, code );
 	}
 
