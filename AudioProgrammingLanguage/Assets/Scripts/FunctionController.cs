@@ -70,9 +70,14 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
         // hook up output to me as a child.
         LanguageObject output = myOutput.GetComponent<LanguageObject>();
         LanguageObject me = GetComponent<LanguageObject>();
-        output.myParent = me;
-        me.myChildren.Add( output );
-        myOutput.myFunction = this;
+
+        // but only if it hasn't already been hooked up 
+        if( output.myParent == null )
+        {
+            output.myParent = me;
+            me.myChildren.Add( output );
+            myOutput.myFunction = this;
+        }
     }
 
     private void UnhookOutput()
@@ -314,12 +319,10 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
 
     public void NewParent( LanguageObject parent )
     {
-        Debug.Log("getting a parent... hopefully!");
         ILanguageObjectListener newParent = (ILanguageObjectListener) parent.GetComponent( typeof( ILanguageObjectListener ) );
         if( newParent != null )
         {
             myParent = newParent;
-            Debug.Log(gameObject.name + " is setting my parent to " + parent.gameObject.name );
             SwitchColors();
         }
     }
@@ -348,12 +351,6 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
     public void GotChuck( ChuckInstance chuck )
     {
         myChuck = chuck;
-        Debug.Log("I am " + gameObject.name);
-        Debug.Log("my children who will be getting chuck are:");
-        foreach( LanguageObject child in GetComponent<LanguageObject>().myChildren)
-        {
-            Debug.Log(child.gameObject.name );
-        }
     }
 
     public void LosingChuck( ChuckInstance chuck )

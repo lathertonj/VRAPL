@@ -192,8 +192,6 @@ public class LanguageObject : MonoBehaviour {
                     entering.myParent == null && 
                     ValidParentRelationship( entering, this ) )
                 {
-                    Debug.Log( "Collision: making " + entering.gameObject.name + " a child of " + this.gameObject.name );
-
                     // I am entering's parent
                     entering.myParent = GetComponent<LanguageObject>();
                     // entering is my child
@@ -217,8 +215,6 @@ public class LanguageObject : MonoBehaviour {
             // Entering will consider me as a child, but is this a valid relationship?
             else if( ValidParentRelationship( this, entering ) )
             {
-                Debug.Log( "Collision: making " + gameObject.name + " a child of " + entering.gameObject.name );
-
                 // I have a parent
                 myParent = entering;
                 // And my parent has me
@@ -385,8 +381,6 @@ public class LanguageObject : MonoBehaviour {
         // make it a child of the parent
         if( parent != null )
         {
-            Debug.Log("Clone: making " + copy.gameObject.name + " a child of " + parent.gameObject.name );
-
             // LanguageObject storage
             copy.myParent = parent;
             parent.myChildren.Add( copy );
