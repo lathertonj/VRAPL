@@ -254,14 +254,31 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
 
     private void FindInput()
     {
-        foreach( Transform child in myBlocks.transform )
+        Queue<Transform> transformsToCheck = new Queue<Transform>();
+        transformsToCheck.Enqueue( myBlocks.transform );
+        while( transformsToCheck.Count > 0 )
         {
-            FunctionInputController maybeInput = child.GetComponent< FunctionInputController >();
+            Transform t = transformsToCheck.Dequeue();
+
+            FunctionInputController maybeInput = t.GetComponent< FunctionInputController >();
+            // if we found any input, it's ours!
             if( maybeInput != null )
             {
                 myInput = maybeInput;
                 myInput.myFunction = this;
+                transformsToCheck.Clear();
                 return;
+            }
+
+            // don't look in other functions
+            FunctionController maybeFunction = t.GetComponent< FunctionController >();
+            if( maybeFunction == null )
+            {
+                // but do check everything else
+                foreach( Transform child in t )
+                {
+                    transformsToCheck.Enqueue( child );
+                }
             }
         }
     }
