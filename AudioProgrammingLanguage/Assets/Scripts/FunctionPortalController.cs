@@ -24,6 +24,7 @@ public class FunctionPortalController : MonoBehaviour {
     private void OnTriggerEnter( Collider other )
     {
         if( myDebounce <= 0 && 
+            RendererController.renderersCurrentlyRendering &&
             other.gameObject == TheRoom.theEye.gameObject && 
             RendererController.renderersCurrentlyRendering )
         {

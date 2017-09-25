@@ -413,6 +413,10 @@ public class LanguageObject : MonoBehaviour {
             LanguageObject clonedChild = child.GetCloneHelper( copy, copyListener, Vector3.one );
         }
 
+        // reset renderer
+        RendererController copyRenderer = copy.GetComponent<RendererController>();
+        copyRenderer.Restart();
+
         return copy;
     }
 

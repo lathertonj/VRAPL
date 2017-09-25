@@ -26,7 +26,7 @@ public class RendererController : MonoBehaviour {
         myRenderersIsText = new List<bool>();
         myRenderersIsGradient = new List<bool>();
         FindAllRenderers( transform );
-        RendererController.TurnOn();
+        DeportalizeRenderers();
     }
 
     private void FindAllRenderers( Transform self )
