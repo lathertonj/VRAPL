@@ -154,7 +154,13 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
         // reposition person to be here too
         lastRoomPosition = TheRoom.theRoom.position;
         lastHeadPosition = TheRoom.theEye.localPosition;
-        TheRoom.theRoom.position = transform.position - (1.5f * Vector3.up * GetComponent<MovableController>().myScale );
+        // position person (not room) to be at the center of the function
+        Vector3 roomEyeDifference = TheRoom.theRoom.position - TheRoom.theEye.position;
+        roomEyeDifference.y = 0;
+        // lower person so they are standing on the function floor
+        Vector3 offsetToFunctionFloor = 1.5f * Vector3.up * GetComponent<MovableController>().myScale;
+        // combine offsets and set
+        TheRoom.theRoom.position = transform.position - offsetToFunctionFloor + roomEyeDifference;
         TheRoom.EnterFunction( this );
 
         // turn on my light
