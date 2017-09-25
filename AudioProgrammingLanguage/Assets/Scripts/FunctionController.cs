@@ -89,27 +89,6 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
         me.myChildren.Remove( output );
     }
 
-    /*
-    public GameObject Clone()
-    {
-        if( myFunctionId == -1 )
-        {
-            myFunctionId = currentFunctionId;
-            currentFunctionId++;
-            allFunctions[ myFunctionId ] = new List< FunctionController >();
-            allFunctions[ myFunctionId ].Add( this );
-        }
-
-        GameObject copy = Instantiate( gameObject );
-        copy.GetComponent< RendererController >().Restart();
-        FunctionController copiedFunction = copy.GetComponent< FunctionController >();
-        copiedFunction.myFunctionId = myFunctionId;
-        allFunctions[ myFunctionId ].Add( copiedFunction );
-
-        return copy;
-    }
-    */
-
     public void CloneYourselfFrom( LanguageObject original, LanguageObject newParent )
     {
         FunctionController other = original.GetComponent< FunctionController >();
@@ -213,7 +192,23 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
             // only replace ones other than myself
             if( fc != this )
             {
+                // turn off chuck?
+                LanguageObject functionLanguageObject = fc.GetComponent<LanguageObject>();
+                ChuckInstance chuckOfFc = functionLanguageObject.GetChuck();
+                bool shouldResetChuck = chuckOfFc != null;
+                if( shouldResetChuck )
+                {
+                    functionLanguageObject.TellChildrenLosingChuck( chuckOfFc );
+                }
+
+                // replace inner blocks
                 fc.ReplaceInnerBlocks( myBlocks );
+                
+                // turn chuck back on?
+                if( shouldResetChuck )
+                {
+                    functionLanguageObject.TellChildrenHaveNewChuck( chuckOfFc );
+                }
             }
         }
     }
