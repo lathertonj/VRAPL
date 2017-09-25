@@ -365,10 +365,16 @@ public class LanguageObject : MonoBehaviour {
 
     public LanguageObject GetClone()
     {
-        return GetCloneHelper( null, null );
+        return GetClone( Vector3.one );
     }
 
-    private LanguageObject GetCloneHelper( LanguageObject parent, ILanguageObjectListener parentListener )
+    public LanguageObject GetClone( Vector3 localScale )
+    {
+        return GetCloneHelper( null, null, localScale );
+    }
+
+    private LanguageObject GetCloneHelper( LanguageObject parent, ILanguageObjectListener parentListener, 
+        Vector3 localScale )
     {
         // copy myself
         GameObject copyGameObject = Instantiate( prefabGeneratedFrom, transform.position, transform.rotation );
@@ -399,6 +405,9 @@ public class LanguageObject : MonoBehaviour {
         // clone other settings such as size from MovableController and what else?
         copy.GetComponent< MovableController >().CloneFrom( this.GetComponent< MovableController >() );
 
+        // copy size before children are copied: so that they have the correct localposition
+        copy.transform.localScale = localScale;
+
         // clone each of my children and for each clone, make it be a child of copy
         foreach( LanguageObject child in myChildren )
         {
@@ -407,7 +416,7 @@ public class LanguageObject : MonoBehaviour {
             {
                 continue;
             }
-            LanguageObject clonedChild = child.GetCloneHelper( copy, copyListener );
+            LanguageObject clonedChild = child.GetCloneHelper( copy, copyListener, Vector3.one );
         }
 
         return copy;

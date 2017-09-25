@@ -226,12 +226,12 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
         // myBlocks = Instantiate( newInnerBlocks, myBlocksHolder );
         foreach( Transform childBlock in newInnerBlocks.transform )
         {
-            LanguageObject clonedChild = childBlock.GetComponent< LanguageObject >().GetClone();
-            // put it in the same position and same size but inside me
+            LanguageObject clonedChild = 
+                childBlock.GetComponent< LanguageObject >().GetClone( childBlock.transform.localScale );
+            // put it in the same position but inside me
             clonedChild.transform.parent = myBlocks.transform;
             clonedChild.transform.localPosition = childBlock.transform.localPosition;
             clonedChild.transform.localRotation = childBlock.transform.localRotation;
-            clonedChild.transform.localScale = childBlock.transform.localScale;
         }
         FindOutput();
         HookUpOutput();
