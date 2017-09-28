@@ -16,11 +16,14 @@ public class FunctionParamController : MonoBehaviour , ILanguageObjectListener
     private string myStorageClass;
     private string myExitEvent;
 
-    private FunctionController myFunction;
+    public FunctionController myFunction;
 
     // Use this for initialization
-    void Start () {
-		myFunction = TheRoom.GetCurrentFunction().GetComponent<FunctionController>();
+    void Awake () {
+        if( myFunction == null )
+        {
+		    myFunction = TheRoom.GetCurrentFunction().GetComponent<FunctionController>();
+        }
 	}
 	
 	// Update is called once per frame

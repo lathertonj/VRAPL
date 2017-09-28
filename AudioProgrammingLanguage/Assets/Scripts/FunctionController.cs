@@ -215,6 +215,9 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
 
     private void ReplaceInnerBlocks( GameObject newInnerBlocks )
     {
+        // Tell TheRoom that the user is "inside" me so that function param blocks can find me
+        TheRoom.EnterFunction( this );
+
         UnhookOutput();
         Destroy( myBlocks );
         myBlocks = new GameObject();
@@ -236,6 +239,9 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
         FindOutput();
         HookUpOutput();
         FindInput();
+
+        // Tell TheRoom that the user is no longer "inside" me -- done copying
+        TheRoom.ExitFunction( this );
     }
 
     private void FindOutput()
