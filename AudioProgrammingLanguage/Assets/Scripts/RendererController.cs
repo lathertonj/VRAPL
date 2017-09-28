@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 public class RendererController : MonoBehaviour {
@@ -31,12 +32,6 @@ public class RendererController : MonoBehaviour {
 
     private void FindAllRenderers( Transform self )
     {
-        /*if( self.GetComponent<FunctionPortalController>() != null )
-        {
-            // don't do things to the function portal renderer
-            return;
-        }*/
-
         Renderer r = self.GetComponent<Renderer>();
         if( r != null )
         {
@@ -49,7 +44,12 @@ public class RendererController : MonoBehaviour {
 
         foreach( Transform child in self )
         {
-            FindAllRenderers( child );
+            // only search through objects that are not rendererControllers themself
+            RendererController maybeRendererController = child.GetComponent<RendererController>();
+            if( maybeRendererController == null )
+            {
+                FindAllRenderers( child );
+            }
         }
     }
 
@@ -71,7 +71,37 @@ public class RendererController : MonoBehaviour {
         beingRendered = false;
     }
 
+    public void PortalizeRenderers()
+    {
+        TryDangerousPortalChange( DangerousPortalizeRenderers );
+    }
+
     public void DeportalizeRenderers()
+    {
+        TryDangerousPortalChange( DangerousDeportalizeRenderers );
+    }
+
+    private void TryDangerousPortalChange( Action PortalAction )
+    {
+        try
+        {
+            PortalAction();
+        }
+        catch( System.NullReferenceException e )
+        {
+            // something went wrong. what was it? who knows?
+            myAutoRenderers = new List<Renderer>();
+            myAutoShaders = new List<Shader>();
+            myRenderersIsText = new List<bool>();
+            myRenderersIsGradient = new List<bool>();
+            FindAllRenderers( transform );
+
+            // try again
+            PortalAction();
+        }
+    }
+
+    private void DangerousDeportalizeRenderers()
     {
         for( int i = 0; i < myAutoRenderers.Count; i++ )
         {
@@ -118,7 +148,7 @@ public class RendererController : MonoBehaviour {
         beingRendered = true;
     }
 
-    public void PortalizeRenderers()
+    private void DangerousPortalizeRenderers()
     {
         for( int i = 0; i < myAutoRenderers.Count; i++ )
         {
