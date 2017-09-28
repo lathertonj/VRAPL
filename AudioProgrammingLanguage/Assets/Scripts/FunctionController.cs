@@ -498,4 +498,12 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
         }
     }
 
+    private void OnDestroy()
+    {
+        if( myFunctionId != -1 )
+        {
+            allFunctions[myFunctionId].Remove( this );
+        }
+    }
+
 }
