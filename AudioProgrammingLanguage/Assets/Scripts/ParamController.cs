@@ -156,6 +156,21 @@ public class ParamController : MonoBehaviour , ILanguageObjectListener, IControl
         return string.Format( "{0}'s {1}", myParent.VisibleName(), myParam );
     }
 
+    public void ResetAcceptableParams()
+    {
+        // only disconnect and reconnect if I was already connected!
+        bool shouldDisconnectAndReconnect = amConnected;
+        if( shouldDisconnectAndReconnect ) myParamAcceptor.DisconnectParam( myParam, OutputConnection() );
+
+        // try to get the same index, but not if it's no longer a valid index
+        myParamIndex %= myParamAcceptor.AcceptableParams().Length;
+        myParam = myParamAcceptor.AcceptableParams()[myParamIndex];
+        myText.GetComponent<TextMesh>().text = myParam;
+
+        // if I was already connected before, I need to connect this new param
+        if( shouldDisconnectAndReconnect ) myParamAcceptor.ConnectParam( myParam, OutputConnection() );
+    }
+
     public void TouchpadDown()
     {
         if( myParamAcceptor != null )

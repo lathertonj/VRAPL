@@ -172,6 +172,8 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
         newPosition.y = lastRoomPosition.y;
         TheRoom.theRoom.position = newPosition;
 
+        // tell my params that they might need to change what is valid
+        RectifyOuterParams();
 
         TheRoom.ExitFunction( this );
 
@@ -219,6 +221,7 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
         TheRoom.EnterFunction( this );
 
         UnhookOutput();
+        ClearParams();
         Destroy( myBlocks );
         myBlocks = new GameObject();
         myBlocks.transform.parent = myBlocksHolder;
@@ -239,6 +242,7 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
         FindOutput();
         HookUpOutput();
         FindInput();
+        RectifyOuterParams();
 
         // Tell TheRoom that the user is no longer "inside" me -- done copying
         TheRoom.ExitFunction( this );
@@ -285,6 +289,18 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
                 {
                     transformsToCheck.Enqueue( child );
                 }
+            }
+        }
+    }
+
+    public void RectifyOuterParams()
+    {
+        foreach( LanguageObject child in GetComponent<LanguageObject>().myChildren )
+        {
+            ParamController maybeParam = child.GetComponent<ParamController>();
+            if( maybeParam != null )
+            {
+                maybeParam.ResetAcceptableParams();
             }
         }
     }
@@ -410,6 +426,14 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
                 myParamRefs.RemoveAt( i );
                 return;
             }
+        }
+    }
+
+    public void ClearParams()
+    {
+        for( int i = myParamRefs.Count - 1; i >= 0; i-- )
+        {
+            RemoveParam( myParamRefs[i] );
         }
     }
 
