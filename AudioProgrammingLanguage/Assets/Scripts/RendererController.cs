@@ -10,7 +10,8 @@ public class RendererController : MonoBehaviour {
     private List<Renderer> myAutoRenderers;
     private List<Shader> myAutoShaders;
     private List<bool> myRenderersIsText;
-    private List<bool> myRenderersIsGradient; 
+    private List<bool> myRenderersIsGradient;
+    private List<bool> myRenderersIsOutline;
 
     public bool beingRendered = true;
 
@@ -26,6 +27,7 @@ public class RendererController : MonoBehaviour {
         myAutoShaders = new List<Shader>();
         myRenderersIsText = new List<bool>();
         myRenderersIsGradient = new List<bool>();
+        myRenderersIsOutline = new List<bool>();
         FindAllRenderers( transform );
         DeportalizeRenderers();
     }
@@ -40,6 +42,7 @@ public class RendererController : MonoBehaviour {
             TextMesh maybeText = r.GetComponent<TextMesh>();
             myRenderersIsText.Add( maybeText != null );
             myRenderersIsGradient.Add( r.material.HasProperty( "_TopColor" ) );
+            myRenderersIsOutline.Add( r.material.HasProperty( "_OutlineColor" ) );
         }
 
         foreach( Transform child in self )
@@ -94,6 +97,7 @@ public class RendererController : MonoBehaviour {
             myAutoShaders = new List<Shader>();
             myRenderersIsText = new List<bool>();
             myRenderersIsGradient = new List<bool>();
+            myRenderersIsOutline = new List<bool>();
             FindAllRenderers( transform );
 
             // try again
@@ -126,6 +130,12 @@ public class RendererController : MonoBehaviour {
             {
                 myAutoRenderers[i].material.shader = HiddenShader.antiHiddenGradientShader;
             }
+            else if( myRenderersIsOutline[i] )
+            {
+                // don't change shader
+                // DO change whether active (default to no)
+                myAutoRenderers[i].enabled = false;
+            }
             else
             {
                 myAutoRenderers[i].material.shader = HiddenShader.antiHiddenShader;
@@ -136,7 +146,7 @@ public class RendererController : MonoBehaviour {
             {
                 myAutoRenderers[i].material.renderQueue = 5000;
             }
-            else
+            else if( !myRenderersIsOutline[i] )
             {
                 myAutoRenderers[i].material.renderQueue = 4000;
             }
@@ -161,6 +171,12 @@ public class RendererController : MonoBehaviour {
             {
                 myAutoRenderers[i].material.shader = HiddenShader.hiddenGradientShader;
             }
+            else if( myRenderersIsOutline[i] )
+            {
+                // don't change shader
+                // DO change whether active
+                myAutoRenderers[i].enabled = false;
+            }
             else
             {
                 myAutoRenderers[i].material.shader = HiddenShader.hiddenShader;
@@ -171,7 +187,7 @@ public class RendererController : MonoBehaviour {
             {
                 myAutoRenderers[i].material.renderQueue = 5000;
             }
-            else
+            else if( !myRenderersIsOutline[i] )
             {
                 myAutoRenderers[i].material.renderQueue = 4000;
             }
@@ -182,6 +198,20 @@ public class RendererController : MonoBehaviour {
         // yes it is technically being rendered but this variable is used
         // to prevent it from being interacted with
         beingRendered = false;
+    }
+
+    public void SetOutlineEnabled( bool enabled )
+    {
+        for( int i = 0; i < myAutoRenderers.Count; i++ )
+        {
+            if( myRenderersIsOutline[i] )
+            {
+                // don't change shader
+                // DO change whether active
+                myAutoRenderers[i].enabled = enabled;
+            }
+        }
+        
     }
 
     public static void TurnOn()

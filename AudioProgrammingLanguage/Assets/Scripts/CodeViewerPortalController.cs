@@ -30,6 +30,8 @@ public class CodeViewerPortalController : MonoBehaviour {
             {
                 RendererController.TurnOn();
             }
+            // also turn off all palettes when turn on or off the language
+            GeneratorInteractionController.TurnOffAllPalettes();
 
             // apply fades. instantly to the portal color, then fade back to clear
             // purple color: DIVIDE RGB BY 2; make it .2 bluer as well

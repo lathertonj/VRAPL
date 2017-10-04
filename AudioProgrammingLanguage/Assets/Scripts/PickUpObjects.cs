@@ -52,6 +52,7 @@ public class PickUpObjects : MonoBehaviour {
             {
                 collidingObject = objectToTest.gameObject;
                 collidedFrom = col;
+                StartOutliningObject();
                 // this fires way too often and so is annoying. would need some sort of variable length debounce
                 // Controller.TriggerHapticPulse( durationMicroSec: 500 );
                 return;
@@ -73,6 +74,7 @@ public class PickUpObjects : MonoBehaviour {
 
     public void OnTriggerExit(Collider other)
     {
+        StopOutliningObject();
         collidingObject = null;
         collidedFrom = null;
     }
@@ -103,6 +105,7 @@ public class PickUpObjects : MonoBehaviour {
             objectInHand = collidingObject;
         }
         
+        StopOutliningObject();
         collidingObject = null;
 
         // store myself on those who want it
@@ -156,7 +159,8 @@ public class PickUpObjects : MonoBehaviour {
         if( collidingWorldObject != null )
         {
             grippedObject = collidingWorldObject.MakeLanguageObjectDataReporter();
-        
+            
+            StopOutliningObject();
             collidingObject = null;
 
             JoinObjectToController( grippedObject );
@@ -175,6 +179,7 @@ public class PickUpObjects : MonoBehaviour {
 
             grippedObject = collidingLanguageObject.GetClone().gameObject;
 
+            StopOutliningObject();
             collidingObject = null;
 
             JoinObjectToController( grippedObject );
@@ -288,6 +293,31 @@ public class PickUpObjects : MonoBehaviour {
     private void StopScalingObject()
     {
         objectBeingScaled = null;
+    }
+
+    private void StartOutliningObject()
+    {
+        // only show outline if renderers currently rendering i.e. language being shown
+        if( collidingObject != null && RendererController.renderersCurrentlyRendering )
+        {
+            RendererController maybeRenderer = collidingObject.GetComponent<RendererController>();
+            if( maybeRenderer != null )
+            {
+                maybeRenderer.SetOutlineEnabled( true );
+            }
+        }
+    }
+
+    private void StopOutliningObject()
+    {
+        if( collidingObject != null )
+        {
+            RendererController maybeRenderer = collidingObject.GetComponent<RendererController>();
+            if( maybeRenderer != null )
+            {
+                maybeRenderer.SetOutlineEnabled( false );
+            }
+        }
     }
 
     public void Update()

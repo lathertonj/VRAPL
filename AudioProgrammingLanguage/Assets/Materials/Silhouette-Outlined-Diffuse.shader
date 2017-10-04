@@ -1,6 +1,6 @@
 ﻿// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
 
-Shader "Custom/Silhouette-Outlined-Diffuse" {
+Shader "Custom/Outline/Silhouette-Outlined-Diffuse" {
         Properties {
             _Color ("Main Color", Color) = (.5,.5,.5,1)
             _OutlineColor ("Outline Color", Color) = (0,0,0,1)
@@ -47,7 +47,7 @@ Shader "Custom/Silhouette-Outlined-Diffuse" {
             Tags { "LightMode" = "Always" }
             Cull Off
             ZWrite Off
-            ZTest Always
+            //ZTest Always
             ColorMask RGB // alpha not used
 
                           // you can choose what kind of blending mode you want for the outline
@@ -95,7 +95,7 @@ Shader "Custom/Silhouette-Outlined-Diffuse" {
             Tags { "LightMode" = "Always" }
             Cull Front
             ZWrite Off
-            ZTest Always
+            //ZTest Always
             ColorMask RGB
 
             // you can choose what kind of blending mode you want for the outline
