@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class GeneratorInteractionController : MonoBehaviour {
 
-    public PaletteGeneratorController myPalette;
+    public GameObject myPalette;
     public GameObject myTrash;
     public GameObject myPortalGenerator;
     private bool myPaletteEnabled = false;
@@ -58,12 +58,12 @@ public class GeneratorInteractionController : MonoBehaviour {
         // only enable palette and trash if renderers are rendering
         if( RendererController.renderersCurrentlyRendering )
         {
-            myPalette.gameObject.SetActive( myPaletteEnabled );
+            myPalette.SetActive( myPaletteEnabled );
             myTrash.SetActive( myPaletteEnabled );
         }
         else
         {
-            myPalette.gameObject.SetActive( false );
+            myPalette.SetActive( false );
             myTrash.SetActive( false );
         }
     }
