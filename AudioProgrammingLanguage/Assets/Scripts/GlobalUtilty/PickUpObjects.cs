@@ -91,7 +91,7 @@ public class PickUpObjects : MonoBehaviour {
             LanguageObject lo = objectInHand.GetComponent<LanguageObject>();
             if( lo != null )
             {
-                lo.prefabGeneratedFrom = generator.prefab;
+                lo.prefabGeneratedFrom = PrefabStorage.GetName( generator.prefab );
             }
             
             // if we're in a function, parent it to the function

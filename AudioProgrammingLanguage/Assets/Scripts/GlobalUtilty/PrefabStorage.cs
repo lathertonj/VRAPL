@@ -9,12 +9,23 @@ public class PrefabStorage : MonoBehaviour {
 
     public NamedPrefab[] allPrefabs;
 
+    private Dictionary<string, GameObject> myPrefabs;
+    private Dictionary<GameObject, string> myNames;
+
 	// Use this for initialization
 	void Awake () {
         // singleton
 		if( thePrefabs == null )
         {
             thePrefabs = this;
+            myPrefabs = new Dictionary<string, GameObject>();
+            myNames = new Dictionary<GameObject, string>();
+
+            for( int i = 0; i < allPrefabs.Length; i++ )
+            {
+                myPrefabs[allPrefabs[i].name] = allPrefabs[i].prefab;
+                myNames[allPrefabs[i].prefab] = allPrefabs[i].name;
+            }
         }
         else if( thePrefabs != this )
         {
@@ -22,7 +33,15 @@ public class PrefabStorage : MonoBehaviour {
         }
 	}
 	
-	
+	public static GameObject GetPrefab( string name )
+    {
+        return thePrefabs.myPrefabs[name];
+    }
+
+    public static string GetName( GameObject prefab )
+    {
+        return thePrefabs.myNames[prefab];
+    }
 }
 
 [Serializable]

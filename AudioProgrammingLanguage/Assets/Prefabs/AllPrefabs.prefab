@@ -1,0 +1,110 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &100100000
+Prefab:
+  m_ObjectHideFlags: 1
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications: []
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 0}
+  m_RootGameObject: {fileID: 1897675061315462}
+  m_IsPrefabParent: 1
+--- !u!1 &1897675061315462
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4349945798578386}
+  - component: {fileID: 114254701588436294}
+  m_Layer: 0
+  m_Name: AllPrefabs
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4349945798578386
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1897675061315462}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &114254701588436294
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1897675061315462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06245824035a5a044bd03e113193f9f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  allPrefabs:
+  - name: language adsr
+    prefab: {fileID: 1309348334550654, guid: f4d6e7f27b056ef4fa73422e507f6c0b, type: 2}
+  - name: language computer music
+    prefab: {fileID: 1343279061548312, guid: cc9906a7346e39945817008e480c358d, type: 2}
+  - name: language control height
+    prefab: {fileID: 1333602922827146, guid: 3038c46ad9114384c98c1a0b23b7c0db, type: 2}
+  - name: language controller position
+    prefab: {fileID: 1344197016296346, guid: f39c2ee963cc40d4886afda8d1f16dc2, type: 2}
+  - name: language dac
+    prefab: {fileID: 1740051879864970, guid: 4794962161e3a38499cd9cb0f6d7a59d, type: 2}
+  - name: language dur
+    prefab: {fileID: 1632531771983664, guid: 4cba52efc12290146847a8bc69b837f0, type: 2}
+  - name: language function
+    prefab: {fileID: 1143813304141748, guid: d59fd353d09f19d4db8f0579845bee30, type: 2}
+  - name: language hpf
+    prefab: {fileID: 1711349004036726, guid: cfb44a2e08bfc924fbc6626f741b06f3, type: 2}
+  - name: language function input
+    prefab: {fileID: 1382745005631692, guid: a46a872ed96efff4e990e4bf1600fa26, type: 2}
+  - name: language function input param
+    prefab: {fileID: 1558441570059900, guid: bd1eac83c3462ab419c01297c788705e, type: 2}
+  - name: language lpf
+    prefab: {fileID: 1308755585747102, guid: f5b19fd5561d70243a4f020eb1d31890, type: 2}
+  - name: language num
+    prefab: {fileID: 1632531771983664, guid: 139f8005804361e4f870b45b12010e71, type: 2}
+  - name: language function output
+    prefab: {fileID: 1885784124361458, guid: df3907416f0d7424fa3f02b2dd8d5050, type: 2}
+  - name: language param
+    prefab: {fileID: 1021945590049472, guid: e146c145732d013428184d032500241c, type: 2}
+  - name: language sawosc
+    prefab: {fileID: 1233520203539334, guid: b17bfdf3fc4632c44bdabb3b122f26f8, type: 2}
+  - name: language scaler
+    prefab: {fileID: 1525922598911798, guid: 7e38571d5ccbfc94487756b8f9289786, type: 2}
+  - name: language sinosc
+    prefab: {fileID: 1169635681209762, guid: 125c5a8e5aacf174fabcd3e3a86d3fc3, type: 2}
+  - name: language soundfile
+    prefab: {fileID: 1951366394248306, guid: 71d759fd5a63f974c9d8e08c639aa8af, type: 2}
+  - name: language sqrosc
+    prefab: {fileID: 1156624309262918, guid: b3d546c1e39bea04bba130b2d859df3d, type: 2}
+  - name: language triosc
+    prefab: {fileID: 1568250544199326, guid: 5da7334f301807445873bebe4e752cd4, type: 2}
+  - name: points spinner
+    prefab: {fileID: 1830482874307362, guid: f30d3ffaacb56c44abb39fd47f6d2a4e, type: 2}
+  - name: points point
+    prefab: {fileID: 1105251420994180, guid: a2064f8428fe7274f9efe6d7556ec700, type: 2}
+  - name: world object baton
+    prefab: {fileID: 1870998436928196, guid: 4f0dfba4f324ca5469b195573f287da0, type: 2}
+  - name: world object baton holder
+    prefab: {fileID: 1222365106435790, guid: 0a593d9816c0694439a9cf988a2397bc, type: 2}
+  - name: world object bongo
+    prefab: {fileID: 1318131989850578, guid: f5b10fe9dc2c7474d97d98dc5df7a6a8, type: 2}
+  - name: misc function portal
+    prefab: {fileID: 1664223419045534, guid: 0156949fac1f591448605ecea48ca846, type: 2}
+  - name: misc portal
+    prefab: {fileID: 1566376819605130, guid: 5aa695bd6d71e3b40b4c9a32723a9107, type: 2}
+  - name: misc trash
+    prefab: {fileID: 1143157109221374, guid: 7da19083752fea646b466d3762b1fcfb, type: 2}

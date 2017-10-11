@@ -16,7 +16,7 @@ public class LanguageObject : MonoBehaviour {
 
     public ArrayList myChildren;
     public LanguageObject myParent = null;
-    public GameObject prefabGeneratedFrom;
+    public string prefabGeneratedFrom;
 
     private Dictionary<LanguageObject, int> currentCollisionCounts;
     private Dictionary<LanguageObject, int> enteringDebounceObjects;
@@ -378,7 +378,7 @@ public class LanguageObject : MonoBehaviour {
         Vector3 localScale )
     {
         // copy myself
-        GameObject copyGameObject = Instantiate( prefabGeneratedFrom, transform.position, transform.rotation );
+        GameObject copyGameObject = Instantiate( PrefabStorage.GetPrefab( prefabGeneratedFrom ), transform.position, transform.rotation );
         LanguageObject copy = copyGameObject.GetComponent<LanguageObject>();
         copy.prefabGeneratedFrom = prefabGeneratedFrom;
         ILanguageObjectListener copyListener = (ILanguageObjectListener) copy.GetComponent( typeof(ILanguageObjectListener) );
@@ -425,6 +425,16 @@ public class LanguageObject : MonoBehaviour {
         return copy;
     }
 
+
+    public void SerializeObject()
+    {
+
+    }
+
+    public void DeserializeObject()
+    {
+
+    }
 }
 
 
