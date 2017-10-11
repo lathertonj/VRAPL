@@ -1,7 +1,7 @@
-﻿using System.Collections;
+﻿using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 using System;
-using UnityEngine;
 
 
 [RequireComponent(typeof(MovableController))]
@@ -14,7 +14,7 @@ public class LanguageObject : MonoBehaviour {
     public static int[] noIntParams = new int[0];
     public static float[] noFloatParams = new float[0];
 
-    public ArrayList myChildren;
+    public List<LanguageObject> myChildren;
     public LanguageObject myParent = null;
     public string prefabGeneratedFrom;
 
@@ -29,7 +29,7 @@ public class LanguageObject : MonoBehaviour {
     {
         // recursively make sure all my colliders are trigger colliders and that my rigidbodies do not use gravity, etc
         EnsureTriggerBehavior( transform );
-		myChildren = new ArrayList();
+		myChildren = new List<LanguageObject>();
         currentCollisionCounts = new Dictionary<LanguageObject, int>();
         enteringDebounceObjects = new Dictionary<LanguageObject, int>();
         exitingDebounceObjects = new Dictionary<LanguageObject, int>();
@@ -425,15 +425,96 @@ public class LanguageObject : MonoBehaviour {
         return copy;
     }
 
-
-    public void SerializeObject()
+    public LanguageObjectSerialStorage SerializeObject()
     {
+        LanguageObjectSerialStorage myStorage = new LanguageObjectSerialStorage();
+        ILanguageObjectListener myObject = (ILanguageObjectListener) GetComponent( typeof(ILanguageObjectListener) );
+        myStorage.version = 0;
 
+        // object specific params
+        myStorage.stringParams = myObject.SerializeStringParams( myStorage.version );
+        myStorage.intParams = myObject.SerializeIntParams( myStorage.version );
+        myStorage.floatParams = myObject.SerializeFloatParams( myStorage.version );
+
+        // languageobject params
+        myStorage.prefabName = prefabGeneratedFrom;
+        myStorage.transformPosition = Serializer.SerializeVector3( transform.localPosition );
+        myStorage.transformRotation = Serializer.SerializeQuaternion( transform.localRotation );
+        myStorage.transformScale = Serializer.SerializeVector3( transform.localScale );
+        MovableController mc = GetComponent<MovableController>();
+        myStorage.languageSize = mc.GetScale();
+        myStorage.minLanguageSize = mc.myMinScale;
+
+        // children
+        myStorage.children = new LanguageObjectSerialStorage[myChildren.Count];
+        for( int i = 0; i < myStorage.children.Length; i++ )
+        {
+            myStorage.children[i] = myChildren[i].SerializeObject();
+        }
+
+        return myStorage;
     }
 
-    public void DeserializeObject()
+    private static LanguageObject InstantiateLanguageObject( LanguageObjectSerialStorage storage, Transform parent )
     {
+        GameObject copyGameObject = Instantiate( PrefabStorage.GetPrefab( storage.prefabName ), 
+            Serializer.DeserializeVector3( storage.transformPosition ),
+            Serializer.DeserializeQuaternion( storage.transformRotation ),
+            parent );
+        return copyGameObject.GetComponent<LanguageObject>();
+    }
 
+    // NOTE: closely linked to GetClone() above!
+    public static LanguageObject DeserializeObject( LanguageObjectSerialStorage storage )
+    {
+        // copy myself
+        LanguageObject me = InstantiateLanguageObject( storage, null );
+        // deserialize
+        me.DeserializeObjectHelper( storage, null, null );
+        // tada!!
+        return me;
+    }
+
+    private void DeserializeObjectHelper( LanguageObjectSerialStorage storage,
+        LanguageObject parent, ILanguageObjectListener parentListener )
+    {
+        prefabGeneratedFrom = storage.prefabName;
+        ILanguageObjectListener meListener = (ILanguageObjectListener) GetComponent( typeof(ILanguageObjectListener) );
+        
+        // make it a child of the parent
+        if( parent != null )
+        {
+            // LanguageObject storage
+            myParent = parent;
+            parent.myChildren.Add( this );
+
+            // notify the objects
+            meListener.NewParent( parent );
+            parentListener.NewChild( this );
+        }
+
+        // clone object-specific settings
+        meListener.SerializeLoad( storage.version, storage.stringParams, storage.intParams, storage.floatParams );
+        
+        // clone other settings such as size from MovableController and what else?
+        MovableController mc = GetComponent<MovableController>();
+        mc.myMinScale = storage.minLanguageSize;
+        mc.SetScale( storage.languageSize );
+
+        // copy size before children are copied: so that they have the correct localposition
+        transform.localScale = Serializer.DeserializeVector3( storage.transformScale );
+
+        // deserialize all children
+        foreach( LanguageObjectSerialStorage childStorage in storage.children )
+        {
+            // TODO: special handling for FunctionOutputController???
+            LanguageObject newChild = InstantiateLanguageObject( childStorage, this.transform );
+            newChild.DeserializeObjectHelper( childStorage, this, meListener );
+        }
+
+        // reset renderer (necessary?)
+        RendererController renderer = GetComponent<RendererController>();
+        renderer.Restart();
     }
 }
 
@@ -460,21 +541,22 @@ public interface ILanguageObjectListener
 }
 
 [Serializable]
-public class LanguageObjectSerialStorage
+public struct LanguageObjectSerialStorage
 {
     // populated by the custom class / interface
-    int version;
-    string[] stringParams;
-    int[] intParams;
-    float[] floatParams;
+    public string[] stringParams;
+    public int[] intParams;
+    public float[] floatParams;
 
     // populated by LanguageObject
-    string prefabName;
-    LanguageObjectSerialStorage[] children;
-    Vector3 transformScale;
-    Vector3 transformPosition;
-    Vector3 transformRotation;
-    float languageSize;
+    public int version;
+    public string prefabName;
+    public LanguageObjectSerialStorage[] children;
+    public float[] transformScale;
+    public float[] transformPosition;
+    public float[] transformRotation;
+    public float languageSize;
+    public float minLanguageSize;
 }
 
 public interface IDataSource

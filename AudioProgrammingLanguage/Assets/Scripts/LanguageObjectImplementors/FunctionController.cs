@@ -492,7 +492,7 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
     // helper functions called by my Input block
     public void TellUgenChildrenGotChuck( ChuckInstance chuck )
     {
-        ArrayList myChildren = GetComponent< LanguageObject >().myChildren;
+        List<LanguageObject> myChildren = GetComponent< LanguageObject >().myChildren;
         foreach( LanguageObject child in myChildren )
         {
             // don't need to notify my Output block or any of my param blocks
@@ -508,7 +508,7 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
 
     public void TellUgenChildrenLosingChuck( ChuckInstance chuck )
     {
-        ArrayList myChildren = GetComponent< LanguageObject >().myChildren;
+        List<LanguageObject> myChildren = GetComponent< LanguageObject >().myChildren;
         foreach( LanguageObject child in myChildren )
         {
             // don't need to notify my Output block or any of my param blocks
