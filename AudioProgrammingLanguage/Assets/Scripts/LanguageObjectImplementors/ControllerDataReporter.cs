@@ -254,4 +254,35 @@ public class ControllerDataReporter : MonoBehaviour , ILanguageObjectListener , 
         myController = other.myController;
         myControllerPosition = other.myControllerPosition;
     }
+
+    // Serialization for storage on disk
+    public string[] SerializeStringParams( int version )
+    {
+        // store modes?
+        return modes;
+    }
+
+    public int[] SerializeIntParams( int version )
+    {
+        // store my current index
+        return new int[] { currentModeIndex };
+    }
+
+    public float[] SerializeFloatParams( int version )
+    {
+        // no float params
+        return LanguageObject.noFloatParams;
+    }
+
+    public void SerializeLoad( int version, string[] stringParams, int[] intParams, float[] floatParams )
+    {
+        // get modes
+        modes = stringParams;
+
+        // simulate touchpad presses until it matches
+        while( currentModeIndex != intParams[0] )
+        {
+            TouchpadDown();
+        }
+    }
 }

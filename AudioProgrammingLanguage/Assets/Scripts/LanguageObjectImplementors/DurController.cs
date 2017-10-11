@@ -188,4 +188,32 @@ public class DurController : MonoBehaviour , ILanguageObjectListener , IControll
             TouchpadDown();
         }
     }
+
+    // Serialization for storage on disk
+    public string[] SerializeStringParams( int version )
+    {
+        // no string params
+        return LanguageObject.noStringParams;
+    }
+
+    public int[] SerializeIntParams( int version )
+    {
+        // current index
+        return new int[] { myCurrentIndex };
+    }
+
+    public float[] SerializeFloatParams( int version )
+    {
+        // no float params
+        return LanguageObject.noFloatParams;
+    }
+
+    public void SerializeLoad( int version, string[] stringParams, int[] intParams, float[] floatParams )
+    {
+        // simulate touchpad presses until state matches
+        while( myCurrentIndex != intParams[0] )
+        {
+            TouchpadDown();
+        }
+    }
 }

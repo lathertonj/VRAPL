@@ -340,4 +340,39 @@ public class SoundfileController : MonoBehaviour , ILanguageObjectListener, IPar
             TouchpadDown();
         }
     }
+
+    // Serialization for storage on disk
+    public string[] SerializeStringParams( int version )
+    {
+        // store soundfile name
+        return new string[] { myFilename };
+    }
+
+    public int[] SerializeIntParams( int version )
+    {
+        // no int params
+        return LanguageObject.noIntParams;
+    }
+
+    public float[] SerializeFloatParams( int version )
+    {
+        // no float params
+        return LanguageObject.noFloatParams;
+    }
+
+    public void SerializeLoad( int version, string[] stringParams, int[] intParams, float[] floatParams )
+    {
+        // try to find the file
+        // simulate button presses until the state matches
+        lastAxis.y = 1;
+        while( myFilename != stringParams[0] )
+        {
+            TouchpadDown();
+            if( myFilenameIndex == 0 )
+            {
+                // wrapped around again; give up
+                return;
+            }
+        }
+    }
 }

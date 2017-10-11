@@ -232,4 +232,30 @@ public class NumberController : MonoBehaviour , ILanguageObjectListener , IContr
         myNumber = other.myNumber;
         UpdateMyNumber();
     }
+
+    // Serialization for storage on disk
+    public string[] SerializeStringParams( int version )
+    {
+        // no string params
+        return LanguageObject.noStringParams;
+    }
+
+    public int[] SerializeIntParams( int version )
+    {
+        // no int params
+        return LanguageObject.noIntParams;
+    }
+
+    public float[] SerializeFloatParams( int version )
+    {
+        // store my number
+        return new float[] { myNumber };
+    }
+
+    public void SerializeLoad( int version, string[] stringParams, int[] intParams, float[] floatParams )
+    {
+        // load my number
+        myNumber = floatParams[0];
+        UpdateMyNumber();
+    }
 }

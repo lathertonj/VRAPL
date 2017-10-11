@@ -9,6 +9,11 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class LanguageObject : MonoBehaviour {
 
+    // empty arrays for serialization
+    public static string[] noStringParams = new string[0];
+    public static int[] noIntParams = new int[0];
+    public static float[] noFloatParams = new float[0];
+
     public ArrayList myChildren;
     public LanguageObject myParent = null;
     public GameObject prefabGeneratedFrom;
@@ -436,6 +441,30 @@ public interface ILanguageObjectListener
     void GotChuck( ChuckInstance chuck );
     void LosingChuck( ChuckInstance chuck );
     void CloneYourselfFrom( LanguageObject original, LanguageObject newParent );
+
+    // serialization for storage on disk
+    string[] SerializeStringParams( int version );
+    int[] SerializeIntParams( int version );
+    float[] SerializeFloatParams( int version );
+    void SerializeLoad( int version, string[] stringParams, int[] intParams, float[] floatParams );
+}
+
+[Serializable]
+public class LanguageObjectSerialStorage
+{
+    // populated by the custom class / interface
+    int version;
+    string[] stringParams;
+    int[] intParams;
+    float[] floatParams;
+
+    // populated by LanguageObject
+    string prefabName;
+    LanguageObjectSerialStorage[] children;
+    Vector3 transformScale;
+    Vector3 transformPosition;
+    Vector3 transformRotation;
+    float languageSize;
 }
 
 public interface IDataSource

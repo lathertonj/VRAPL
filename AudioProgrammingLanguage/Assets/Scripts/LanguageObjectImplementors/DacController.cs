@@ -138,6 +138,39 @@ public class DacController : MonoBehaviour , ILanguageObjectListener , IControll
     public void CloneYourselfFrom( LanguageObject original, LanguageObject newParent )
     {
         DacController other = original.GetComponent<DacController>();
-        enabled = other.enabled;
+        if( enabled != other.enabled )
+        {
+            // simulate touchpad down
+            TouchpadDown();
+        }
+    }
+
+    // Serialization for storage on disk
+    public string[] SerializeStringParams( int version )
+    {
+        // no string params
+        return LanguageObject.noStringParams;
+    }
+
+    public int[] SerializeIntParams( int version )
+    {
+        // whether enabled
+        return new int [] { enabled? 1 : 0 };
+    }
+
+    public float[] SerializeFloatParams( int version )
+    {
+        // no float params
+        return LanguageObject.noFloatParams;
+    }
+
+    public void SerializeLoad( int version, string[] stringParams, int[] intParams, float[] floatParams )
+    {
+        // whether enabled
+        if( enabled != ( intParams[0] != 0 ) )
+        {
+            // simulate touchpad down
+            TouchpadDown();  
+        }
     }
 }

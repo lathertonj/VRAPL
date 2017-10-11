@@ -413,4 +413,28 @@ public class ADSRController : MonoBehaviour , ILanguageObjectListener, IParamAcc
     {
         // no settings to be copied over
     }
+
+    // Serialization for storage on disk
+    public string[] SerializeStringParams( int version )
+    {
+        // no string params
+        return LanguageObject.noStringParams;
+    }
+
+    public int[] SerializeIntParams( int version )
+    {
+        // no int params
+        return LanguageObject.noIntParams;
+    }
+
+    public float[] SerializeFloatParams( int version )
+    {
+        // no float params
+        return LanguageObject.noFloatParams;
+    }
+
+    public void SerializeLoad( int version, string[] stringParams, int[] intParams, float[] floatParams )
+    {
+        // nothing to load from params
+    }
 }

@@ -255,4 +255,32 @@ public class ControlWorldObjectController : MonoBehaviour , ILanguageObjectListe
             TouchpadDown();
         }
     }
+
+    // Serialization for storage on disk
+    public string[] SerializeStringParams( int version )
+    {
+        // no string params
+        return LanguageObject.noStringParams;
+    }
+
+    public int[] SerializeIntParams( int version )
+    {
+        // store control index
+        return new int[] { myControl };
+    }
+
+    public float[] SerializeFloatParams( int version )
+    {
+        // no float params
+        return LanguageObject.noFloatParams;
+    }
+
+    public void SerializeLoad( int version, string[] stringParams, int[] intParams, float[] floatParams )
+    {
+        // load control by simulating touchpad down
+        while( myControl != intParams[0] )
+        {
+            TouchpadDown();
+        }
+    }
 }
