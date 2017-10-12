@@ -457,10 +457,10 @@ public class LanguageObject : MonoBehaviour {
 
     private static LanguageObject InstantiateLanguageObject( LanguageObjectSerialStorage storage, Transform parent )
     {
-        GameObject copyGameObject = Instantiate( PrefabStorage.GetPrefab( storage.prefabName ), 
-            Serializer.DeserializeVector3( storage.transformPosition ),
-            Serializer.DeserializeQuaternion( storage.transformRotation ),
-            parent );
+        GameObject copyGameObject = Instantiate( PrefabStorage.GetPrefab( storage.prefabName ), parent );
+        // set localPosition and localRotation (Instantiate only allows setting global position and global rotation)
+        copyGameObject.transform.localPosition = Serializer.DeserializeVector3( storage.transformPosition );
+        copyGameObject.transform.localRotation = Serializer.DeserializeQuaternion( storage.transformRotation );
         return copyGameObject.GetComponent<LanguageObject>();
     }
 
