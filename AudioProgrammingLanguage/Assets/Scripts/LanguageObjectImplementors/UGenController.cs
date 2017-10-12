@@ -15,6 +15,7 @@ public class UGenController : MonoBehaviour , ILanguageObjectListener, IParamAcc
     public float myDefaultParamMinimumValue;
     public string shaderColorName = "";
 
+    private ChuckInstance myChuck;
     private string myStorageClass;
     private string myExitEvent;
     private LanguageObject myParent = null;
@@ -23,7 +24,7 @@ public class UGenController : MonoBehaviour , ILanguageObjectListener, IParamAcc
 
     private float myDefaultParam;
 
-    void Start () {
+    void Awake() {
         numParamConnections = new Dictionary<string, int>();
         for( int i = 0; i < myParams.Length; i++ ) { 
             numParamConnections[myParams[i]] = 0; 
@@ -37,9 +38,9 @@ public class UGenController : MonoBehaviour , ILanguageObjectListener, IParamAcc
         myDefaultParam = Mathf.Max( myParamDefaultValues[0] / ( 1 + 2 * ( GetComponent<MovableController>().myScale - 1 ) ), myDefaultParamMinimumValue );
 
         // if we have a chuck, set the default param
-        if( GetChuck() != null )
+        if( myChuck != null )
         {
-            GetChuck().RunCode(string.Format(
+            myChuck.RunCode(string.Format(
                 "{0:0.000} => {1}.myDefault{2}.next;", myDefaultParam, myStorageClass, myParams[0]
             ));
         }
@@ -84,14 +85,14 @@ public class UGenController : MonoBehaviour , ILanguageObjectListener, IParamAcc
         }
         numParamConnections[param]++;
 
-        GetChuck().RunCode( string.Format(
+        myChuck.RunCode( string.Format(
             "{0} => {1}.my{2};", var, myStorageClass, param
         ));
 
         if( numParamConnections[param] == 1 )
         {
             // first connection: disable my default
-            GetChuck().RunCode(string.Format(
+            myChuck.RunCode(string.Format(
                 "0 => {0}.myDefault{1}.gain;", myStorageClass, param
             ));
         }
@@ -105,14 +106,14 @@ public class UGenController : MonoBehaviour , ILanguageObjectListener, IParamAcc
         }
         numParamConnections[param]--;
 
-        GetChuck().RunCode(string.Format(
+        myChuck.RunCode(string.Format(
             "{0} =< {1}.my{2};", var, myStorageClass, param    
         ));
         
         if( numParamConnections[param] == 0 )
         {
             // no more connections: enable my default
-            GetChuck().RunCode(string.Format(
+            myChuck.RunCode(string.Format(
                 "1 => {0}.myDefault{1}.gain;", myStorageClass, param
             ));
         }
@@ -155,13 +156,9 @@ public class UGenController : MonoBehaviour , ILanguageObjectListener, IParamAcc
         return ( other.GetComponent<ChuckInstance>() != null );
     }
 
-    public ChuckInstance GetChuck()
-    {
-        return GetComponent<LanguageObject>().GetChuck();
-    }
-
     public void GotChuck(ChuckInstance chuck)
     {
+        myChuck = chuck;
         myStorageClass = chuck.GetUniqueVariableName();
         myExitEvent = chuck.GetUniqueVariableName();
         string connectMyOscTo = myParentListener.InputConnection();
@@ -222,6 +219,7 @@ public class UGenController : MonoBehaviour , ILanguageObjectListener, IParamAcc
     public void LosingChuck(ChuckInstance chuck)
     {
         chuck.BroadcastEvent( myExitEvent );
+        myChuck = null;
     }
 
     public void NewChild( LanguageObject child )

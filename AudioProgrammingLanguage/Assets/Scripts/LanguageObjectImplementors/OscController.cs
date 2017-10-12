@@ -10,6 +10,7 @@ public class OscController : MonoBehaviour , ILanguageObjectListener, IParamAcce
     public GameObject myShape;
     public string myOscillatorType;
 
+    private ChuckInstance myChuck;
     private string myStorageClass;
     private string myExitEvent;
     private LanguageObject myParent = null;
@@ -34,9 +35,9 @@ public class OscController : MonoBehaviour , ILanguageObjectListener, IParamAcce
         myDefaultFrequency = Mathf.Max( 440.0f / ( 1 + 2 * ( GetComponent<MovableController>().myScale - 1 ) ), 20.0f );
 
         // if we have a chuck, set the default frequency
-        if( GetChuck() != null )
+        if( myChuck != null )
         {
-            GetChuck().RunCode(string.Format(
+            myChuck.RunCode(string.Format(
                 "{1} => {0}.myDefaultFreq.next;", myStorageClass, myDefaultFrequency
             ));
         }
@@ -78,14 +79,14 @@ public class OscController : MonoBehaviour , ILanguageObjectListener, IParamAcce
         if( param == myAcceptableParams[0] )
         {
             // freq
-            GetChuck().RunCode(string.Format(
+            myChuck.RunCode(string.Format(
                 "{1} => {0}.myFreq;", myStorageClass, var    
             ));
 
             if( numParamConnections[param] == 1 )
             {
                 // first connection: disable my default
-                GetChuck().RunCode(string.Format(
+                myChuck.RunCode(string.Format(
                     "0 => {0}.myDefaultFreq.gain;", myStorageClass
                 ));
             }
@@ -93,14 +94,14 @@ public class OscController : MonoBehaviour , ILanguageObjectListener, IParamAcce
         else if( param == myAcceptableParams[1] )
         {
             // gain
-            GetChuck().RunCode(string.Format(
+            myChuck.RunCode(string.Format(
                "{1} => {0}.myGain;", myStorageClass, var 
             ));
 
             if( numParamConnections[param] == 1 )
             {
                 // first connection: disable my default
-                GetChuck().RunCode(string.Format(
+                myChuck.RunCode(string.Format(
                     "0 => {0}.myDefaultGain.gain;", myStorageClass
                 ));
             }
@@ -118,14 +119,14 @@ public class OscController : MonoBehaviour , ILanguageObjectListener, IParamAcce
         if( param == myAcceptableParams[0] )
         {
             // freq
-            GetChuck().RunCode(string.Format(
+            myChuck.RunCode(string.Format(
                 "{1} =< {0}.myFreq;", myStorageClass, var    
             ));
 
             if( numParamConnections[param] == 0 )
             {
                 // no more connections: enable my default
-                GetChuck().RunCode(string.Format(
+                myChuck.RunCode(string.Format(
                     "1 => {0}.myDefaultFreq.gain;", myStorageClass
                 ));
             }
@@ -133,14 +134,14 @@ public class OscController : MonoBehaviour , ILanguageObjectListener, IParamAcce
         else if( param == myAcceptableParams[1] )
         {
             // gain
-            GetChuck().RunCode(string.Format(
+            myChuck.RunCode(string.Format(
                "{1} =< {0}.myGain;", myStorageClass, var 
             ));
 
             if( numParamConnections[param] == 0 )
             {
                 // no more connections: enable my default
-                GetChuck().RunCode(string.Format(
+                myChuck.RunCode(string.Format(
                     "1 => {0}.myDefaultGain.gain;", myStorageClass
                 ));
             }
@@ -169,13 +170,9 @@ public class OscController : MonoBehaviour , ILanguageObjectListener, IParamAcce
         SwitchColors();
     }
 
-    public ChuckInstance GetChuck()
-    {
-        return GetComponent<LanguageObject>().GetChuck();
-    }
-
     public void GotChuck(ChuckInstance chuck)
     {
+        myChuck = chuck;
         myStorageClass = chuck.GetUniqueVariableName();
         myExitEvent = chuck.GetUniqueVariableName();
         string connectMyOscTo = myParentListener.InputConnection();
@@ -233,6 +230,7 @@ public class OscController : MonoBehaviour , ILanguageObjectListener, IParamAcce
     public void LosingChuck(ChuckInstance chuck)
     {
         chuck.BroadcastEvent( myExitEvent );
+        myChuck = null;
     }
 
     public void NewChild( LanguageObject child )

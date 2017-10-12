@@ -15,6 +15,7 @@ public class ParamController : MonoBehaviour , ILanguageObjectListener, IControl
     private string myParam;
     private int myParamIndex = 0;
     private bool amConnected = false;
+    private ChuckInstance myChuck = null;
 
     private ILanguageObjectListener myParent = null;
     private IParamAcceptor myParamAcceptor = null;
@@ -79,7 +80,7 @@ public class ParamController : MonoBehaviour , ILanguageObjectListener, IControl
         myNumChildren++;
         // if I got my first child after I was already hooked up to a chuck,
         // I need to hook up myself now.
-        if( myNumChildren == 1 && myParamAcceptor != null && GetChuck() != null )
+        if( myNumChildren == 1 && myParamAcceptor != null && myChuck != null )
         {
             myParamAcceptor.ConnectParam( myParam, OutputConnection() );
             amConnected = true;
@@ -91,7 +92,7 @@ public class ParamController : MonoBehaviour , ILanguageObjectListener, IControl
         myNumChildren--;
         // if I lost my last child while I was hooked up to a chuck,
         // I need to disconnect myself now
-        if( myNumChildren == 0 && myParamAcceptor != null && GetChuck() != null )
+        if( myNumChildren == 0 && myParamAcceptor != null && myChuck != null )
         {
             myParamAcceptor.DisconnectParam( myParam, OutputConnection() );
             amConnected = false;
@@ -110,6 +111,8 @@ public class ParamController : MonoBehaviour , ILanguageObjectListener, IControl
 
     public void GotChuck( ChuckInstance chuck )
     {
+        myChuck = chuck;
+
         myStorageClass = chuck.GetUniqueVariableName();
         myExitEvent = chuck.GetUniqueVariableName();
 
@@ -144,11 +147,7 @@ public class ParamController : MonoBehaviour , ILanguageObjectListener, IControl
         }
 
         chuck.BroadcastEvent( myExitEvent );
-    }
-
-    public ChuckInstance GetChuck()
-    {
-        return GetComponent<LanguageObject>().GetChuck();
+        myChuck = null;
     }
 
     public string GetParamName()

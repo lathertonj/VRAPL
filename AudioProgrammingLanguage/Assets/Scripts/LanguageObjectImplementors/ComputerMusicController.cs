@@ -47,11 +47,6 @@ public class ComputerMusicController : MonoBehaviour , ILanguageObjectListener
 
     }
 
-    public ChuckInstance GetChuck()
-    {
-        return GetComponent<LanguageObject>().GetChuck();
-    }
-
     public bool AcceptableChild( LanguageObject other )
     {
         // computer music cannot have any children.

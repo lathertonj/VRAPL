@@ -22,7 +22,7 @@ public class NumberController : MonoBehaviour , ILanguageObjectListener , IContr
     private Color originalBodyColor;
 
     private ILanguageObjectListener myParent = null;
-
+    private ChuckInstance myChuck = null;
 
     // Use this for initialization
     void Start () {
@@ -87,6 +87,7 @@ public class NumberController : MonoBehaviour , ILanguageObjectListener , IContr
 
     public void GotChuck(ChuckInstance chuck)
     {
+        myChuck = chuck;
         myStorageClass = chuck.GetUniqueVariableName();
         myExitEvent = chuck.GetUniqueVariableName();
 
@@ -117,6 +118,7 @@ public class NumberController : MonoBehaviour , ILanguageObjectListener , IContr
         }
 
         chuck.BroadcastEvent( myExitEvent );
+        myChuck = null;
     }
 
     public string InputConnection()
@@ -127,11 +129,6 @@ public class NumberController : MonoBehaviour , ILanguageObjectListener , IContr
     public string OutputConnection()
     {
         return InputConnection();
-    }
-
-    public ChuckInstance GetChuck()
-    {
-        return GetComponent<LanguageObject>().GetChuck();
     }
 
     public void TouchpadDown()
@@ -204,10 +201,10 @@ public class NumberController : MonoBehaviour , ILanguageObjectListener , IContr
     {
         // round number in display
         myText.GetComponent<TextMesh>().text = myNumber.ToString("0.00");
-        if( GetChuck() != null )
+        if( myChuck != null )
         {
             // round number in chuck as well
-            GetChuck().RunCode(string.Format(@"
+            myChuck.RunCode(string.Format(@"
                 {0} => {1}.next;
                 ",
                 myNumber.ToString("0.00"), OutputConnection() 

@@ -20,6 +20,7 @@ public class SimpleScalerController : MonoBehaviour , ILanguageObjectListener
     private Color myDefaultColor;
     private bool sendingData = false;
 
+    private ChuckInstance myChuck;
     private string myStorageClass;
     private string myExitEvent;
 
@@ -45,6 +46,7 @@ public class SimpleScalerController : MonoBehaviour , ILanguageObjectListener
 
     public void GotChuck( ChuckInstance chuck )
     {
+        myChuck = chuck;
         myStorageClass = chuck.GetUniqueVariableName();
         myExitEvent = chuck.GetUniqueVariableName();
 
@@ -74,6 +76,7 @@ public class SimpleScalerController : MonoBehaviour , ILanguageObjectListener
             DisconnectData();
         }
         chuck.BroadcastEvent( myExitEvent );
+        myChuck = null;
     }
 
     public string InputConnection()
@@ -252,23 +255,18 @@ public class SimpleScalerController : MonoBehaviour , ILanguageObjectListener
                  myDataSource != null && 
                  myMinNumber != null && 
                  myMaxNumber != null &&
-                 GetChuck() != null ); 
-    }
-
-    public ChuckInstance GetChuck()
-    {
-        return GetComponent<LanguageObject>().GetChuck();
+                 myChuck != null ); 
     }
 
     private void ConnectData()
     {
-        GetChuck().RunCode( string.Format( "{0} => {1};", OutputConnection(), myParent.InputConnection() ) );
+        myChuck.RunCode( string.Format( "{0} => {1};", OutputConnection(), myParent.InputConnection() ) );
         sendingData = true;
     }
     
     private void DisconnectData()
     {
-        GetChuck().RunCode( string.Format( "{0} =< {1};", OutputConnection(), myParent.InputConnection() ) );
+        myChuck.RunCode( string.Format( "{0} =< {1};", OutputConnection(), myParent.InputConnection() ) );
         sendingData = false;
     }
 
@@ -276,7 +274,7 @@ public class SimpleScalerController : MonoBehaviour , ILanguageObjectListener
     {
         float val = myDataSource.NormValue();
         float scaledVal = myMinNumber.GetValue() + val * ( myMaxNumber.GetValue() - myMinNumber.GetValue() );
-        GetChuck().RunCode( string.Format( "{0:0.000} => {1}.next;", scaledVal, OutputConnection() ) );
+        myChuck.RunCode( string.Format( "{0:0.000} => {1}.next;", scaledVal, OutputConnection() ) );
     }
     
     public string VisibleName()
