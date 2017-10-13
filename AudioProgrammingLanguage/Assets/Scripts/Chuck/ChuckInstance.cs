@@ -74,10 +74,12 @@ public class ChuckInstance : MonoBehaviour {
 	}
 
 	// Update is called once per frame
-	void OnAudioFilterRead(float[] data, int channels)
+	void OnAudioFilterRead( float[] data, int channels )
 	{
 		if( !running || isMuted )
 		{
+            // need to fill output with zeros then return
+            Array.Clear( data, 0, data.Length );
 			return;
 		}
 
