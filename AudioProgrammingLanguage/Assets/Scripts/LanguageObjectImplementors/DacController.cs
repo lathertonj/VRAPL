@@ -11,7 +11,7 @@ public class DacController : MonoBehaviour , ILanguageObjectListener , IControll
     private Color darkColor;
     private Color lightColor;
 
-    private bool enabled = true;
+    private bool myEnabled = true;
 
     public void NewParent(LanguageObject parent)
     {
@@ -35,7 +35,7 @@ public class DacController : MonoBehaviour , ILanguageObjectListener , IControll
     }
 
     // Use this for initialization
-    void Start () {
+    void Awake() {
 		darkColor = myText.color;
         lightColor = myShapes[0].material.color;
         SetColors();
@@ -49,7 +49,7 @@ public class DacController : MonoBehaviour , ILanguageObjectListener , IControll
     private void SetColors()
     {
         Color bodyColor, textColor;
-        if( enabled )
+        if( myEnabled )
         {
             bodyColor = darkColor;
             textColor = lightColor;
@@ -99,17 +99,17 @@ public class DacController : MonoBehaviour , ILanguageObjectListener , IControll
 
     public void TouchpadDown()
     {
-        enabled = !enabled;
+        myEnabled = !myEnabled;
         SetColors();
         
-        if( !enabled )
+        if( !myEnabled )
         {
             GetComponent<LanguageObject>().TellChildrenLosingChuck( GetComponent<ChuckInstance>() );
         }
 
-        GetComponent<ChuckInstance>().SetRunning( enabled );
+        GetComponent<ChuckInstance>().SetRunning( myEnabled );
 
-        if( enabled )
+        if( myEnabled )
         {
             GetComponent<LanguageObject>().TellChildrenHaveNewChuck( GetComponent<ChuckInstance>() );
         }
@@ -130,6 +130,11 @@ public class DacController : MonoBehaviour , ILanguageObjectListener , IControll
         // don't care
     }
 
+    public bool IsEnabled()
+    {
+        return myEnabled;
+    }
+
     public string VisibleName()
     {
         return myText.text;
@@ -138,7 +143,7 @@ public class DacController : MonoBehaviour , ILanguageObjectListener , IControll
     public void CloneYourselfFrom( LanguageObject original, LanguageObject newParent )
     {
         DacController other = original.GetComponent<DacController>();
-        if( enabled != other.enabled )
+        if( myEnabled != other.myEnabled )
         {
             // simulate touchpad down
             TouchpadDown();
@@ -155,7 +160,7 @@ public class DacController : MonoBehaviour , ILanguageObjectListener , IControll
     public int[] SerializeIntParams( int version )
     {
         // whether enabled
-        return new int [] { enabled? 1 : 0 };
+        return new int [] { myEnabled ? 1 : 0 };
     }
 
     public float[] SerializeFloatParams( int version )
@@ -167,10 +172,8 @@ public class DacController : MonoBehaviour , ILanguageObjectListener , IControll
     public void SerializeLoad( int version, string[] stringParams, int[] intParams, float[] floatParams )
     {
         // whether enabled
-        if( enabled != ( intParams[0] != 0 ) )
-        {
-            // simulate touchpad down
-            TouchpadDown();  
-        }
+        myEnabled = ( intParams[0] != 0 );
+        SetColors();
+        GetComponent<ChuckInstance>().SetRunning( myEnabled );
     }
 }

@@ -343,7 +343,15 @@ public class LanguageObject : MonoBehaviour {
 
     public bool HaveOwnChuck()
     {
-        return gameObject.GetComponent<ChuckInstance>() != null;
+        DacController maybeDac = gameObject.GetComponent<DacController>();
+        if( maybeDac != null )
+        {
+            return maybeDac.IsEnabled() && maybeDac.GetComponent<ChuckInstance>() != null;
+        }
+        else
+        {
+            return gameObject.GetComponent<ChuckInstance>() != null;
+        }
     }
 
     public void TellChildrenHaveNewChuck( ChuckInstance chuck )
@@ -383,6 +391,8 @@ public class LanguageObject : MonoBehaviour {
         copy.prefabGeneratedFrom = prefabGeneratedFrom;
         ILanguageObjectListener copyListener = (ILanguageObjectListener) copy.GetComponent( typeof(ILanguageObjectListener) );
         
+        ChuckInstance parentChuck = parent.GetChuck();
+
         // make it a child of the parent
         if( parent != null )
         {
@@ -396,6 +406,13 @@ public class LanguageObject : MonoBehaviour {
             // notify the objects
             copyListener.NewParent( parent );
             parentListener.NewChild( copy );
+
+            // do I have a chuck now?
+            if( parentChuck != null )
+            {
+                // I will tell myself and my children that now we have a chuck!
+                TellChildrenHaveNewChuck( parentChuck );
+            }
         }
 
         // clone object-specific settings
@@ -481,6 +498,8 @@ public class LanguageObject : MonoBehaviour {
         prefabGeneratedFrom = storage.prefabName;
         ILanguageObjectListener meListener = (ILanguageObjectListener) GetComponent( typeof(ILanguageObjectListener) );
         
+        ChuckInstance parentChuck = ( parent != null ) ? parent.GetChuck() : null;
+
         // make it a child of the parent
         if( parent != null )
         {
@@ -491,6 +510,13 @@ public class LanguageObject : MonoBehaviour {
             // notify the objects
             meListener.NewParent( parent );
             parentListener.NewChild( this );
+
+            // do I have a chuck now?
+            if( parentChuck != null )
+            {
+                // I will tell myself and my children that now we have a chuck!
+                TellChildrenHaveNewChuck( parentChuck );
+            }
         }
 
         // clone object-specific settings
@@ -515,6 +541,13 @@ public class LanguageObject : MonoBehaviour {
         // reset renderer (necessary?)
         RendererController renderer = GetComponent<RendererController>();
         renderer.Restart();
+
+        // TODO: no clue whether this is correct to do: inform of chuck
+        //DacController maybeDac = GetComponent<DacController>();
+        //if (maybeDac != null && maybeDac.enabled)
+        //{
+        //    TellChildrenHaveNewChuck(GetChuck());
+        //}
     }
 }
 

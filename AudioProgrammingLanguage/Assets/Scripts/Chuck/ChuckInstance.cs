@@ -91,6 +91,12 @@ public class ChuckInstance : MonoBehaviour {
 		// first, run callback with data as input and myOutBuffer as output
 		Chuck.Manager.ManualAudioCallback( myChuckId, data, myOutBuffer, Convert.ToUInt32( channels ) );
 
+        // multiply by 0.8 to try to avoid some clipping
+        for( int i = 0; i < myOutBuffer.Length; i++ )
+        {
+            myOutBuffer[i] *= 0.8f;
+        }
+
 		// if spatializing, need to multiply output by input
 		if( spatialize )
 		{

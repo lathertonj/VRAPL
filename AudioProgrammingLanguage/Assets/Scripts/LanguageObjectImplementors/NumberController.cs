@@ -25,7 +25,7 @@ public class NumberController : MonoBehaviour , ILanguageObjectListener , IContr
     private ChuckInstance myChuck = null;
 
     // Use this for initialization
-    void Start () {
+    void Awake() {
 		UpdateMyNumber();
         originalTextColor = myText.GetComponent<TextMesh>().color;
         originalBodyColor = myShape.GetComponent<Renderer>().material.color;
