@@ -455,6 +455,7 @@ public class LanguageObject : MonoBehaviour {
 
         // languageobject params
         myStorage.prefabName = prefabGeneratedFrom;
+        Debug.Log("serializing " + gameObject.name + " with prefab name " + prefabGeneratedFrom );
         myStorage.transformPosition = Serializer.SerializeVector3( transform.localPosition );
         myStorage.transformRotation = Serializer.SerializeQuaternion( transform.localRotation );
         myStorage.transformScale = Serializer.SerializeVector3( transform.localScale );

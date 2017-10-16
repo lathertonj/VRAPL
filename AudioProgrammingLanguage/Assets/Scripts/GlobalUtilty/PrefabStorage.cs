@@ -35,6 +35,10 @@ public class PrefabStorage : MonoBehaviour {
 	
 	public static GameObject GetPrefab( string name )
     {
+        if( !thePrefabs.myPrefabs.ContainsKey( name ) )
+        {
+            Debug.LogError( "I don't know what is prefab: " + name );
+        }
         return thePrefabs.myPrefabs[name];
     }
 

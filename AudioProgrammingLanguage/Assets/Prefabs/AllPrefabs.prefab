@@ -108,3 +108,5 @@ MonoBehaviour:
     prefab: {fileID: 1566376819605130, guid: 5aa695bd6d71e3b40b4c9a32723a9107, type: 2}
   - name: misc trash
     prefab: {fileID: 1143157109221374, guid: 7da19083752fea646b466d3762b1fcfb, type: 2}
+  - name: language comment
+    prefab: {fileID: 1772315093361056, guid: 560b73e18cefe6c41baeddc7ccddb591, type: 2}

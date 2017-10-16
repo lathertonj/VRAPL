@@ -22,6 +22,11 @@ public class TrashController : MonoBehaviour {
                 {
                     lo.RemoveFromParent();
                 }
+                CommentController maybeComment = lo.GetComponent<CommentController>();
+                if( maybeComment )
+                {
+                    maybeComment.OnTrash();
+                }
                 Destroy( objectToSearch.gameObject );
                 return;
             }
