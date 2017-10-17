@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
+using System;
 
 public class MicrophoneController : MonoBehaviour {
 
     private static MicrophoneController theMic;
     private static string theFile = "";
+    private static int srate;
 
     public static void StartRecording( string filename, float time )
     {
@@ -51,6 +53,7 @@ public class MicrophoneController : MonoBehaviour {
         if( theMic == null )
         {
             theMic = this;
+            srate = AudioSettings.GetConfiguration().sampleRate;
         }
         else if( theMic != this )
         {
@@ -72,7 +75,7 @@ public class MicrophoneController : MonoBehaviour {
 	
     private void _StartRecording( float time )
     {
-        myAudioClip = Microphone.Start( myDevice, false, (int) ( time + 0.5f ), AudioSettings.GetConfiguration().sampleRate );
+        myAudioClip = Microphone.Start( myDevice, false, (int) ( time + 0.5f ), srate );
     }
     
     private void _StopRecording( string filename )
@@ -81,11 +84,18 @@ public class MicrophoneController : MonoBehaviour {
         Microphone.End( myDevice );
 
         // only save the part up until where the recording was ended
-        float[] cutoffData = new float[endSamplePosition];
-        myAudioClip.GetData( cutoffData, 0 );
-        myAudioClip.SetData( cutoffData, 0 );
+        float[] originalData = new float[myAudioClip.samples];
+        float[] clippedData = new float[endSamplePosition];
+        
+        // copy data
+        myAudioClip.GetData( originalData, 0 );
+        Array.Copy( originalData, clippedData, clippedData.Length - 1 );
+
+        // insert into new audio clip
+        AudioClip shorterAudioClip = AudioClip.Create( "comment", endSamplePosition, 1, srate, false );
+        shorterAudioClip.SetData( clippedData, 0 );
 
         // write to disk
-        SavWav.Save( filename, myAudioClip );
+        SavWav.Save( filename, shorterAudioClip );
     }
 }
