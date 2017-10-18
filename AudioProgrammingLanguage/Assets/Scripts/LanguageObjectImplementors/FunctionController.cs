@@ -577,6 +577,9 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
             }
             allFunctions[myFunctionId].Add( this );
         }
+        // in order to avoid overwriting existing function IDs,
+        // currentFunctionId needs to be AT LEAST this functionID + 1
+        FunctionController.currentFunctionId = Mathf.Max( currentFunctionId, myFunctionId + 1 );
 
         // load inner blocks from serialization
         GameObject newMyBlocks = new GameObject();
