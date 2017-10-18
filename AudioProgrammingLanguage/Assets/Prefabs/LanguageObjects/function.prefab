@@ -3015,9 +3015,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 859de76def956da44ad684b7b3338603, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  myChildren: []
   myParent: {fileID: 0}
-  prefabGeneratedFrom: {fileID: 1885784124361458, guid: df3907416f0d7424fa3f02b2dd8d5050,
-    type: 2}
+  prefabGeneratedFrom: language function output
 --- !u!114 &114108853900582480
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3140,8 +3140,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 859de76def956da44ad684b7b3338603, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  myChildren: []
   myParent: {fileID: 0}
-  prefabGeneratedFrom: {fileID: 1143813304141748}
+  prefabGeneratedFrom: (
 --- !u!114 &114618915914339426
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3165,9 +3166,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 859de76def956da44ad684b7b3338603, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  myChildren: []
   myParent: {fileID: 0}
-  prefabGeneratedFrom: {fileID: 1382745005631692, guid: a46a872ed96efff4e990e4bf1600fa26,
-    type: 2}
+  prefabGeneratedFrom: language function input
 --- !u!114 &114663159574620482
 MonoBehaviour:
   m_ObjectHideFlags: 1

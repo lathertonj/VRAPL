@@ -391,7 +391,7 @@ public class LanguageObject : MonoBehaviour {
         copy.prefabGeneratedFrom = prefabGeneratedFrom;
         ILanguageObjectListener copyListener = (ILanguageObjectListener) copy.GetComponent( typeof(ILanguageObjectListener) );
         
-        ChuckInstance parentChuck = parent.GetChuck();
+        ChuckInstance parentChuck = parent != null ? parent.GetChuck() : null;
 
         // make it a child of the parent
         if( parent != null )

@@ -75,7 +75,8 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
         if( output.myParent == null )
         {
             output.myParent = me;
-            me.myChildren.Add( output );
+            // output should ALWAYS be the first child
+            me.myChildren.Insert( 0, output );
             myOutput.myFunction = this;
         }
     }
