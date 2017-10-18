@@ -457,7 +457,6 @@ public class LanguageObject : MonoBehaviour {
 
         // languageobject params
         myStorage.prefabName = prefabGeneratedFrom;
-        Debug.Log("serializing " + gameObject.name + " with prefab name " + prefabGeneratedFrom );
         myStorage.transformPosition = Serializer.SerializeVector3( transform.localPosition );
         myStorage.transformRotation = Serializer.SerializeQuaternion( transform.localRotation );
         myStorage.transformScale = Serializer.SerializeVector3( transform.localScale );
@@ -544,18 +543,21 @@ public class LanguageObject : MonoBehaviour {
             // notify the objects
             meListener.NewParent( parent );
             parentListener.NewChild( this );
-
-            // do I have a chuck now?
-            if( parentChuck != null )
-            {
-                // I will tell myself and my children that now we have a chuck!
-                TellChildrenHaveNewChuck( parentChuck );
-            }
         }
 
         // clone object-specific settings
         meListener.SerializeLoad( storage.version, storage.stringParams, storage.intParams, 
             storage.floatParams, storage.objectParams );
+
+        // do I have a chuck now?
+        if( parentChuck != null )
+        {
+            // I will tell myself and my children that now we have a chuck!
+            // (children are deserialized below, so this is just really myself
+            //  and any children created via SerializeLoad(), such as
+            //  a function's FunctionOutputController)
+            TellChildrenHaveNewChuck( parentChuck );
+        }
         
         // clone other settings such as size from MovableController and what else?
         MovableController mc = GetComponent<MovableController>();
@@ -576,13 +578,6 @@ public class LanguageObject : MonoBehaviour {
         // reset renderer (necessary?)
         RendererController renderer = GetComponent<RendererController>();
         renderer.Restart();
-
-        // TODO: no clue whether this is correct to do: inform of chuck
-        //DacController maybeDac = GetComponent<DacController>();
-        //if (maybeDac != null && maybeDac.enabled)
-        //{
-        //    TellChildrenHaveNewChuck(GetChuck());
-        //}
     }
 }
 

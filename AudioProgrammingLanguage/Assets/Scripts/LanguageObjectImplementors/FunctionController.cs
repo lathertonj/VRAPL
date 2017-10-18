@@ -558,7 +558,6 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
             LanguageObject maybeLanguageObject = child.GetComponent<LanguageObject>();
             if( maybeLanguageObject != null )
             {
-                Debug.Log( "serializing function's " + maybeLanguageObject.gameObject.name );
                 allChildBlocks.Add( maybeLanguageObject.SerializeObject() );
             }
         }
