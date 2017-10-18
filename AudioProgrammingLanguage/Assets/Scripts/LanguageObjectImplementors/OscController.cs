@@ -273,7 +273,14 @@ public class OscController : MonoBehaviour , ILanguageObjectListener, IParamAcce
         return LanguageObject.noFloatParams;
     }
 
-    public void SerializeLoad( int version, string[] stringParams, int[] intParams, float[] floatParams )
+    public object[] SerializeObjectParams( int version )
+    {
+        // no object params
+        return LanguageObject.noObjectParams;
+    }
+
+    public void SerializeLoad( int version, string[] stringParams, int[] intParams, 
+        float[] floatParams, object[] objectParams )
     {
         // nothing to load from params (everything is in the prefab)
     }

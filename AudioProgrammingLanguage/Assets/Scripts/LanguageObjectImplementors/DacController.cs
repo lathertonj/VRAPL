@@ -169,7 +169,14 @@ public class DacController : MonoBehaviour , ILanguageObjectListener , IControll
         return LanguageObject.noFloatParams;
     }
 
-    public void SerializeLoad( int version, string[] stringParams, int[] intParams, float[] floatParams )
+    public object[] SerializeObjectParams( int version )
+    {
+        // no object params
+        return LanguageObject.noObjectParams;
+    }
+
+    public void SerializeLoad( int version, string[] stringParams, int[] intParams, 
+        float[] floatParams, object[] objectParams )
     {
         // whether enabled
         myEnabled = ( intParams[0] != 0 );

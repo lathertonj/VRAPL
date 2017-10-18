@@ -13,6 +13,7 @@ public class LanguageObject : MonoBehaviour {
     public static string[] noStringParams = new string[0];
     public static int[] noIntParams = new int[0];
     public static float[] noFloatParams = new float[0];
+    public static object[] noObjectParams = new object[0];
 
     public List<LanguageObject> myChildren;
     public LanguageObject myParent = null;
@@ -452,6 +453,7 @@ public class LanguageObject : MonoBehaviour {
         myStorage.stringParams = myObject.SerializeStringParams( myStorage.version );
         myStorage.intParams = myObject.SerializeIntParams( myStorage.version );
         myStorage.floatParams = myObject.SerializeFloatParams( myStorage.version );
+        myStorage.objectParams = myObject.SerializeObjectParams( myStorage.version );
 
         // languageobject params
         myStorage.prefabName = prefabGeneratedFrom;
@@ -521,7 +523,8 @@ public class LanguageObject : MonoBehaviour {
         }
 
         // clone object-specific settings
-        meListener.SerializeLoad( storage.version, storage.stringParams, storage.intParams, storage.floatParams );
+        meListener.SerializeLoad( storage.version, storage.stringParams, storage.intParams, 
+            storage.floatParams, storage.objectParams );
         
         // clone other settings such as size from MovableController and what else?
         MovableController mc = GetComponent<MovableController>();
@@ -572,7 +575,9 @@ public interface ILanguageObjectListener
     string[] SerializeStringParams( int version );
     int[] SerializeIntParams( int version );
     float[] SerializeFloatParams( int version );
-    void SerializeLoad( int version, string[] stringParams, int[] intParams, float[] floatParams );
+    object[] SerializeObjectParams( int version );
+    void SerializeLoad( int version, string[] stringParams, int[] intParams, 
+        float[] floatParams, object[] objectParams );
 }
 
 [Serializable]
@@ -582,6 +587,7 @@ public struct LanguageObjectSerialStorage
     public string[] stringParams;
     public int[] intParams;
     public float[] floatParams;
+    public object[] objectParams;
 
     // populated by LanguageObject
     public int version;

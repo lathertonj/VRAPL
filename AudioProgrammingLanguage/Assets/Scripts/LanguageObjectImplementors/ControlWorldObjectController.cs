@@ -280,7 +280,14 @@ public class ControlWorldObjectController : MonoBehaviour , ILanguageObjectListe
         return LanguageObject.noFloatParams;
     }
 
-    public void SerializeLoad( int version, string[] stringParams, int[] intParams, float[] floatParams )
+    public object[] SerializeObjectParams( int version )
+    {
+        // no object params
+        return LanguageObject.noObjectParams;
+    }
+
+    public void SerializeLoad( int version, string[] stringParams, int[] intParams, 
+        float[] floatParams, object[] objectParams )
     {
         // load control by simulating touchpad down
         while( myControl != intParams[0] )

@@ -360,7 +360,14 @@ public class SoundfileController : MonoBehaviour , ILanguageObjectListener, IPar
         return LanguageObject.noFloatParams;
     }
 
-    public void SerializeLoad( int version, string[] stringParams, int[] intParams, float[] floatParams )
+    public object[] SerializeObjectParams( int version )
+    {
+        // no object params
+        return LanguageObject.noObjectParams;
+    }
+
+    public void SerializeLoad( int version, string[] stringParams, int[] intParams, 
+        float[] floatParams, object[] objectParams )
     {
         // try to find the file
         // simulate button presses until the state matches
