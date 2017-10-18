@@ -137,6 +137,11 @@ public class ControlWorldObjectController : MonoBehaviour , ILanguageObjectListe
         // don't care, shouldn't ever get a chuck
     }
 
+    public void SizeChanged( float newSize )
+    {
+        // don't care about my size
+    }
+
     public string InputConnection()
     {
         return string.Format( "{0}.myGain", myStorageClass );

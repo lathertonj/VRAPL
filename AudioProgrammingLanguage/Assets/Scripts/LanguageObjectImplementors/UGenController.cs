@@ -22,8 +22,6 @@ public class UGenController : MonoBehaviour , ILanguageObjectListener, IParamAcc
     ILanguageObjectListener myParentListener = null;
     private Dictionary<string, int> numParamConnections;
 
-    private float myDefaultParam;
-
     void Awake() {
         numParamConnections = new Dictionary<string, int>();
         for( int i = 0; i < myParams.Length; i++ ) { 
@@ -33,17 +31,16 @@ public class UGenController : MonoBehaviour , ILanguageObjectListener, IParamAcc
 
     private void Update()
     {
+
+    }
+
+    private float GetMyDefaultParam()
+    {
         // divide param by increase in size
         // min param for a param set in this way is 20
-        myDefaultParam = Mathf.Max( myParamDefaultValues[0] / ( 1 + 2 * ( GetComponent<MovableController>().myScale - 1 ) ), myDefaultParamMinimumValue );
+        return Mathf.Max( myParamDefaultValues[0] / ( 1 + 2 * ( GetComponent<MovableController>().GetScale() - 1 ) ), myDefaultParamMinimumValue );
 
-        // if we have a chuck, set the default param
-        if( myChuck != null )
-        {
-            myChuck.RunCode(string.Format(
-                "{0:0.000} => {1}.myDefault{2}.next;", myDefaultParam, myStorageClass, myParams[0]
-            ));
-        }
+        
     }
     
     public bool AcceptableChild( LanguageObject other )
@@ -214,12 +211,29 @@ public class UGenController : MonoBehaviour , ILanguageObjectListener, IParamAcc
         );
 
         chuck.RunCode( oscCreation );
+        SetMyDefaultParam();
     }
 
     public void LosingChuck(ChuckInstance chuck)
     {
         chuck.BroadcastEvent( myExitEvent );
         myChuck = null;
+    }
+
+    public void SizeChanged( float newSize )
+    {
+        SetMyDefaultParam();
+    }
+
+    private void SetMyDefaultParam()
+    {
+        // if we have a chuck, set the default param
+        if( myChuck != null )
+        {
+            myChuck.RunCode(string.Format(
+                "{0:0.000} => {1}.myDefault{2}.next;", GetMyDefaultParam(), myStorageClass, myParams[0]
+            ));
+        }
     }
 
     public void NewChild( LanguageObject child )

@@ -60,12 +60,7 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
 		HookUpOutput();
 	}
 	
-	// Update is called once per frame
-	void Update () {
-		
-	}
-
-    private void HookUpOutput()
+	private void HookUpOutput()
     {
         // hook up output to me as a child.
         LanguageObject output = myOutput.GetComponent<LanguageObject>();
@@ -143,7 +138,7 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
         Vector3 roomEyeDifference = TheRoom.theRoom.position - TheRoom.theEye.position;
         roomEyeDifference.y = 0;
         // lower person so they are standing on the function floor
-        Vector3 offsetToFunctionFloor = 1.5f * Vector3.up * GetComponent<MovableController>().myScale;
+        Vector3 offsetToFunctionFloor = 1.5f * Vector3.up * GetComponent<MovableController>().GetScale();
         // combine offsets and set
         TheRoom.theRoom.position = transform.position - offsetToFunctionFloor + roomEyeDifference;
         TheRoom.EnterFunction( this );
@@ -374,6 +369,11 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
     public void LosingChuck( ChuckInstance chuck )
     {
         myChuck = null;
+    }
+
+    public void SizeChanged( float newSize )
+    {
+        // don't care about my size
     }
     
     public string InputConnection()

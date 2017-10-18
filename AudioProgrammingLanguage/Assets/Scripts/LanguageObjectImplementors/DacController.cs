@@ -41,12 +41,7 @@ public class DacController : MonoBehaviour , ILanguageObjectListener , IControll
         SetColors();
 	}
 	
-	// Update is called once per frame
-	void Update () {
-		
-	}
-
-    private void SetColors()
+	private void SetColors()
     {
         Color bodyColor, textColor;
         if( myEnabled )
@@ -85,6 +80,11 @@ public class DacController : MonoBehaviour , ILanguageObjectListener , IControll
     public void LosingChuck( ChuckInstance chuck )
     {
         // don't care
+    }
+
+    public void SizeChanged( float newSize )
+    {
+        // don't care about my size
     }
 
     public void NewChild( LanguageObject child )

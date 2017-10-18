@@ -263,7 +263,7 @@ public class PickUpObjects : MonoBehaviour {
             return;
         }
         scaleStartDifference = transform.position - collidingObject.GetComponent<MovableController>().amBeingMovedBy.position;
-        scaleStart = collidingObject.GetComponent<MovableController>().myScale;
+        scaleStart = collidingObject.GetComponent<MovableController>().GetScale();
         scaleInitialLocalTransformPosition = collidingObject.transform.localPosition;
         objectBeingScaled = collidingObject;
     }

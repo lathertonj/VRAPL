@@ -11,8 +11,10 @@ public class MovableController : MonoBehaviour {
     public Transform additionalRelationshipChild = null;
     public Transform additionalRelationshipParent = null;
 
-    public float myScale = 1.0f;
+    private float myScale = 1.0f;
     public float myMinScale = 1.0f;
+
+    private ILanguageObjectListener myLanguageObject;
     
     // only want to scale up and down the transforms that were part of me at the time
     // of my construction, so that inheriting language objects don't get changed too.
@@ -29,6 +31,8 @@ public class MovableController : MonoBehaviour {
             myInitialChildren[i] = transform.GetChild( i );
             myInitialChildrenBaseScales[i] = myInitialChildren[i].localScale / myScale;
         }
+
+        myLanguageObject = (ILanguageObjectListener) GetComponent( typeof(ILanguageObjectListener) );
     }
 
     private void Update()
@@ -42,6 +46,7 @@ public class MovableController : MonoBehaviour {
     public void SetScale( float s )
     {
         myScale = Mathf.Max( s, myMinScale );
+        myLanguageObject.SizeChanged( myScale );
     }
 
     public float GetScale()

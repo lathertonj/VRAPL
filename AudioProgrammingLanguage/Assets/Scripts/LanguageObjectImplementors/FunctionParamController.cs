@@ -26,12 +26,7 @@ public class FunctionParamController : MonoBehaviour , ILanguageObjectListener
         }
 	}
 	
-	// Update is called once per frame
-	void Update () {
-		
-	}
-
-    void SwitchColors()
+	void SwitchColors()
     {
         Color temp = myText.color;
         myText.color = myShape.material.color;
@@ -63,6 +58,11 @@ public class FunctionParamController : MonoBehaviour , ILanguageObjectListener
             SwitchColors();
             myFunction.RemoveParam( this );
         }
+    }
+
+    public void SizeChanged( float newSize )
+    {
+        // don't care about my size
     }
 
     public void NewChild( LanguageObject child )

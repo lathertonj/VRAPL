@@ -57,12 +57,7 @@ public class SoundfileController : MonoBehaviour , ILanguageObjectListener, IPar
         lastAxis = Vector2.zero;
 	}
 	
-	// Update is called once per frame
-	void Update () {
-		
-	}
-
-    void SwitchColors()
+	void SwitchColors()
     {
         Color temp = myText.color;
         myText.color = myShapes[0].material.color;
@@ -280,6 +275,11 @@ public class SoundfileController : MonoBehaviour , ILanguageObjectListener, IPar
 
         chuck.BroadcastEvent( myExitEvent );
         myChuck = null;
+    }
+
+    public void SizeChanged( float newSize )
+    {
+        // don't care about my size
     }
 
     public string InputConnection()

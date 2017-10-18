@@ -42,11 +42,6 @@ public class ComputerMusicController : MonoBehaviour , ILanguageObjectListener
         }
     }
 
-    private void Update()
-    {
-
-    }
-
     public bool AcceptableChild( LanguageObject other )
     {
         // computer music cannot have any children.
@@ -98,6 +93,11 @@ public class ComputerMusicController : MonoBehaviour , ILanguageObjectListener
     {
         // Stop my script
         chuck.BroadcastEvent( myExitEvent );
+    }
+
+    public void SizeChanged( float newSize )
+    {
+        // don't care about my size
     }
 
     public void NewChild( LanguageObject child )

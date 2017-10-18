@@ -22,12 +22,7 @@ public class FunctionInputController : MonoBehaviour , ILanguageObjectListener
 		
 	}
 	
-	// Update is called once per frame
-	void Update () {
-		
-	}
-
-    void SwitchColors()
+	void SwitchColors()
     {
         Color temp = myText.color;
         myText.color = myBox.material.color;
@@ -96,6 +91,11 @@ public class FunctionInputController : MonoBehaviour , ILanguageObjectListener
     {
         myFunction.TellUgenChildrenLosingChuck( chuck );
         chuck.BroadcastEvent( myExitEvent );
+    }
+
+    public void SizeChanged( float newSize )
+    {
+        // don't care about my size
     }
     
     public string InputConnection()

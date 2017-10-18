@@ -18,8 +18,6 @@ public class OscController : MonoBehaviour , ILanguageObjectListener, IParamAcce
     private string[] myAcceptableParams;
     private Dictionary<string, int> numParamConnections;
 
-    private float myDefaultFrequency = 440.0f;
-
     void Start () {
         myAcceptableParams = new string[] { "freq", "gain" };
         numParamConnections = new Dictionary<string, int>();
@@ -28,19 +26,11 @@ public class OscController : MonoBehaviour , ILanguageObjectListener, IParamAcce
         }
 	}
 
-    private void Update()
+    private float GetMyDefaultFrequency()
     {
         // divide frequency by increase in size
         // min frequency for a frequency set in this way is 20
-        myDefaultFrequency = Mathf.Max( 440.0f / ( 1 + 2 * ( GetComponent<MovableController>().myScale - 1 ) ), 20.0f );
-
-        // if we have a chuck, set the default frequency
-        if( myChuck != null )
-        {
-            myChuck.RunCode(string.Format(
-                "{1} => {0}.myDefaultFreq.next;", myStorageClass, myDefaultFrequency
-            ));
-        }
+        return Mathf.Max( 440.0f / ( 1 + 2 * ( GetComponent<MovableController>().GetScale() - 1 ) ), 20.0f );
     }
     
     public bool AcceptableChild( LanguageObject other )
@@ -192,7 +182,7 @@ public class OscController : MonoBehaviour , ILanguageObjectListener, IParamAcce
             Gain g2 @=> {0}.myFreq;
             Step s1 @=> {0}.myDefaultGain;
             Step s2 @=> {0}.myDefaultFreq;
-            220 => {0}.myDefaultFreq.next;
+            {4} => {0}.myDefaultFreq.next;
             1 => {0}.myDefaultGain.next;
             {0}.myGain => blackhole;
             {0}.myFreq => blackhole;
@@ -224,13 +214,24 @@ public class OscController : MonoBehaviour , ILanguageObjectListener, IParamAcce
 
             // wait until told to exit
             {1} => now;
-        ", myStorageClass, myExitEvent, connectMyOscTo, myOscillatorType ));
+        ", myStorageClass, myExitEvent, connectMyOscTo, myOscillatorType, GetMyDefaultFrequency() ));
     }
 
     public void LosingChuck(ChuckInstance chuck)
     {
         chuck.BroadcastEvent( myExitEvent );
         myChuck = null;
+    }
+
+    public void SizeChanged( float newSize )
+    {
+        // if we have a chuck, set the default frequency
+        if( myChuck != null )
+        {
+            myChuck.RunCode(string.Format(
+                "{1} => {0}.myDefaultFreq.next;", myStorageClass, GetMyDefaultFrequency()
+            ));
+        }
     }
 
     public void NewChild( LanguageObject child )

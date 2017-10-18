@@ -79,6 +79,11 @@ public class SimpleScalerController : MonoBehaviour , ILanguageObjectListener
         myChuck = null;
     }
 
+    public void SizeChanged( float newSize )
+    {
+        // don't care about my size
+    }
+
     public string InputConnection()
     {
         return string.Format( "{0}.myStep", myStorageClass );

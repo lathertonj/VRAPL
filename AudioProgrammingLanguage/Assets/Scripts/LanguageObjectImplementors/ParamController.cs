@@ -25,12 +25,7 @@ public class ParamController : MonoBehaviour , ILanguageObjectListener, IControl
 		
 	}
 	
-	// Update is called once per frame
-	void Update () {
-
-	}
-
-    private void SwitchColors()
+	private void SwitchColors()
     {
         Color tempColor = myText.GetComponent<TextMesh>().color;
         myText.GetComponent<TextMesh>().color = myShape.GetComponent<Renderer>().material.color;
@@ -148,6 +143,11 @@ public class ParamController : MonoBehaviour , ILanguageObjectListener, IControl
 
         chuck.BroadcastEvent( myExitEvent );
         myChuck = null;
+    }
+
+    public void SizeChanged( float newSize )
+    {
+        // don't care about my size
     }
 
     public string GetParamName()

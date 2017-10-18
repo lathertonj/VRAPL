@@ -83,7 +83,7 @@ public class DataReporter : MonoBehaviour , ILanguageObjectListener , IDataSourc
                     myCurrent = myRigidbody.angularVelocity.magnitude;
                     break;
                 case "size":
-                    myCurrent = myRigidbody.GetComponent<MovableController>().myScale;
+                    myCurrent = myRigidbody.GetComponent<MovableController>().GetScale();
                     break;
                 case "collision intensity":
                     myCurrent = lastCollisionIntensity;
@@ -183,6 +183,11 @@ public class DataReporter : MonoBehaviour , ILanguageObjectListener , IDataSourc
     public void LosingChuck( ChuckInstance chuck )
     {
         // don't care
+    }
+
+    public void SizeChanged( float newSize )
+    {
+        // don't care about my size
     }
 
     public string InputConnection()

@@ -30,13 +30,7 @@ public class DurController : MonoBehaviour , ILanguageObjectListener , IControll
         myText.text = myCurrentDurType;
 	}
 	
-	// Update is called once per frame
-	void Update() 
-    {
-		
-	}
-
-    void SwitchColors()
+	void SwitchColors()
     {
         Color temp = myText.color;
         myText.color = myShape.material.color;
@@ -171,6 +165,11 @@ public class DurController : MonoBehaviour , ILanguageObjectListener , IControll
 
         chuck.BroadcastEvent( myExitEvent );
         myChuck = null;
+    }
+
+    public void SizeChanged( float newSize )
+    {
+        // don't care about my size
     }
 
     public string VisibleName()

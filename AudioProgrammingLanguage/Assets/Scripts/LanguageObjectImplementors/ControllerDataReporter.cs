@@ -153,6 +153,11 @@ public class ControllerDataReporter : MonoBehaviour , ILanguageObjectListener , 
         // don't care
     }
 
+    public void SizeChanged( float newSize )
+    {
+        // don't care about my size
+    }
+
     public string InputConnection()
     {
         // don't have one
