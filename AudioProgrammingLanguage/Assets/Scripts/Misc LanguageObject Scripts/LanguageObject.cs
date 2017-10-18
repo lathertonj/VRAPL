@@ -466,11 +466,20 @@ public class LanguageObject : MonoBehaviour {
         myStorage.minLanguageSize = mc.myMinScale;
 
         // children
-        myStorage.children = new LanguageObjectSerialStorage[myChildren.Count];
-        for( int i = 0; i < myStorage.children.Length; i++ )
+        List<LanguageObjectSerialStorage> mySerializedChildren = new List<LanguageObjectSerialStorage>();
+        for( int i = 0; i < myChildren.Count; i++ )
         {
-            myStorage.children[i] = myChildren[i].SerializeObject();
+            // don't serialize the function output -- it is a child of the function,
+            // but it will be deserialized as part of the function's innards.
+            if( myChildren[i].GetComponent<FunctionOutputController>() != null )
+            {
+                continue;
+            }
+            // serialize and store
+            mySerializedChildren.Add( myChildren[i].SerializeObject() );
         }
+
+        myStorage.children = mySerializedChildren.ToArray();
 
         return myStorage;
     }
@@ -492,6 +501,28 @@ public class LanguageObject : MonoBehaviour {
         // deserialize
         me.DeserializeObjectHelper( storage, null, null );
         // tada!!
+        return me;
+    }
+
+    public static LanguageObject DeserializeObject( LanguageObjectSerialStorage storage, GameObject parent )
+    {
+        // deserialize
+        LanguageObject me = DeserializeObject( storage );
+        
+        // store local transform properties (these get changed when parent is changed)
+        Vector3 myLocalScale = me.transform.localScale;
+        Vector3 myLocalPosition = me.transform.localPosition;
+        Quaternion myLocalRotation = me.transform.localRotation;
+        
+        // set parent
+        me.transform.parent = parent.transform;
+
+        // reset local transform properties
+        me.transform.localScale = myLocalScale;
+        me.transform.localPosition = myLocalPosition;
+        me.transform.localRotation = myLocalRotation;
+
+        // send off into the world...
         return me;
     }
 

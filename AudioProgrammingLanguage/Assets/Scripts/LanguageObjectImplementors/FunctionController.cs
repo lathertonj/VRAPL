@@ -531,7 +531,6 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
         }
     }
 
-    // TODO: IMPLEMENT Serialization for storage on disk
     public string[] SerializeStringParams( int version )
     {
         // no string params
@@ -540,8 +539,8 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
 
     public int[] SerializeIntParams( int version )
     {
-        // no int params
-        return LanguageObject.noIntParams;
+        // my function id
+        return new int[] { myFunctionId };
     }
 
     public float[] SerializeFloatParams( int version )
@@ -552,13 +551,47 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
 
     public object[] SerializeObjectParams( int version )
     {
-        // no object params
-        return LanguageObject.noObjectParams;
+        // serialize everything that is a child of myBlocks and a LanguageObject
+        List<object> allChildBlocks = new List<object>();
+        foreach( Transform child in myBlocks.transform )
+        {
+            LanguageObject maybeLanguageObject = child.GetComponent<LanguageObject>();
+            if( maybeLanguageObject != null )
+            {
+                Debug.Log( "serializing function's " + maybeLanguageObject.gameObject.name );
+                allChildBlocks.Add( maybeLanguageObject.SerializeObject() );
+            }
+        }
+        return allChildBlocks.ToArray();
     }
 
     public void SerializeLoad( int version, string[] stringParams, int[] intParams, 
         float[] floatParams, object[] objectParams )
     {
-        // nothing to load from params
+        // retrieve function ID and add to static global storage
+        myFunctionId = intParams[0];
+        if( myFunctionId != -1 )
+        {
+            if( !allFunctions.ContainsKey( myFunctionId ) )
+            {
+                allFunctions[myFunctionId] = new List<FunctionController>();
+            }
+            allFunctions[myFunctionId].Add( this );
+        }
+
+        // load inner blocks from serialization
+        GameObject newMyBlocks = new GameObject();
+
+        // parent each old child to newMyBlocks with its original localTransform
+        foreach( LanguageObjectSerialStorage storage in objectParams )
+        {
+            LanguageObject.DeserializeObject( storage, newMyBlocks );
+        }
+
+        // now, copy these blocks into myself
+        ReplaceInnerBlocks( newMyBlocks );
+
+        // and destroy the original
+        Destroy( newMyBlocks );
     }
 }
