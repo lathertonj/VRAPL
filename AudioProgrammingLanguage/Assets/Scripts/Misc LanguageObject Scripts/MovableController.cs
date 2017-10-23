@@ -11,7 +11,7 @@ public class MovableController : MonoBehaviour {
     public Transform additionalRelationshipChild = null;
     public Transform additionalRelationshipParent = null;
 
-    private float myScale = 1.0f;
+    public float myScale = 1.0f;
     public float myMinScale = 1.0f;
 
     private ILanguageObjectListener myLanguageObject;

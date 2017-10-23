@@ -22,7 +22,10 @@ public class FunctionParamController : MonoBehaviour , ILanguageObjectListener
     void Awake () {
         if( myFunction == null )
         {
-		    myFunction = TheRoom.GetCurrentFunction().GetComponent<FunctionController>();
+            if( TheRoom.GetCurrentFunction() != null )
+            {
+		        myFunction = TheRoom.GetCurrentFunction().GetComponent<FunctionController>();
+            }
         }
 	}
 	

@@ -30,6 +30,12 @@ public class Serializer : MonoBehaviour {
 
     private void OnApplicationQuit()
     {
+        // make sure we're on the ground
+        while( TheRoom.InAFunction() )
+        {
+            TheRoom.GetCurrentFunction().ExitFunction();
+        }
+
         // empty myLanguageObjectSerialDir
         Directory.Delete( myLanguageObjectSerialDir, true );
         Directory.CreateDirectory( myLanguageObjectSerialDir );

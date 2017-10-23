@@ -276,14 +276,25 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
                 return;
             }
 
-            // don't look in other functions
             FunctionController maybeFunction = t.GetComponent< FunctionController >();
             if( maybeFunction == null )
             {
-                // but do check everything else
+                // check all non-function transforms recursively
                 foreach( Transform child in t )
                 {
                     transformsToCheck.Enqueue( child );
+                }
+            }
+            // special handling for functions
+            else
+            {
+                // we want to check all languageobject children of the function except for its outputcontroller
+                foreach( LanguageObject child in maybeFunction.GetComponent<LanguageObject>().myChildren )
+                {
+                    if( child.GetComponent<FunctionOutputController>() == null )
+                    {
+                        transformsToCheck.Enqueue( child.transform );
+                    }
                 }
             }
         }
@@ -584,11 +595,17 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
         // load inner blocks from serialization
         GameObject newMyBlocks = new GameObject();
 
+        // Tell the room it's inside me so that blocks below are initialized correctly
+        TheRoom.EnterFunction( this );
+
         // parent each old child to newMyBlocks with its original localTransform
         foreach( LanguageObjectSerialStorage storage in objectParams )
         {
             LanguageObject.DeserializeObject( storage, newMyBlocks );
         }
+
+        // Done being inside me (though ReplaceInnerBlocks will do it again below)
+        TheRoom.ExitFunction( this );
 
         // now, copy these blocks into myself
         ReplaceInnerBlocks( newMyBlocks );
