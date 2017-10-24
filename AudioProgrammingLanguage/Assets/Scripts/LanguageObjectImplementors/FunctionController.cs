@@ -228,10 +228,12 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
         // myBlocks = Instantiate( newInnerBlocks, myBlocksHolder );
         foreach( Transform childBlock in newInnerBlocks.transform )
         {
+            // pass in localScale so that children of this clone will set their localScale correctly
             LanguageObject clonedChild = 
                 childBlock.GetComponent< LanguageObject >().GetClone( childBlock.transform.localScale );
-            // put it in the same position but inside me
+            // put it in the same position but inside me (this messes up localScale so reset it too)
             clonedChild.transform.parent = myBlocks.transform;
+            clonedChild.transform.localScale = childBlock.transform.localScale;
             clonedChild.transform.localPosition = childBlock.transform.localPosition;
             clonedChild.transform.localRotation = childBlock.transform.localRotation;
         }
@@ -594,6 +596,7 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
 
         // load inner blocks from serialization
         GameObject newMyBlocks = new GameObject();
+        newMyBlocks.transform.localScale = Vector3.one;
 
         // Tell the room it's inside me so that blocks below are initialized correctly
         TheRoom.EnterFunction( this );
