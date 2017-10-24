@@ -74,12 +74,10 @@ public class ChuckInstance : MonoBehaviour {
 	}
 
 	// Update is called once per frame
-	void OnAudioFilterRead( float[] data, int channels )
+	void OnAudioFilterRead(float[] data, int channels)
 	{
 		if( !running || isMuted )
 		{
-            // need to fill output with zeros then return
-            Array.Clear( data, 0, data.Length );
 			return;
 		}
 
@@ -92,12 +90,6 @@ public class ChuckInstance : MonoBehaviour {
 
 		// first, run callback with data as input and myOutBuffer as output
 		Chuck.Manager.ManualAudioCallback( myChuckId, data, myOutBuffer, Convert.ToUInt32( channels ) );
-
-        // multiply by 0.8 to try to avoid some clipping
-        for( int i = 0; i < myOutBuffer.Length; i++ )
-        {
-            myOutBuffer[i] *= 0.8f;
-        }
 
 		// if spatializing, need to multiply output by input
 		if( spatialize )
@@ -139,7 +131,12 @@ public class ChuckInstance : MonoBehaviour {
 		return Chuck.Manager.SetInt( myChuckId, variableName, value );
 	}
 
-	public Chuck.IntCallback GetInt( string variableName, Action< System.Int64 > callback )
+	public Chuck.IntCallback CreateGetIntCallback( Action< System.Int64 > callbackFunction )
+	{
+		return Chuck.CreateGetIntCallback( callbackFunction );
+	}
+
+	public bool GetInt( string variableName, Chuck.IntCallback callback )
 	{
 		return Chuck.Manager.GetInt( myChuckId, variableName, callback );
 	}
@@ -149,9 +146,19 @@ public class ChuckInstance : MonoBehaviour {
 		return Chuck.Manager.SetFloat( myChuckId, variableName, value );
 	}
 
-	public Chuck.FloatCallback GetFloat( string variableName, Action< double > callback )
+	public Chuck.FloatCallback CreateGetFloatCallback( Action< double > callbackFunction )
+	{
+		return Chuck.CreateGetFloatCallback( callbackFunction );
+	}
+
+	public bool GetFloat( string variableName, Chuck.FloatCallback callback )
 	{
 		return Chuck.Manager.GetFloat( myChuckId, variableName, callback );
+	}
+
+	public Chuck.VoidCallback CreateVoidCallback( Action callbackFunction )
+	{
+		return Chuck.CreateVoidCallback( callbackFunction );
 	}
 
 	public bool SignalEvent( string variableName )
@@ -162,6 +169,21 @@ public class ChuckInstance : MonoBehaviour {
 	public bool BroadcastEvent( string variableName )
 	{
 		return Chuck.Manager.SignalEvent( myChuckId, variableName );
+	}
+
+	public bool ListenForChuckEventOnce( string variableName, Chuck.VoidCallback callback )
+	{
+		return Chuck.Manager.ListenForChuckEventOnce( myChuckId, variableName, callback );
+	}
+
+	public bool StartListeningForChuckEvent( string variableName, Chuck.VoidCallback callback )
+	{
+		return Chuck.Manager.StartListeningForChuckEvent( myChuckId, variableName, callback );
+	}
+
+	public bool StopListeningForChuckEvent( string variableName, Chuck.VoidCallback callback )
+	{
+		return Chuck.Manager.StopListeningForChuckEvent( myChuckId, variableName, callback );
 	}
 
 	public void SetRunning( bool shouldRun )

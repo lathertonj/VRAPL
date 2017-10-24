@@ -122,7 +122,12 @@ public class Chuck
 		return setChuckInt( chuckId, variableName, value );
 	}
 
-	public IntCallback GetInt( string chuckName, string variableName, Action< System.Int64 > callback )
+	public static Chuck.IntCallback CreateGetIntCallback( Action< System.Int64 > callbackFunction )
+	{
+		return new IntCallback( callbackFunction );
+	}
+
+	public bool GetInt( string chuckName, string variableName, Chuck.IntCallback callback )
 	{
 		if( ids.ContainsKey( chuckName ) )
 		{
@@ -131,21 +136,21 @@ public class Chuck
 		else
 		{
 			Debug.Log( chuckName + " has not been initialized as a ChucK instance" );
-			return null;
+			return false;
 		}
 	}
 
-	public IntCallback GetInt( System.UInt32 chuckId, string variableName, Action< System.Int64 > callback )
+	public bool GetInt( System.UInt32 chuckId, string variableName, Chuck.IntCallback callback )
 	{
 		// save a copy of the delegate so it doesn't get garbage collected!
 		string internalKey = chuckId.ToString() + "$" + variableName;
-		intCallbacks[internalKey] = new IntCallback( callback );
+		intCallbacks[internalKey] = callback;
 		// register the callback with ChucK
 		if( !getChuckInt( chuckId, variableName, intCallbacks[internalKey] ) )
 		{
-			return null;
+			return false;
 		}
-		return intCallbacks[internalKey];
+		return true;
 	}
 
 	public bool SetFloat( string chuckName, string variableName, double value )
@@ -166,7 +171,12 @@ public class Chuck
 		return setChuckFloat( chuckId, variableName, value );
 	}
 
-	public FloatCallback GetFloat( string chuckName, string variableName, Action< double > callback )
+	public static Chuck.FloatCallback CreateGetFloatCallback( Action< double > callbackFunction )
+	{
+		return new FloatCallback( callbackFunction );
+	}
+
+	public bool GetFloat( string chuckName, string variableName, Chuck.FloatCallback callback )
 	{
 		if( ids.ContainsKey( chuckName ) )
 		{
@@ -175,21 +185,26 @@ public class Chuck
 		else
 		{
 			Debug.Log( chuckName + " has not been initialized as a ChucK instance" );
-			return null;
+			return false;
 		}
 	}
 
-	public FloatCallback GetFloat( System.UInt32 chuckId, string variableName, Action< double > callback )
+	public bool GetFloat( System.UInt32 chuckId, string variableName, Chuck.FloatCallback callback )
 	{
 		// save a copy of the delegate so it doesn't get garbage collected!
 		string internalKey = chuckId.ToString() + "$" + variableName;
-		floatCallbacks[internalKey] = new FloatCallback( callback );
+		floatCallbacks[internalKey] = callback;
 		// register the callback with ChucK
 		if( !getChuckFloat( chuckId, variableName, floatCallbacks[internalKey] ) )
 		{
-			return null;
+			return false;
 		}
-		return floatCallbacks[internalKey];
+		return true;
+	}
+
+	public static Chuck.VoidCallback CreateVoidCallback( Action callbackFunction )
+	{
+		return new VoidCallback( callbackFunction );
 	}
 
 	public bool SignalEvent( string chuckName, string variableName )
@@ -228,11 +243,70 @@ public class Chuck
 		return broadcastChuckEvent( chuckId, variableName );
 	}
 
+	public bool ListenForChuckEventOnce( string chuckName, string variableName, Chuck.VoidCallback callback )
+	{
+		if( ids.ContainsKey( chuckName ) )
+		{
+			return ListenForChuckEventOnce( ids[chuckName], variableName, callback );
+		}
+		else
+		{
+			Debug.Log( chuckName + " has not been initialized as a ChucK instance" );
+			return false;
+		}	
+	}
+
+	public bool ListenForChuckEventOnce( System.UInt32 chuckId, string variableName, Chuck.VoidCallback callback )
+	{
+		return listenForChuckEventOnce( chuckId, variableName, callback );
+	}
+
+	public bool StartListeningForChuckEvent( string chuckName, string variableName, Chuck.VoidCallback callback )
+	{
+		if( ids.ContainsKey( chuckName ) )
+		{
+			return StartListeningForChuckEvent( ids[chuckName], variableName, callback );
+		}
+		else
+		{
+			Debug.Log( chuckName + " has not been initialized as a ChucK instance" );
+			return false;
+		}	
+	}
+
+	public bool StartListeningForChuckEvent( System.UInt32 chuckId, string variableName, Chuck.VoidCallback callback )
+	{
+		return startListeningForChuckEvent( chuckId, variableName, callback );
+	}
+
+
+	public bool StopListeningForChuckEvent( string chuckName, string variableName, Chuck.VoidCallback callback )
+	{
+		if( ids.ContainsKey( chuckName ) )
+		{
+			return StopListeningForChuckEvent( ids[chuckName], variableName, callback );
+		}
+		else
+		{
+			Debug.Log( chuckName + " has not been initialized as a ChucK instance" );
+			return false;
+		}	
+	}
+
+	public bool StopListeningForChuckEvent( System.UInt32 chuckId, string variableName, Chuck.VoidCallback callback )
+	{
+		return stopListeningForChuckEvent( chuckId, variableName, callback );
+	}
+
+
 	[UnmanagedFunctionPointer (CallingConvention.Cdecl)]
 	public delegate void MyLogCallback( System.String str );
 
 	[UnmanagedFunctionPointer (CallingConvention.Cdecl)]
 	public delegate void IntCallback( System.Int64 i );
+
+	[UnmanagedFunctionPointer (CallingConvention.Cdecl)]
+	public delegate void VoidCallback();
 
 	[UnmanagedFunctionPointer (CallingConvention.Cdecl)]
 	public delegate void FloatCallback( double f );
@@ -279,6 +353,15 @@ public class Chuck
 
 	[DllImport (PLUGIN_NAME)]
 	private static extern bool broadcastChuckEvent( System.UInt32 chuckID, System.String name );
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool listenForChuckEventOnce( System.UInt32 chuckID, System.String name, VoidCallback callback );
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool startListeningForChuckEvent( System.UInt32 chuckID, System.String name, VoidCallback callback );
+
+	[DllImport (PLUGIN_NAME)]
+	private static extern bool stopListeningForChuckEvent( System.UInt32 chuckID, System.String name, VoidCallback callback );
 
 	[DllImport (PLUGIN_NAME)]
 	private static extern bool setChoutCallback( System.UInt32 chuckID, MyLogCallback callback );

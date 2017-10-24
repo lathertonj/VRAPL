@@ -14,8 +14,6 @@ public class ControlWorldObjectController : MonoBehaviour , ILanguageObjectListe
 
 
     private Chuck.FloatCallback myValueGetterCallback = null;
-    private List<Chuck.FloatCallback> deadCallbacks;
-    private int framesSinceCallback = 0;
 
     private IControllable myParent = null;
 
@@ -29,7 +27,8 @@ public class ControlWorldObjectController : MonoBehaviour , ILanguageObjectListe
 		myCurrent = 0;
         myMin = -1;
         myMax = 1;
-        deadCallbacks = new List<Chuck.FloatCallback>();
+
+        myValueGetterCallback = Chuck.CreateGetFloatCallback( GetMyCurrentValueCallback );
 
         defaultAllowedControls = new string[] { "object" };
         myAllowedControls = defaultAllowedControls;
@@ -71,22 +70,7 @@ public class ControlWorldObjectController : MonoBehaviour , ILanguageObjectListe
 	
 	private void Update () {
         // fetch myGain.last() into myCurrent
-        if (myValueGetterCallback == null)
-        {
-            myValueGetterCallback = TheChuck.Instance.GetFloat(mySampleGetter, GetMyCurrentValueCallback);
-            framesSinceCallback = 0;
-        }
-        else
-        {
-            framesSinceCallback++;
-        }
-
-        if( framesSinceCallback > 2 )
-        {
-            deadCallbacks.Add( myValueGetterCallback );
-            myValueGetterCallback = null;
-            Debug.Log("num dead callbacks: " + deadCallbacks.Count.ToString() );
-        }
+        TheChuck.Instance.GetFloat( mySampleGetter, myValueGetterCallback );
 	}
 
     private void UpdateText()
@@ -103,7 +87,6 @@ public class ControlWorldObjectController : MonoBehaviour , ILanguageObjectListe
     void GetMyCurrentValueCallback( double value )
     {
         myCurrent = (float) value;
-        myValueGetterCallback = null;
     }
 
     void SwitchColors()
