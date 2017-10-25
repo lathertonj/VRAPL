@@ -26,7 +26,7 @@ public class LanguageObject : MonoBehaviour {
     private Dictionary<LanguageObject, Collider> exitingDebounceColliders;
     private int debounceFramesToWait = 1;
 
-    private void Awake()
+    protected void Awake()
     {
         // recursively make sure all my colliders are trigger colliders and that my rigidbodies do not use gravity, etc
         EnsureTriggerBehavior( transform );
@@ -37,11 +37,6 @@ public class LanguageObject : MonoBehaviour {
         enteringDebounceColliders = new Dictionary<LanguageObject, Collider>();
         exitingDebounceColliders = new Dictionary<LanguageObject, Collider>();        
     }
-
-    // Use this for initialization
-    void Start () {
-
-	}
 
     void EnsureTriggerBehavior( Transform self )
     {
@@ -320,7 +315,7 @@ public class LanguageObject : MonoBehaviour {
         return null;
     }
 
-    public ChuckInstance GetChuck()
+    public virtual ChuckInstance GetChuck()
     {
         if( HaveOwnChuck() )
         {
@@ -589,11 +584,11 @@ public interface ILanguageObjectListener
     void ParentDisconnected( LanguageObject parent );
     void NewChild( LanguageObject child );
     void ChildDisconnected( LanguageObject child );
-    string InputConnection();
-    string OutputConnection();
     string VisibleName();
     void GotChuck( ChuckInstance chuck );
     void LosingChuck( ChuckInstance chuck );
+    string InputConnection();
+    string OutputConnection();
     void SizeChanged( float newSize );
     void CloneYourselfFrom( LanguageObject original, LanguageObject newParent );
 

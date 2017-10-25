@@ -110,3 +110,5 @@ MonoBehaviour:
     prefab: {fileID: 1143157109221374, guid: 7da19083752fea646b466d3762b1fcfb, type: 2}
   - name: language comment
     prefab: {fileID: 1772315093361056, guid: 560b73e18cefe6c41baeddc7ccddb591, type: 2}
+  - name: event clock
+    prefab: {fileID: 1685811851115912, guid: e73f47057dc01b7439a9dc74d64049de, type: 2}
