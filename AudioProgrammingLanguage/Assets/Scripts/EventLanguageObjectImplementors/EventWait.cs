@@ -4,19 +4,19 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(EventLanguageObject))]
-public class EventClock : MonoBehaviour , IEventLanguageObjectListener , IEventLanguageObjectEmitter {
+public class EventWait : MonoBehaviour , IEventLanguageObjectListener , IEventLanguageObjectEmitter {
 
     public MeshRenderer myRenderer;
 
     private string myStorageClass;
-    private string myTriggerEvent;
+    private string myOutgoingTriggerEvent;
     private string myExitEvent;
 
     public void StartEmitTrigger() 
     {
         ChuckInstance theChuck = TheChuck.Instance;
         myStorageClass = theChuck.GetUniqueVariableName();
-        myTriggerEvent = theChuck.GetUniqueVariableName();
+        myOutgoingTriggerEvent = theChuck.GetUniqueVariableName();
         myExitEvent = theChuck.GetUniqueVariableName();
 
         theChuck.RunCode( string.Format( @"
@@ -25,39 +25,46 @@ public class EventClock : MonoBehaviour , IEventLanguageObjectListener , IEventL
 
             public class {0}
             {{
+                static Event @ myIncomingTriggerEvent;
+                static Shred @ myCurrentShred;
+
                 static Gain @ myGain;
                 static Step @ myDefaultValue;
+
+                fun static void BroadcastEvents()
+                {{
+                    while( true )
+                    {{
+                        {0}.myIncomingTriggerEvent => now;
+                        {0}.myGain.last() => float secTimeToWait;
+                        Math.max( secTimeToWait, 0.0001 ) => secTimeToWait;
+                        secTimeToWait::second => now;
+                        {2}.broadcast();
+                    }}
+                }}
             }}
+            
+            Event e @=> {0}.myIncomingTriggerEvent;
+
 
             Gain g @=> {0}.myGain;
             Step s @=> {0}.myDefaultValue;
-            1 => {0}.myDefaultValue.next;
+            0.5 => {0}.myDefaultValue.next;
             {0}.myDefaultValue => {0}.myGain => blackhole;
 
-            fun void BroadcastEvents()
-            {{
-                while( true )
-                {{
-                    {0}.myGain.last() => float secTimeToWait;
-                    Math.max( secTimeToWait, 0.0001 ) => secTimeToWait;
-                    secTimeToWait::second => now;
-                    {2}.broadcast();
-                }}
-            }}
-
             // broadcast
-            spork ~ BroadcastEvents();
+            spork ~ {0}.BroadcastEvents() @=> {0}.myCurrentShred;
 
             // wait until told to exit
             {1} => now;
 
-            ", myStorageClass, myExitEvent, myTriggerEvent    
+            ", myStorageClass, myExitEvent, myOutgoingTriggerEvent    
         ));
     }
 
     public string ExternalEventSource()
     {
-        return myTriggerEvent;
+        return myOutgoingTriggerEvent;
     }
 
     public string InputConnection()
@@ -72,19 +79,25 @@ public class EventClock : MonoBehaviour , IEventLanguageObjectListener , IEventL
 
     public void TickDoAction()
     {
-        // change color
-        // NOTE: this will not be called unless the clock is a child of something else
-        myRenderer.material.color = UnityEngine.Random.ColorHSV();
+        // don't do anything on an action
     }
 
     public void NewListenEvent( ChuckInstance theChuck, string incomingEvent )
     {
-        // don't care
+        // listen for the new event
+        theChuck.RunCode( string.Format( @"
+            external Event {1};
+            // broadcast
+            spork ~ {0}.BroadcastEvents() @=> {0}.myCurrentShred;
+        ", myStorageClass, incomingEvent ));
     }
 
-    public void LosingListenEvent( ChuckInstance theChuck, string losingEvent)
+    public void LosingListenEvent( ChuckInstance theChuck, string losingEvent )
     {
-        // don't care
+        // exit the shred that is listening to the old event
+        theChuck.RunCode( string.Format( @"
+            {0}.myCurrentShred.exit();
+        ", myStorageClass ));
     }
     
     public bool AcceptableChild( LanguageObject other )

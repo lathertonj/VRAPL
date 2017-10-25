@@ -35,7 +35,7 @@ public class EventLanguageObject : LanguageObject {
         }
     }
 
-    public override void Update()
+    protected override void Update()
     {
         // do LanguageObject update
         base.Update();
@@ -138,12 +138,14 @@ public class EventLanguageObject : LanguageObject {
         if( myListeningTriggerEvent != "" )
         {
             // deregister
+            myMaybeListener.LosingListenEvent( TheChuck.Instance, myListeningTriggerEvent );
             TheChuck.Instance.StopListeningForChuckEvent( myListeningTriggerEvent, myTriggerCallback );
         }
         
         // register
         myListeningTriggerEvent = newTriggerEvent;
         TheChuck.Instance.StartListeningForChuckEvent( myListeningTriggerEvent, myTriggerCallback );
+        myMaybeListener.NewListenEvent( TheChuck.Instance, newTriggerEvent );
     }
 
     private void ListenTriggerCallback()
@@ -156,6 +158,8 @@ public class EventLanguageObject : LanguageObject {
 public interface IEventLanguageObjectListener : ILanguageObjectListener
 {
     void TickDoAction();
+    void NewListenEvent( ChuckInstance theChuck, string incomingEvent );
+    void LosingListenEvent( ChuckInstance theChuck, string losingEvent );
 }
 
 public interface IEventLanguageObjectEmitter : ILanguageObjectListener

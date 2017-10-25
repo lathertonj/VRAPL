@@ -14,6 +14,16 @@ public class EventVisualizer : MonoBehaviour , IEventLanguageObjectListener {
         // NOTE: this will not be called unless the clock is a child of something else
         myRenderer.material.color = UnityEngine.Random.ColorHSV();
     }
+
+    public void NewListenEvent( ChuckInstance theChuck, string incomingEvent )
+    {
+        // don't care
+    }
+
+    public void LosingListenEvent( ChuckInstance theChuck, string losingEvent)
+    {
+        // don't care
+    }
     
     public bool AcceptableChild( LanguageObject other )
     {

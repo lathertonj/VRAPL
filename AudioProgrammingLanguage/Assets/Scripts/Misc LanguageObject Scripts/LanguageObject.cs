@@ -61,7 +61,7 @@ public class LanguageObject : MonoBehaviour {
     }
 
     // Update is called once per frame
-    public virtual void Update () {
+    protected virtual void Update () {
         // sometimes an enter-exit-enter fires in quick succession.
         // debouncing makes each one wait a frame to see if the other fires to negate it
         // this way, an enter-exit-enter or an exit-enter-exit will just be sent as 
