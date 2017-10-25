@@ -61,7 +61,7 @@ public class LanguageObject : MonoBehaviour {
     }
 
     // Update is called once per frame
-    void Update () {
+    public virtual void Update () {
         // sometimes an enter-exit-enter fires in quick succession.
         // debouncing makes each one wait a frame to see if the other fires to negate it
         // this way, an enter-exit-enter or an exit-enter-exit will just be sent as 
@@ -196,7 +196,7 @@ public class LanguageObject : MonoBehaviour {
                     // I am entering's parent
                     entering.myParent = GetComponent<LanguageObject>();
                     // entering is my child
-                    myChildren.Add( entering );
+                    this.AddToChildren( entering );
                     // Make entering a child of me when the move is finished
                     GetComponent<MovableController>().additionalRelationshipChild = entering.transform;
                     GetComponent<MovableController>().additionalRelationshipParent = transform;
@@ -219,7 +219,7 @@ public class LanguageObject : MonoBehaviour {
                 // I have a parent
                 myParent = entering;
                 // And my parent has me
-                myParent.myChildren.Add( GetComponent<LanguageObject>() );
+                myParent.AddToChildren( this );
                 // Make me a child of the parent when the move is finished
                 GetComponent<MovableController>().parentAfterMovement = myParent.transform;
                 // Signal to outside I have a parent now
@@ -258,7 +258,7 @@ public class LanguageObject : MonoBehaviour {
         }
     }
 
-    public void RemoveFromParent()
+    public virtual void RemoveFromParent()
     {
         ChuckInstance myChuck = GetChuck();
         if( !HaveOwnChuck() && myChuck != null )
@@ -378,6 +378,11 @@ public class LanguageObject : MonoBehaviour {
         return GetCloneHelper( null, null, localScale );
     }
 
+    public virtual void AddToChildren( LanguageObject child )
+    {
+        myChildren.Add( child );
+    }
+
     private LanguageObject GetCloneHelper( LanguageObject parent, ILanguageObjectListener parentListener, 
         Vector3 localScale )
     {
@@ -394,7 +399,7 @@ public class LanguageObject : MonoBehaviour {
         {
             // LanguageObject storage
             copy.myParent = parent;
-            parent.myChildren.Add( copy );
+            parent.AddToChildren( copy );
 
             // Unity transform tree
             copy.transform.parent = parent.transform;
@@ -533,7 +538,7 @@ public class LanguageObject : MonoBehaviour {
         {
             // LanguageObject storage
             myParent = parent;
-            parent.myChildren.Add( this );
+            parent.AddToChildren( this );
 
             // notify the objects
             meListener.NewParent( parent );

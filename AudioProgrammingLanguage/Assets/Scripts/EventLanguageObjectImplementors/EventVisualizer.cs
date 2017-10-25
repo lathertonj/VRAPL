@@ -4,72 +4,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(EventLanguageObject))]
-public class EventClock : MonoBehaviour , IEventLanguageObjectListener , IEventLanguageObjectEmitter {
+public class EventVisualizer : MonoBehaviour , IEventLanguageObjectListener {
 
     public MeshRenderer myRenderer;
-
-    private string myStorageClass;
-    private string myTriggerEvent;
-    private string myExitEvent;
-
-    public void StartEmitTrigger() 
-    {
-        ChuckInstance theChuck = TheChuck.Instance;
-        myStorageClass = theChuck.GetUniqueVariableName();
-        myTriggerEvent = theChuck.GetUniqueVariableName();
-        myExitEvent = theChuck.GetUniqueVariableName();
-
-        theChuck.RunCode( string.Format( @"
-            external Event {1};
-            external Event {2};
-
-            public class {0}
-            {{
-                static Gain @ myGain;
-                static Step @ myDefaultValue;
-            }}
-
-            Gain g @=> {0}.myGain;
-            Step s @=> {0}.myDefaultValue;
-            1 => {0}.myDefaultValue.next;
-            {0}.myDefaultValue => {0}.myGain => blackhole;
-
-            fun void BroadcastEvents()
-            {{
-                while( true )
-                {{
-                    {0}.myGain.last() => float secTimeToWait;
-                    Math.max( secTimeToWait, 0.0001 ) => secTimeToWait;
-                    secTimeToWait::second => now;
-                    {2}.broadcast();
-                }}
-            }}
-
-            // broadcast
-            spork ~ BroadcastEvents();
-
-            // wait until told to exit
-            {1} => now;
-
-            ", myStorageClass, myExitEvent, myTriggerEvent    
-        ));
-    }
-
-    public string ExternalEventSource()
-    {
-        return myTriggerEvent;
-    }
-
-    public string InputConnection()
-    {
-        return string.Format( "{0}.myGain", myStorageClass );
-    }
-
-    public string OutputConnection()
-    {
-        return InputConnection();
-    }
-
+    
     public void TickDoAction()
     {
         // change color
@@ -79,9 +17,7 @@ public class EventClock : MonoBehaviour , IEventLanguageObjectListener , IEventL
     
     public bool AcceptableChild( LanguageObject other )
     {
-        Debug.Log( "Clock is being asked whether something is an acceptable child!");
-        if( other.GetComponent<NumberProducer>() != null ||
-            other is EventLanguageObject )
+        if( other.GetComponent<EventLanguageObject>() != null )
         {
             return true;
         }
@@ -123,6 +59,16 @@ public class EventClock : MonoBehaviour , IEventLanguageObjectListener , IEventL
         // don't care
     }
 
+    public string InputConnection()
+    {
+        // have no connection
+        return "";
+    }
+
+    public string OutputConnection()
+    {
+        return InputConnection();
+    }
 
     public void SizeChanged( float newSize )
     {

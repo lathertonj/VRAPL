@@ -112,3 +112,5 @@ MonoBehaviour:
     prefab: {fileID: 1772315093361056, guid: 560b73e18cefe6c41baeddc7ccddb591, type: 2}
   - name: event clock
     prefab: {fileID: 1685811851115912, guid: e73f47057dc01b7439a9dc74d64049de, type: 2}
+  - name: event visualizer
+    prefab: {fileID: 1958857918817802, guid: 4829fe61b6549584fa39fd61887f937c, type: 2}
