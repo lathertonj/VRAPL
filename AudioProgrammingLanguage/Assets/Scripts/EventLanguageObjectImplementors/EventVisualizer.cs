@@ -7,12 +7,21 @@ using UnityEngine;
 public class EventVisualizer : MonoBehaviour , IEventLanguageObjectListener {
 
     public MeshRenderer myRenderer;
-    
+
+    private void Awake()
+    {
+        myRenderer.material.color = Color.HSVToRGB( 1, 0.15f, 1 );
+    }
+
     public void TickDoAction()
     {
-        // change color
-        // NOTE: this will not be called unless the clock is a child of something else
-        myRenderer.material.color = UnityEngine.Random.ColorHSV();
+        // change color when ticked
+        // get hsv
+        float h,s,v;
+        Color.RGBToHSV( myRenderer.material.color, out h, out s, out v );
+        // increment h
+        h += 2 * 0.07134f;
+        myRenderer.material.color = Color.HSVToRGB( h, s, v );
     }
 
     public void NewListenEvent( ChuckInstance theChuck, string incomingEvent )

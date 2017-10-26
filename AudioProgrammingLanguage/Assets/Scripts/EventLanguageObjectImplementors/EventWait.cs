@@ -15,6 +15,7 @@ public class EventWait : MonoBehaviour , IEventLanguageObjectListener , IEventLa
     private string myOutgoingTriggerEvent;
     private string myOverallExitEvent;
     private string mySmallerExitEvent;
+    private int myNumNumberChildren = 0;
 
     private void Awake()
     {
@@ -161,12 +162,34 @@ public class EventWait : MonoBehaviour , IEventLanguageObjectListener , IEventLa
 
     public void NewChild( LanguageObject child )
     {
-        // don't care
+        // is it a new number source?
+        if( child.GetComponent<NumberProducer>() != null )
+        {
+            myNumNumberChildren++;
+            // is it the first number source? --> turn off my default
+            if( myNumNumberChildren == 1 )
+            {
+                TheChuck.Instance.RunCode( string.Format( 
+                    "0 => {0}.myDefaultValue.gain;", myStorageClass 
+                ) );
+            }
+        }
     }
 
     public void ChildDisconnected( LanguageObject child )
     {
-        // don't care
+       // is it a number source?
+        if( child.GetComponent<NumberProducer>() != null )
+        {
+            myNumNumberChildren--;
+            // is it the last number source? --> turn on my default
+            if( myNumNumberChildren == 0 )
+            {
+                TheChuck.Instance.RunCode( string.Format( 
+                    "1 => {0}.myDefaultValue.gain;", myStorageClass 
+                ) );
+            }
+        }
     }
 
     public string VisibleName()

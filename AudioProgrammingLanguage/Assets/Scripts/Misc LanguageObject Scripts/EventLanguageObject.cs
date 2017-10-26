@@ -27,10 +27,7 @@ public class EventLanguageObject : LanguageObject {
         myEventChildren = new List<EventLanguageObject>();
         myIncomingTriggerCallback = Chuck.CreateVoidCallback( ListenTriggerCallback );
         myOutgoingTriggerCallback = Chuck.CreateVoidCallback( EmitTriggerCallback );
-    }
 
-    private void Start()
-    {
         // if I'm an emitter, set me up
         if( myMaybeEmitter != null )
         {
