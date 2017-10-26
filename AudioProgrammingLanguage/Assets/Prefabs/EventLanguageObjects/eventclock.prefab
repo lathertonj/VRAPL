@@ -146,14 +146,14 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1107458736813958}
-  m_LocalRotation: {x: 0, y: -0, z: 0.0022687619, w: -0.99999744}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4042141157180620}
   m_Father: {fileID: 4562644552397218}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -360.26}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4559934861530030
 Transform:
   m_ObjectHideFlags: 1
@@ -382,6 +382,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myClockHand: {fileID: 4315995401956356}
+  myClockHandMesh: {fileID: 23090514239798958}
 --- !u!114 &114141027197745144
 MonoBehaviour:
   m_ObjectHideFlags: 1

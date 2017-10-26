@@ -7,10 +7,16 @@ using UnityEngine;
 public class EventClock : MonoBehaviour , IEventLanguageObjectEmitter {
 
     public Transform myClockHand;
+    public MeshRenderer myClockHandMesh;
 
     private string myStorageClass;
     private string myTriggerEvent;
     private string myExitEvent;
+
+    private void Awake()
+    {
+        myClockHandMesh.material.color = Color.black;
+    }
 
     public void StartEmitTrigger() 
     {

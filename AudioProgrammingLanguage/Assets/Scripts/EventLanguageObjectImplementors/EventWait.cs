@@ -6,12 +6,48 @@ using UnityEngine;
 [RequireComponent(typeof(EventLanguageObject))]
 public class EventWait : MonoBehaviour , IEventLanguageObjectListener , IEventLanguageObjectEmitter {
 
-    public MeshRenderer myRenderer;
+    public MeshRenderer myInputSphere;
+    public MeshRenderer myOutputSphere;
+    private int numFramesToShowInput = 0;
+    private int numFramesToShowOutput = 0;
 
     private string myStorageClass;
     private string myOutgoingTriggerEvent;
     private string myOverallExitEvent;
     private string mySmallerExitEvent;
+
+    private void Awake()
+    {
+        // set colors
+        myInputSphere.material.color = myOutputSphere.material.color = Color.blue;
+
+        // set active
+        myInputSphere.gameObject.SetActive( false );
+        myOutputSphere.gameObject.SetActive( false );
+    }
+
+    private void Update()
+    {
+        // show input or disable it
+        if( numFramesToShowInput > 0 )
+        {
+            numFramesToShowInput--;
+        }
+        else
+        {
+            myInputSphere.gameObject.SetActive( false );
+        }
+
+        // show output or disable it
+        if( numFramesToShowOutput > 0 )
+        {
+            numFramesToShowOutput--;
+        }
+        else
+        {
+            myOutputSphere.gameObject.SetActive( false );
+        }
+    }
 
     public void StartEmitTrigger() 
     {
@@ -59,12 +95,16 @@ public class EventWait : MonoBehaviour , IEventLanguageObjectListener , IEventLa
 
     public void TickDoAction()
     {
-        // don't do anything on an action
+        // show my output sphere when I receive an event
+        numFramesToShowInput = 10;
+        myInputSphere.gameObject.SetActive( true );
     }
 
     public void ShowEmit()
     {
-        // don't show anything on emit
+        // show my output sphere when I emit an event
+        numFramesToShowOutput = 10;
+        myOutputSphere.gameObject.SetActive( true );
     }
 
     public void NewListenEvent( ChuckInstance theChuck, string incomingEvent )
