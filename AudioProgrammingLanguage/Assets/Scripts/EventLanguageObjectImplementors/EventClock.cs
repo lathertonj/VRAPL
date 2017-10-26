@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(EventLanguageObject))]
-public class EventClock : MonoBehaviour , IEventLanguageObjectListener , IEventLanguageObjectEmitter {
+public class EventClock : MonoBehaviour , IEventLanguageObjectEmitter {
 
-    public MeshRenderer myRenderer;
+    public Transform myClockHand;
 
     private string myStorageClass;
     private string myTriggerEvent;
@@ -60,6 +60,14 @@ public class EventClock : MonoBehaviour , IEventLanguageObjectListener , IEventL
         return myTriggerEvent;
     }
 
+    public void ShowEmit()
+    {
+        // tick the clock hand forward by 5 degrees
+        Vector3 rotation = myClockHand.localEulerAngles;
+        rotation.z -= 5;
+        myClockHand.localEulerAngles = rotation;
+    }
+
     public string InputConnection()
     {
         return string.Format( "{0}.myGain", myStorageClass );
@@ -68,23 +76,6 @@ public class EventClock : MonoBehaviour , IEventLanguageObjectListener , IEventL
     public string OutputConnection()
     {
         return InputConnection();
-    }
-
-    public void TickDoAction()
-    {
-        // change color
-        // NOTE: this will not be called unless the clock is a child of something else
-        myRenderer.material.color = UnityEngine.Random.ColorHSV();
-    }
-
-    public void NewListenEvent( ChuckInstance theChuck, string incomingEvent )
-    {
-        // don't care
-    }
-
-    public void LosingListenEvent( ChuckInstance theChuck, string losingEvent)
-    {
-        // don't care
     }
     
     public bool AcceptableChild( LanguageObject other )

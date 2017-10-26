@@ -62,6 +62,11 @@ public class EventWait : MonoBehaviour , IEventLanguageObjectListener , IEventLa
         // don't do anything on an action
     }
 
+    public void ShowEmit()
+    {
+        // don't show anything on emit
+    }
+
     public void NewListenEvent( ChuckInstance theChuck, string incomingEvent )
     {
         // listen for the new event

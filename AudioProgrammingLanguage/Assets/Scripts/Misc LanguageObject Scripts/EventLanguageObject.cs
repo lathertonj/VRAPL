@@ -8,10 +8,12 @@ public class EventLanguageObject : LanguageObject {
     IEventLanguageObjectEmitter myMaybeEmitter = null;
     List<EventLanguageObject> myEventChildren = null;
     EventLanguageObject myEventParent = null;
-    Chuck.VoidCallback myTriggerCallback = null;
+    Chuck.VoidCallback myIncomingTriggerCallback = null;
+    Chuck.VoidCallback myOutgoingTriggerCallback = null;
 
     string myListeningTriggerEvent = "";
-    int myTriggerCount = 0;
+    int myIncomingTriggerCount = 0;
+    int myOutgoingTriggerCount = 0;
 
     private new void Awake()
     {
@@ -23,7 +25,8 @@ public class EventLanguageObject : LanguageObject {
             Debug.LogError( "EventLanguageObject must at least implement Listener or Emitter!" );
         }
         myEventChildren = new List<EventLanguageObject>();
-        myTriggerCallback = Chuck.CreateVoidCallback( ListenTriggerCallback );
+        myIncomingTriggerCallback = Chuck.CreateVoidCallback( ListenTriggerCallback );
+        myOutgoingTriggerCallback = Chuck.CreateVoidCallback( EmitTriggerCallback );
     }
 
     private void Start()
@@ -31,7 +34,11 @@ public class EventLanguageObject : LanguageObject {
         // if I'm an emitter, set me up
         if( myMaybeEmitter != null )
         {
+            // do setup
             myMaybeEmitter.StartEmitTrigger();
+            // tell emitter when its trigger goes
+            TheChuck.Instance.StartListeningForChuckEvent( myMaybeEmitter.ExternalEventSource(),
+                myOutgoingTriggerCallback );
         }
     }
 
@@ -41,12 +48,22 @@ public class EventLanguageObject : LanguageObject {
         base.Update();
 
         // if I've received any triggers, send them out to my listener
-        while( myTriggerCount > 0 )
+        while( myIncomingTriggerCount > 0 )
         {
-            myTriggerCount--;
+            myIncomingTriggerCount--;
             if( myMaybeListener != null )
             {
                 myMaybeListener.TickDoAction();
+            }
+        }
+
+        // if I've sent out any triggers, send themt to my emitter
+        while( myOutgoingTriggerCount > 0 )
+        {
+            myOutgoingTriggerCount--;
+            if( myMaybeEmitter != null )
+            {
+                myMaybeEmitter.ShowEmit();
             }
         }
     }
@@ -139,21 +156,26 @@ public class EventLanguageObject : LanguageObject {
         {
             // deregister
             myMaybeListener.LosingListenEvent( TheChuck.Instance, myListeningTriggerEvent );
-            TheChuck.Instance.StopListeningForChuckEvent( myListeningTriggerEvent, myTriggerCallback );
+            TheChuck.Instance.StopListeningForChuckEvent( myListeningTriggerEvent, myIncomingTriggerCallback );
         }
         
         // register
         myListeningTriggerEvent = newTriggerEvent;
         if( myListeningTriggerEvent != "" )
         {
-            TheChuck.Instance.StartListeningForChuckEvent( myListeningTriggerEvent, myTriggerCallback );
+            TheChuck.Instance.StartListeningForChuckEvent( myListeningTriggerEvent, myIncomingTriggerCallback );
             myMaybeListener.NewListenEvent( TheChuck.Instance, newTriggerEvent );
         }
     }
 
     private void ListenTriggerCallback()
     {
-        myTriggerCount++;
+        myIncomingTriggerCount++;
+    }
+
+    private void EmitTriggerCallback()
+    {
+        myOutgoingTriggerCount++;
     }
 
 }
@@ -170,4 +192,5 @@ public interface IEventLanguageObjectEmitter : ILanguageObjectListener
     // return a string which is the Event people should listen to
     string ExternalEventSource();
     void StartEmitTrigger();
+    void ShowEmit();
 }
