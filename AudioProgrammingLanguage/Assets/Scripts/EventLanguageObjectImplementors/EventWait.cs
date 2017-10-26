@@ -10,14 +10,15 @@ public class EventWait : MonoBehaviour , IEventLanguageObjectListener , IEventLa
 
     private string myStorageClass;
     private string myOutgoingTriggerEvent;
-    private string myExitEvent;
+    private string myOverallExitEvent;
+    private string mySmallerExitEvent;
 
     public void StartEmitTrigger() 
     {
         ChuckInstance theChuck = TheChuck.Instance;
         myStorageClass = theChuck.GetUniqueVariableName();
         myOutgoingTriggerEvent = theChuck.GetUniqueVariableName();
-        myExitEvent = theChuck.GetUniqueVariableName();
+        myOverallExitEvent = theChuck.GetUniqueVariableName();
 
         theChuck.RunCode( string.Format( @"
             external Event {1};
@@ -25,40 +26,19 @@ public class EventWait : MonoBehaviour , IEventLanguageObjectListener , IEventLa
 
             public class {0}
             {{
-                static Event @ myIncomingTriggerEvent;
-                static Shred @ myCurrentShred;
-
                 static Gain @ myGain;
                 static Step @ myDefaultValue;
-
-                fun static void BroadcastEvents()
-                {{
-                    while( true )
-                    {{
-                        {0}.myIncomingTriggerEvent => now;
-                        {0}.myGain.last() => float secTimeToWait;
-                        Math.max( secTimeToWait, 0.0001 ) => secTimeToWait;
-                        secTimeToWait::second => now;
-                        {2}.broadcast();
-                    }}
-                }}
             }}
-            
-            Event e @=> {0}.myIncomingTriggerEvent;
-
 
             Gain g @=> {0}.myGain;
             Step s @=> {0}.myDefaultValue;
             0.5 => {0}.myDefaultValue.next;
             {0}.myDefaultValue => {0}.myGain => blackhole;
 
-            // broadcast
-            spork ~ {0}.BroadcastEvents() @=> {0}.myCurrentShred;
-
             // wait until told to exit
             {1} => now;
 
-            ", myStorageClass, myExitEvent, myOutgoingTriggerEvent    
+            ", myStorageClass, myOverallExitEvent, myOutgoingTriggerEvent    
         ));
     }
 
@@ -85,19 +65,33 @@ public class EventWait : MonoBehaviour , IEventLanguageObjectListener , IEventLa
     public void NewListenEvent( ChuckInstance theChuck, string incomingEvent )
     {
         // listen for the new event
+        mySmallerExitEvent = theChuck.GetUniqueVariableName();
         theChuck.RunCode( string.Format( @"
             external Event {1};
+            external Event {2};
+            external Event {3};
+
+            fun void BroadcastEvents()
+            {{
+                while( true )
+                {{
+                    {1} => now;
+                    {0}.myGain.last() => float secTimeToWait;
+                    Math.max( secTimeToWait, 0.0001 ) => secTimeToWait;
+                    secTimeToWait::second => now;
+                    {2}.broadcast();
+                }}
+            }}
             // broadcast
-            spork ~ {0}.BroadcastEvents() @=> {0}.myCurrentShred;
-        ", myStorageClass, incomingEvent ));
+            spork ~ BroadcastEvents();
+            {3} => now;
+        ", myStorageClass, incomingEvent, myOutgoingTriggerEvent, mySmallerExitEvent ));
     }
 
     public void LosingListenEvent( ChuckInstance theChuck, string losingEvent )
     {
         // exit the shred that is listening to the old event
-        theChuck.RunCode( string.Format( @"
-            {0}.myCurrentShred.exit();
-        ", myStorageClass ));
+        theChuck.BroadcastEvent( mySmallerExitEvent );
     }
     
     public bool AcceptableChild( LanguageObject other )
@@ -132,7 +126,7 @@ public class EventWait : MonoBehaviour , IEventLanguageObjectListener , IEventLa
 
     public string VisibleName()
     {
-        return "trigger clock";
+        return "event wait";
     }
 
     public void GotChuck( ChuckInstance chuck )
@@ -145,7 +139,6 @@ public class EventWait : MonoBehaviour , IEventLanguageObjectListener , IEventLa
         // don't care
     }
 
-
     public void SizeChanged( float newSize )
     {
         // don't care
@@ -155,7 +148,6 @@ public class EventWait : MonoBehaviour , IEventLanguageObjectListener , IEventLa
     {
         // no state to clone
     }
-
 
     public float[] SerializeFloatParams( int version )
     {

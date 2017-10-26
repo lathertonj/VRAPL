@@ -119,7 +119,7 @@ public class EventClock : MonoBehaviour , IEventLanguageObjectListener , IEventL
 
     public string VisibleName()
     {
-        return "trigger clock";
+        return "event clock";
     }
 
     public void GotChuck( ChuckInstance chuck )

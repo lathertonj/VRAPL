@@ -144,8 +144,11 @@ public class EventLanguageObject : LanguageObject {
         
         // register
         myListeningTriggerEvent = newTriggerEvent;
-        TheChuck.Instance.StartListeningForChuckEvent( myListeningTriggerEvent, myTriggerCallback );
-        myMaybeListener.NewListenEvent( TheChuck.Instance, newTriggerEvent );
+        if( myListeningTriggerEvent != "" )
+        {
+            TheChuck.Instance.StartListeningForChuckEvent( myListeningTriggerEvent, myTriggerCallback );
+            myMaybeListener.NewListenEvent( TheChuck.Instance, newTriggerEvent );
+        }
     }
 
     private void ListenTriggerCallback()

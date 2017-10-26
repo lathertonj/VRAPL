@@ -56,7 +56,7 @@ public class EventVisualizer : MonoBehaviour , IEventLanguageObjectListener {
 
     public string VisibleName()
     {
-        return "trigger clock";
+        return "event visualizer";
     }
 
     public void GotChuck( ChuckInstance chuck )
