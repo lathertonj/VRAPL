@@ -16,6 +16,7 @@ public class SimpleScalerController : MonoBehaviour , ILanguageObjectListener
     private NumberController myMinNumber = null;
     private NumberController myMaxNumber = null;
     private ILanguageObjectListener myParent = null;
+    private LanguageObject myLO = null;
     private IDataSource myDataSource = null;
     private Color myDefaultColor;
     private bool sendingData = false;
@@ -24,6 +25,10 @@ public class SimpleScalerController : MonoBehaviour , ILanguageObjectListener
     private string myStorageClass;
     private string myExitEvent;
 
+    private void Awake()
+    {
+        myLO = GetComponent<LanguageObject>();
+    }
 
     public bool AcceptableChild( LanguageObject other )
     {
@@ -84,14 +89,14 @@ public class SimpleScalerController : MonoBehaviour , ILanguageObjectListener
         // don't care about my size
     }
 
-    public string InputConnection()
+    public string InputConnection( LanguageObject whoAsking )
     {
-        return string.Format( "{0}.myStep", myStorageClass );
+        return OutputConnection();
     }
 
     public string OutputConnection()
     {
-        return InputConnection();
+        return string.Format( "{0}.myStep", myStorageClass );
     }
 
     public void NewChild( LanguageObject child )
@@ -265,13 +270,13 @@ public class SimpleScalerController : MonoBehaviour , ILanguageObjectListener
 
     private void ConnectData()
     {
-        myChuck.RunCode( string.Format( "{0} => {1};", OutputConnection(), myParent.InputConnection() ) );
+        myChuck.RunCode( string.Format( "{0} => {1};", OutputConnection(), myParent.InputConnection( myLO ) ) );
         sendingData = true;
     }
     
     private void DisconnectData()
     {
-        myChuck.RunCode( string.Format( "{0} =< {1};", OutputConnection(), myParent.InputConnection() ) );
+        myChuck.RunCode( string.Format( "{0} =< {1};", OutputConnection(), myParent.InputConnection( myLO ) ) );
         sendingData = false;
     }
 

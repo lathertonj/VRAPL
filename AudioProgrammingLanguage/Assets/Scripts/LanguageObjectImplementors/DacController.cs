@@ -62,14 +62,14 @@ public class DacController : MonoBehaviour , ILanguageObjectListener , IControll
         }
     }
 
-    public string InputConnection()
+    public string InputConnection( LanguageObject whoAsking )
     {
-        return "dac";
+        return OutputConnection();
     }
 
     public string OutputConnection()
     {
-        return InputConnection();
+        return "dac";
     }
 
     public void GotChuck( ChuckInstance chuck )

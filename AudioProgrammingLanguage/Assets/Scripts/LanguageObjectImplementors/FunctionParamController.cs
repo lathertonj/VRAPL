@@ -15,11 +15,13 @@ public class FunctionParamController : MonoBehaviour , ILanguageObjectListener
 
     private string myStorageClass;
     private string myExitEvent;
+    private LanguageObject myLO;
 
     public FunctionController myFunction;
 
     // Use this for initialization
-    void Awake () {
+    void Awake()
+    {
         if( myFunction == null )
         {
             if( TheRoom.GetCurrentFunction() != null )
@@ -27,6 +29,7 @@ public class FunctionParamController : MonoBehaviour , ILanguageObjectListener
 		        myFunction = TheRoom.GetCurrentFunction().GetComponent<FunctionController>();
             }
         }
+        myLO = GetComponent<LanguageObject>();
 	}
 	
 	void SwitchColors()
@@ -95,23 +98,23 @@ public class FunctionParamController : MonoBehaviour , ILanguageObjectListener
 
             {1} => now;
 
-        ", myStorageClass, myExitEvent, myParent.InputConnection() ));
+        ", myStorageClass, myExitEvent, myParent.InputConnection( myLO ) ));
     }
 
     public void LosingChuck( ChuckInstance chuck )
     {
-        chuck.RunCode( string.Format(@"{0} =< {1};", OutputConnection(), myParent.InputConnection() ) );
+        chuck.RunCode( string.Format(@"{0} =< {1};", OutputConnection(), myParent.InputConnection( myLO ) ) );
         chuck.BroadcastEvent( myExitEvent );
     }
     
-    public string InputConnection()
+    public string InputConnection( LanguageObject whoAsking )
     {
-        return string.Format( @"{0}.myGain", myStorageClass );
+        return OutputConnection();
     }
     
     public string OutputConnection()
     {
-        return InputConnection();
+        return string.Format( @"{0}.myGain", myStorageClass );
     }
 
     public string VisibleName()

@@ -166,7 +166,7 @@ public class CommentController : MonoBehaviour, ILanguageObjectListener, IContro
         // don't care about my size
     }
 
-    public string InputConnection()
+    public string InputConnection( LanguageObject whoAsking )
     {
         return string.Format( "{0}.myInput", myStorageClass );
     }

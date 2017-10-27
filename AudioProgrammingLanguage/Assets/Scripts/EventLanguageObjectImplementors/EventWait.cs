@@ -84,14 +84,14 @@ public class EventWait : MonoBehaviour , IEventLanguageObjectListener , IEventLa
         return myOutgoingTriggerEvent;
     }
 
-    public string InputConnection()
+    public string InputConnection( LanguageObject whoAsking )
     {
-        return string.Format( "{0}.myGain", myStorageClass );
+        return OutputConnection();
     }
 
     public string OutputConnection()
     {
-        return InputConnection();
+        return string.Format( "{0}.myGain", myStorageClass );
     }
 
     public void TickDoAction()

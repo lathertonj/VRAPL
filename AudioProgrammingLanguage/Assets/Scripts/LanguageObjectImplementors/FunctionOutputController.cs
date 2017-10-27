@@ -14,12 +14,14 @@ public class FunctionOutputController : MonoBehaviour , ILanguageObjectListener
 
     private string myStorageClass;
     private string myExitEvent;
+    private LanguageObject myLO;
 
     private int numChildren;
 
     // Use this for initialization
-    void Start () {
-		
+    void Awake()
+    {
+	    myLO = GetComponent<LanguageObject>();	
 	}
 	
 	void SwitchColors()
@@ -84,12 +86,12 @@ public class FunctionOutputController : MonoBehaviour , ILanguageObjectListener
 
             {1} => now;
 
-        ", myStorageClass, myExitEvent, myFunction.GetFunctionParentConnection() ));
+        ", myStorageClass, myExitEvent, myFunction.GetFunctionParentConnection( myLO ) ));
     }
 
     public void LosingChuck(ChuckInstance chuck)
     {
-        chuck.RunCode( string.Format(@"{0} =< {1};", OutputConnection(), myFunction.GetFunctionParentConnection() ) );
+        chuck.RunCode( string.Format(@"{0} =< {1};", OutputConnection(), myFunction.GetFunctionParentConnection( myLO ) ) );
         chuck.BroadcastEvent( myExitEvent );
     }
 
@@ -98,14 +100,14 @@ public class FunctionOutputController : MonoBehaviour , ILanguageObjectListener
         // don't care about my size
     }
     
-    public string InputConnection()
+    public string InputConnection( LanguageObject whoAsking )
     {
-        return string.Format( "{0}.myGain", myStorageClass );
+        return OutputConnection();
     }
 
     public string OutputConnection()
     {
-        return InputConnection();
+        return string.Format( "{0}.myGain", myStorageClass );
     }
     
     public string VisibleName()

@@ -14,6 +14,12 @@ public class ComputerMusicController : MonoBehaviour , ILanguageObjectListener
 
     private string myExitEvent;
     private ILanguageObjectListener myParent;
+    private LanguageObject myLO;
+
+    private void Awake()
+    {
+        myLO = GetComponent<LanguageObject>();
+    }
 
     private void SwitchColors()
     {
@@ -48,15 +54,15 @@ public class ComputerMusicController : MonoBehaviour , ILanguageObjectListener
         return false;
     }
 
-    public string InputConnection()
+    public string InputConnection( LanguageObject whoAsking )
     {
-        // nothing should be connecting to ComputerMusicController anyway
-        return "";
+        return OutputConnection();
     }
 
     public string OutputConnection()
     {
-        return InputConnection();
+        // nothing should be connecting to ComputerMusicController anyway
+        return "";
     }
 
     public string VisibleName()
@@ -86,7 +92,7 @@ public class ComputerMusicController : MonoBehaviour , ILanguageObjectListener
             {0} => now;
             foo =< dac;
             
-        ", myExitEvent, myParent.InputConnection() ));
+        ", myExitEvent, myParent.InputConnection( myLO ) ));
     }
 
     public void LosingChuck( ChuckInstance chuck )

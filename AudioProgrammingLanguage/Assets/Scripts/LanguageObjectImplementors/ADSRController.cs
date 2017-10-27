@@ -22,11 +22,12 @@ public class ADSRController : MonoBehaviour , ILanguageObjectListener, IParamAcc
     private ChuckInstance myChuck = null;
 
     private ILanguageObjectListener myParent;
+    private LanguageObject myLO = null;
 
     private Dictionary<EventNotifyController, bool> myNotifiers;
 
     // Use this for initialization
-    void Start () {
+    void Awake() {
 		myAcceptableParams = new string[] { "attack time", "decay time", "sustain time", "sustain level", "release time" };
         //myParamDefaults = new string[] { "10::ms", "20::ms", "0.5::second", "0.5", "0.5::second" };
         numParamConnections = new Dictionary<string, int>();
@@ -35,6 +36,7 @@ public class ADSRController : MonoBehaviour , ILanguageObjectListener, IParamAcc
             numParamConnections[myAcceptableParams[i]] = 0;
         }
         myNotifiers = new Dictionary<EventNotifyController, bool>();
+        myLO = GetComponent<LanguageObject>();
 	}
 	
 	// Update is called once per frame
@@ -69,7 +71,7 @@ public class ADSRController : MonoBehaviour , ILanguageObjectListener, IParamAcc
                 a.releaseTime() => now;
                 {1} => a;
                 a =< {2};
-            ", myStorageClass, InputConnection(), OutputConnection(), intensity
+            ", myStorageClass, this.InputConnection( null ), OutputConnection(), intensity
             ));
         }
     }
@@ -359,7 +361,7 @@ public class ADSRController : MonoBehaviour , ILanguageObjectListener, IParamAcc
 
             // wait until told to exit
             {1} => now;
-            ", myStorageClass, myExitEvent, myParent.InputConnection()
+            ", myStorageClass, myExitEvent, myParent.InputConnection( myLO )
         ));
     }
 
@@ -367,7 +369,7 @@ public class ADSRController : MonoBehaviour , ILanguageObjectListener, IParamAcc
     {
         if( myParent != null )
         {
-            chuck.RunCode(string.Format("{0} =< {1};", OutputConnection(), myParent.InputConnection() ) );
+            chuck.RunCode(string.Format("{0} =< {1};", OutputConnection(), myParent.InputConnection( myLO ) ) );
         }
 
         chuck.BroadcastEvent( myExitEvent );
@@ -379,7 +381,7 @@ public class ADSRController : MonoBehaviour , ILanguageObjectListener, IParamAcc
         // don't care about my size
     }
 
-    public string InputConnection()
+    public string InputConnection( LanguageObject whoAsking )
     {
         return string.Format( "{0}.myInput", myStorageClass );
     }

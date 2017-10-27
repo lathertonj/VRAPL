@@ -28,11 +28,14 @@ public class SoundfileController : MonoBehaviour , ILanguageObjectListener, IPar
     private ChuckInstance myChuck = null;
 
     private ILanguageObjectListener myParent;
+    private LanguageObject myLO;
 
     private Dictionary<EventNotifyController, bool> myNotifiers;
 
     // Use this for initialization
-    void Awake () {
+    void Awake()
+    {
+        myLO = GetComponent<LanguageObject>();
 		myAcceptableParams = new string[] { "rate", "gain" };
         numParamConnections = new Dictionary<string, int>();
         for( int i = 0; i < myAcceptableParams.Length; i++ )
@@ -260,7 +263,7 @@ public class SoundfileController : MonoBehaviour , ILanguageObjectListener, IPar
 
             // wait until told to exit
             {1} => now;
-            ", myStorageClass, myExitEvent, myParent.InputConnection()
+            ", myStorageClass, myExitEvent, myParent.InputConnection( myLO )
         );
 
         chuck.RunCode( initCode );
@@ -270,7 +273,7 @@ public class SoundfileController : MonoBehaviour , ILanguageObjectListener, IPar
     {
         if( myParent != null )
         {
-            chuck.RunCode(string.Format("{0} =< {1};", OutputConnection(), myParent.InputConnection() ) );
+            chuck.RunCode(string.Format("{0} =< {1};", OutputConnection(), myParent.InputConnection( myLO ) ) );
         }
 
         chuck.BroadcastEvent( myExitEvent );
@@ -282,14 +285,14 @@ public class SoundfileController : MonoBehaviour , ILanguageObjectListener, IPar
         // don't care about my size
     }
 
-    public string InputConnection()
+    public string InputConnection( LanguageObject whoAsking )
     {
-        return string.Format( "{0}.myOutput", myStorageClass );
+        return OutputConnection();
     }
 
     public string OutputConnection()
     {
-        return InputConnection();
+        return string.Format( "{0}.myOutput", myStorageClass );
     }
 
     public void TouchpadDown()

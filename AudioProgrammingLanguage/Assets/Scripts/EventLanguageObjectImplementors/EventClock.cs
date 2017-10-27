@@ -75,14 +75,14 @@ public class EventClock : MonoBehaviour , IEventLanguageObjectEmitter {
         myClockHand.localEulerAngles = rotation;
     }
 
-    public string InputConnection()
+    public string InputConnection( LanguageObject whoAsking )
     {
-        return string.Format( "{0}.myGain", myStorageClass );
+        return OutputConnection();
     }
 
     public string OutputConnection()
     {
-        return InputConnection();
+        return string.Format( "{0}.myGain", myStorageClass );
     }
     
     public bool AcceptableChild( LanguageObject other )

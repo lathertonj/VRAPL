@@ -5,19 +5,19 @@ using UnityEngine;
 
 [RequireComponent(typeof(NumberProducer))]
 [RequireComponent(typeof(LanguageObject))]
-public class DurController : MonoBehaviour , ILanguageObjectListener , IControllerInputAcceptor
+public class OperationController : MonoBehaviour , ILanguageObjectListener , IControllerInputAcceptor
 {
 
     public TextMesh myText;
     public MeshRenderer myShape;
 
-    private NumberController myNumber = null;
     private int myCurrentIndex;
-    private string myCurrentDurType;
-    private string[] myDurTypes;
+    private string myCurrentOp;
+    private string[] myOps;
 
     private string myStorageClass;
     private string myExitEvent;
+    private string myChangeOpEvent;
     private ILanguageObjectListener myParent = null;
     private LanguageObject myLO = null;
     private ChuckInstance myChuck = null;
@@ -25,10 +25,10 @@ public class DurController : MonoBehaviour , ILanguageObjectListener , IControll
 	// Use this for initialization
 	void Awake() 
     {
-		myDurTypes = new string[] { "ms", "second", "sample" };
+		myOps = new string[] { ">", "<", ">=", "<=" };
         myCurrentIndex = 0;
-        myCurrentDurType = myDurTypes[myCurrentIndex];
-        myText.text = myCurrentDurType;
+        myCurrentOp = myOps[myCurrentIndex];
+        myText.text = myCurrentOp;
         myLO = GetComponent<LanguageObject>();
 	}
 	
@@ -39,24 +39,13 @@ public class DurController : MonoBehaviour , ILanguageObjectListener , IControll
         myShape.material.color = temp;
     }
 
-    private void UpdateMyGain()
-    {
-        if( myChuck == null )
-        {
-            return;
-        }
-        string durName = myCurrentDurType;
-        if( durName == "sample" ) durName = "samp";
-        myChuck.RunCode( string.Format( "{0} / second => {1}.gain;", durName, OutputConnection() ) );
-    }
-
     public void TouchpadDown()
     {
         myCurrentIndex++;
-        myCurrentIndex %= myDurTypes.Length;
-        myCurrentDurType = myDurTypes[myCurrentIndex];
-        myText.text = myCurrentDurType;
-        UpdateMyGain();
+        myCurrentIndex %= myOps.Length;
+        myCurrentOp = myOps[myCurrentIndex];
+        myText.text = myCurrentOp;
+        UpdateMyOp();
     }
 
 
@@ -77,10 +66,7 @@ public class DurController : MonoBehaviour , ILanguageObjectListener , IControll
 
     public bool AcceptableChild( LanguageObject other )
     {
-        if( myNumber == null && other.GetComponent<NumberController>() != null )
-        {
-            return true;
-        }
+        // TODO: is it correct type and I have a free space there?
         return false;
     }
 
@@ -106,29 +92,24 @@ public class DurController : MonoBehaviour , ILanguageObjectListener , IControll
 
     public void NewChild( LanguageObject child )
     {
-        NumberController nc = child.GetComponent<NumberController>();
-        if( nc != null )
-        {
-            myNumber = nc;
-        }
+        // TODO: is it left or is it right?
     }
 
     public void ChildDisconnected(LanguageObject child)
     {
-        if( child.GetComponent<NumberController>() == myNumber )
-        {
-            myNumber = null;
-        }
+        // TODO: is it left or is it right?
     }
 
     public string InputConnection( LanguageObject whoAsking )
     {
-        return OutputConnection();
+        // TODO
+        return "";
     }
 
     public string OutputConnection()
     {
-        return string.Format("{0}.myGain", myStorageClass);
+        // TODO
+        return "";
     }
 
     public void GotChuck(ChuckInstance chuck)
@@ -136,9 +117,11 @@ public class DurController : MonoBehaviour , ILanguageObjectListener , IControll
         myChuck = chuck;
         myStorageClass = chuck.GetUniqueVariableName();
         myExitEvent = chuck.GetUniqueVariableName();
+        myChangeOpEvent = chuck.GetUniqueVariableName();
 
         chuck.RunCode(string.Format(@"
             external Event {1};
+            external Event {2};
             public class {0}
             {{
                 static Gain @ myGain;
@@ -148,9 +131,9 @@ public class DurController : MonoBehaviour , ILanguageObjectListener , IControll
 
             // wait until told to exit
             {1} => now;
-        ", myStorageClass, myExitEvent ));
+        ", myStorageClass, myExitEvent, myChangeOpEvent ));
 
-        UpdateMyGain();
+        UpdateMyOp();
 
         if( myParent != null )
         {
@@ -169,6 +152,11 @@ public class DurController : MonoBehaviour , ILanguageObjectListener , IControll
         myChuck = null;
     }
 
+    public void UpdateMyOp()
+    {
+
+    }
+
     public void SizeChanged( float newSize )
     {
         // don't care about my size
@@ -181,7 +169,7 @@ public class DurController : MonoBehaviour , ILanguageObjectListener , IControll
 
     public void CloneYourselfFrom( LanguageObject original, LanguageObject newParent )
     {
-        DurController other = original.GetComponent<DurController>();
+        OperationController other = original.GetComponent<OperationController>();
 
         // simulate touchpad presses until state matches
         while( myCurrentIndex != other.myCurrentIndex )

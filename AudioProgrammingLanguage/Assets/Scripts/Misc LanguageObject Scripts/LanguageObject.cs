@@ -592,7 +592,7 @@ public interface ILanguageObjectListener
     string VisibleName();
     void GotChuck( ChuckInstance chuck );
     void LosingChuck( ChuckInstance chuck );
-    string InputConnection();
+    string InputConnection( LanguageObject whoAsking );
     string OutputConnection();
     void SizeChanged( float newSize );
     void CloneYourselfFrom( LanguageObject original, LanguageObject newParent );

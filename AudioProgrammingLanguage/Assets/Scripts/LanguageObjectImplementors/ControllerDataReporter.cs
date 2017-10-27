@@ -158,15 +158,15 @@ public class ControllerDataReporter : MonoBehaviour , ILanguageObjectListener , 
         // don't care about my size
     }
 
-    public string InputConnection()
+    public string InputConnection( LanguageObject whoAsking )
     {
-        // don't have one
-        return "";
+        return OutputConnection();
     }
 
     public string OutputConnection()
     {
-        return InputConnection();
+        // don't have one
+        return "";
     }
 
     public void NewChild( LanguageObject child )

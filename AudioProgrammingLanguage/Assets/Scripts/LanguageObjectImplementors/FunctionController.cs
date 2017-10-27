@@ -389,10 +389,10 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
         // don't care about my size
     }
     
-    public string InputConnection()
+    public string InputConnection( LanguageObject whoAsking )
     {
         // TODO: return some error if myInput doesn't have a chuck?
-        return myInput.InputConnection();
+        return myInput.InputConnection( whoAsking );
     }
 
     public string OutputConnection()
@@ -472,7 +472,11 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
                 // this works because output is always the first child, and so the
                 // inner param block will be initialized first even though it and
                 // the outer param block are both descendants of the same block 
-                myChuck.RunCode( string.Format("{0} => {1};", var, myParamRefs[i].InputConnection() ));
+
+
+                // Dirty hack: pass null as who is asking for the input connection
+                // (hopefully, fn input blocks will never need it)
+                myChuck.RunCode( string.Format("{0} => {1};", var, myParamRefs[i].InputConnection( null ) ));
             }
         }
     }
@@ -483,14 +487,16 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
         {
             if( myParams[i] == param )
             {
-                myChuck.RunCode( string.Format("{0} =< {1};", var, myParamRefs[i].InputConnection() ));
+                // Dirty hack: pass null as who is asking for the input connection
+                // (hopefully, fn input blocks will never need it)
+                myChuck.RunCode( string.Format("{0} =< {1};", var, myParamRefs[i].InputConnection( null ) ));
             }
         }
     }
 
-    public string GetFunctionParentConnection()
+    public string GetFunctionParentConnection( LanguageObject whoAsking )
     {
-        return myParent.InputConnection();
+        return myParent.InputConnection( whoAsking );
     }
 
     public string VisibleName()

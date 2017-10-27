@@ -22,13 +22,16 @@ public class NumberController : MonoBehaviour , ILanguageObjectListener , IContr
     private Color originalBodyColor;
 
     private ILanguageObjectListener myParent = null;
+    private LanguageObject myLO;
     private ChuckInstance myChuck = null;
 
     // Use this for initialization
-    void Awake() {
+    void Awake()
+    {
 		UpdateMyNumber();
         originalTextColor = myText.GetComponent<TextMesh>().color;
         originalBodyColor = myShape.GetComponent<Renderer>().material.color;
+        myLO = GetComponent<LanguageObject>();
 	}
 	
 	// Update is called once per frame
@@ -106,7 +109,7 @@ public class NumberController : MonoBehaviour , ILanguageObjectListener , IContr
 
         if( myParent != null )
         {
-            chuck.RunCode(string.Format("{0} => {1};", OutputConnection(), myParent.InputConnection() ) );
+            chuck.RunCode(string.Format("{0} => {1};", OutputConnection(), myParent.InputConnection( myLO ) ) );
         }
     }
 
@@ -114,7 +117,7 @@ public class NumberController : MonoBehaviour , ILanguageObjectListener , IContr
     {
         if( myParent != null )
         {
-            chuck.RunCode(string.Format("{0} =< {1};", OutputConnection(), myParent.InputConnection() ) );
+            chuck.RunCode(string.Format("{0} =< {1};", OutputConnection(), myParent.InputConnection( myLO ) ) );
         }
 
         chuck.BroadcastEvent( myExitEvent );
@@ -126,14 +129,14 @@ public class NumberController : MonoBehaviour , ILanguageObjectListener , IContr
         // don't care about my size
     }
 
-    public string InputConnection()
+    public string InputConnection( LanguageObject whoAsking )
     {
-        return string.Format("{0}.myStep", myStorageClass);
+        return OutputConnection();
     }
 
     public string OutputConnection()
     {
-        return InputConnection();
+        return string.Format("{0}.myStep", myStorageClass);
     }
 
     public void TouchpadDown()

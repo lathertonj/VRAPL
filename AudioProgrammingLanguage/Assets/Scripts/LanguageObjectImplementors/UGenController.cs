@@ -19,6 +19,7 @@ public class UGenController : MonoBehaviour , ILanguageObjectListener, IParamAcc
     private string myStorageClass;
     private string myExitEvent;
     private LanguageObject myParent = null;
+    private LanguageObject myLO = null;
     ILanguageObjectListener myParentListener = null;
     private Dictionary<string, int> numParamConnections;
 
@@ -27,6 +28,7 @@ public class UGenController : MonoBehaviour , ILanguageObjectListener, IParamAcc
         for( int i = 0; i < myParams.Length; i++ ) { 
             numParamConnections[myParams[i]] = 0; 
         }
+        myLO = GetComponent<LanguageObject>();
 	}
 
     private void Update()
@@ -59,14 +61,14 @@ public class UGenController : MonoBehaviour , ILanguageObjectListener, IParamAcc
         return false;
     }
 
-    public string InputConnection()
+    public string InputConnection( LanguageObject whoAsking )
     {
-        return string.Format("{0}.myOsc", myStorageClass);
+        return OutputConnection();
     }
 
     public string OutputConnection()
     {
-        return InputConnection();
+        return string.Format("{0}.myOsc", myStorageClass);
     }
 
     public string[] AcceptableParams()
@@ -158,7 +160,7 @@ public class UGenController : MonoBehaviour , ILanguageObjectListener, IParamAcc
         myChuck = chuck;
         myStorageClass = chuck.GetUniqueVariableName();
         myExitEvent = chuck.GetUniqueVariableName();
-        string connectMyOscTo = myParentListener.InputConnection();
+        string connectMyOscTo = myParentListener.InputConnection( myLO );
 
         string classDeclarations = "";
         string oscDeclarations = "";

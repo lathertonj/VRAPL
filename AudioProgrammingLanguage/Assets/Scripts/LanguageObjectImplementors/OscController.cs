@@ -14,16 +14,19 @@ public class OscController : MonoBehaviour , ILanguageObjectListener, IParamAcce
     private string myStorageClass;
     private string myExitEvent;
     private LanguageObject myParent = null;
+    private LanguageObject myLO = null;
     ILanguageObjectListener myParentListener = null;
     private string[] myAcceptableParams;
     private Dictionary<string, int> numParamConnections;
 
-    void Start () {
+    void Awake()
+    {
         myAcceptableParams = new string[] { "freq", "gain" };
         numParamConnections = new Dictionary<string, int>();
         for( int i = 0; i < myAcceptableParams.Length; i++ ) { 
             numParamConnections[myAcceptableParams[i]] = 0; 
         }
+        myLO = GetComponent<LanguageObject>();
 	}
 
     private float GetMyDefaultFrequency()
@@ -43,14 +46,14 @@ public class OscController : MonoBehaviour , ILanguageObjectListener, IParamAcce
         return false;
     }
 
-    public string InputConnection()
+    public string InputConnection( LanguageObject whoAsking )
     {
-        return string.Format("{0}.myOsc", myStorageClass);
+        return OutputConnection();
     }
 
     public string OutputConnection()
     {
-        return InputConnection();
+        return string.Format("{0}.myOsc", myStorageClass);
     }
 
     public string[] AcceptableParams()
@@ -165,7 +168,7 @@ public class OscController : MonoBehaviour , ILanguageObjectListener, IParamAcce
         myChuck = chuck;
         myStorageClass = chuck.GetUniqueVariableName();
         myExitEvent = chuck.GetUniqueVariableName();
-        string connectMyOscTo = myParentListener.InputConnection();
+        string connectMyOscTo = myParentListener.InputConnection( myLO );
 
         chuck.RunCode(string.Format(@"
             external Event {1};

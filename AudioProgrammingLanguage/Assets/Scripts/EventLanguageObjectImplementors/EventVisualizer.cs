@@ -78,15 +78,15 @@ public class EventVisualizer : MonoBehaviour , IEventLanguageObjectListener {
         // don't care
     }
 
-    public string InputConnection()
+    public string InputConnection( LanguageObject whoAsking )
     {
         // have no connection
-        return "";
+        return OutputConnection();
     }
 
     public string OutputConnection()
     {
-        return InputConnection();
+        return "";
     }
 
     public void SizeChanged( float newSize )
