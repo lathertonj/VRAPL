@@ -377,10 +377,18 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
     public void GotChuck( ChuckInstance chuck )
     {
         myChuck = chuck;
+        // tell my external params
+        TellParamChildrenGotChuck( chuck );
+        // tell my output, which might make it back to my external non-params 
+        myOutput.GetComponent<LanguageObject>().TellChildrenHaveNewChuck( chuck );
     }
 
     public void LosingChuck( ChuckInstance chuck )
     {
+        // tell my output
+        myOutput.GetComponent<LanguageObject>().TellChildrenLosingChuck( chuck );
+        // tell my external params
+        TellParamChildrenLosingChuck( chuck );
         myChuck = null;
     }
 
@@ -539,6 +547,32 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
                 continue;
             }
             child.TellChildrenLosingChuck( chuck );
+        }
+    }
+
+    private void TellParamChildrenGotChuck( ChuckInstance chuck )
+    {
+        List<LanguageObject> myChildren = GetComponent< LanguageObject >().myChildren;
+        foreach( LanguageObject child in myChildren )
+        {
+            // notify only paramcontroller blocks
+            if( child.GetComponent< ParamController >() != null )
+            {
+                child.TellChildrenHaveNewChuck( chuck );
+            }
+        }
+    }
+
+    private void TellParamChildrenLosingChuck( ChuckInstance chuck )
+    {
+        List<LanguageObject> myChildren = GetComponent< LanguageObject >().myChildren;
+        foreach( LanguageObject child in myChildren )
+        {
+            // notify only paramcontroller blocks
+            if( child.GetComponent< ParamController >() != null )
+            {
+                child.TellChildrenLosingChuck( chuck );
+            }
         }
     }
 

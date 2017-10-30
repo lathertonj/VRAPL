@@ -12,6 +12,7 @@ public class FunctionInputController : MonoBehaviour , ILanguageObjectListener
     public Renderer myBox;
     public TextMesh myText;
 
+    private ChuckInstance myChuck = null;
     private string myStorageClass;
     private string myExitEvent;
     
@@ -87,12 +88,20 @@ public class FunctionInputController : MonoBehaviour , ILanguageObjectListener
         ", myStorageClass, myExitEvent, myParent.InputConnection( myLO ) ));
 
         myFunction.TellUgenChildrenGotChuck( chuck );
+
+        myChuck = chuck;
     }
 
     public void LosingChuck( ChuckInstance chuck )
     {
         myFunction.TellUgenChildrenLosingChuck( chuck );
         chuck.BroadcastEvent( myExitEvent );
+        myChuck = null;
+    }
+
+    public bool CurrentlyHaveChuck()
+    {
+        return myChuck == null;
     }
 
     public void SizeChanged( float newSize )

@@ -352,7 +352,21 @@ public class LanguageObject : MonoBehaviour {
 
     public void TellChildrenHaveNewChuck( ChuckInstance chuck )
     {
+        // short circuit return before getting chuck if I am connecting to a function and its input doesn't have chuck
+        if( FunctionChildShouldNotGetChuck() )
+        {
+            return;
+        }
+        // tell myself
         ((ILanguageObjectListener) GetComponent(typeof(ILanguageObjectListener))).GotChuck( chuck );
+
+        // short circuit return before telling children if I am a Function -- it already happened manually
+        if( GetComponent<FunctionController>() != null )
+        {
+            return;
+        }
+
+        // tell children
         foreach( LanguageObject child in myChildren )
         {
             child.TellChildrenHaveNewChuck( chuck );
@@ -361,11 +375,40 @@ public class LanguageObject : MonoBehaviour {
 
     public void TellChildrenLosingChuck( ChuckInstance chuck )
     {
-        foreach( LanguageObject child in myChildren )
+        // short circuit return before losing chuck if I am connecting to a function and its input doesn't have chuck
+        if( FunctionChildShouldNotGetChuck() )
         {
-            child.TellChildrenLosingChuck( chuck );
+            return;
         }
+        
+        // only tell children losing chuck if I am not a function -- otherwise I'll do it manually
+        if( GetComponent<FunctionController>() == null )
+        {
+            foreach( LanguageObject child in myChildren )
+            {
+                child.TellChildrenLosingChuck( chuck );
+            }
+        }
+        
+        // tell myself
         ((ILanguageObjectListener) GetComponent(typeof(ILanguageObjectListener))).LosingChuck( chuck );
+    }
+
+    private bool FunctionChildShouldNotGetChuck()
+    {
+        // param controllers get connected automatically if fn has chuck
+        // otherwise, if it's not a paramcontroller, and the parent is a function, and the function's
+        // input has no chuck, then we shouldn't be connecting / disconnecting it.
+        FunctionController maybeParentFunction = ( myParent != null ? myParent.GetComponent<FunctionController>() : null );
+        if( GetComponent<ParamController>() == null && // I am not a param controller
+            maybeParentFunction != null && // my parent is a function
+            GetComponent<FunctionOutputController>() == null && // I am not a function output controller
+            !maybeParentFunction.myInput.CurrentlyHaveChuck() ) // the function's input has no chuck
+        {
+            // I should not be connected / disconnected
+            return true;
+        }
+        return false;
     }
 
     public LanguageObject GetClone()
