@@ -20,6 +20,8 @@ public class OperationController : MonoBehaviour , ILanguageObjectListener , ICo
     private string myChangeOpEvent;
     private ILanguageObjectListener myParent = null;
     private LanguageObject myLO = null;
+    private LanguageObject myLeftArg = null;
+    private LanguageObject myRightArg = null;
     private ChuckInstance myChuck = null;
 
 	// Use this for initialization
@@ -66,8 +68,25 @@ public class OperationController : MonoBehaviour , ILanguageObjectListener , ICo
 
     public bool AcceptableChild( LanguageObject other )
     {
-        // TODO: is it correct type and I have a free space there?
-        return false;
+        // is it incorrect type?
+        if( other.GetComponent<SoundProducer>() == null &&
+            other.GetComponent<NumberProducer>() == null )
+        {
+            // can't make sounds or numbers. not acceptable.
+            return false;
+        }
+        
+        // do I have a free space there?
+        if( WouldBeLeft( other ) )
+        {
+            // do I have space on the left side?
+            return myLeftArg == null;
+        }
+        else
+        {
+            // do I have space on the right side?
+            return myRightArg == null;
+        }
     }
 
     public void NewParent( LanguageObject parent )
@@ -90,26 +109,61 @@ public class OperationController : MonoBehaviour , ILanguageObjectListener , ICo
         }
     }
 
-    public void NewChild( LanguageObject child )
+    private bool WouldBeLeft( LanguageObject potentialChild )
     {
-        // TODO: is it left or is it right?
+        // is it left or is it right? temporarily put it in me and check localPosition.x
+        Transform oldParent = potentialChild.transform.parent;
+        potentialChild.transform.parent = transform;
+        float localXPos = potentialChild.transform.localPosition.x;
+        potentialChild.transform.parent = oldParent;
+
+        return localXPos <= 0;
     }
 
-    public void ChildDisconnected(LanguageObject child)
+    public void NewChild( LanguageObject child )
     {
-        // TODO: is it left or is it right?
+        if( WouldBeLeft( child ) )
+        {
+            myLeftArg = child;
+        }
+        else
+        {
+            myRightArg = child;
+        }
+    }
+
+    public void ChildDisconnected( LanguageObject child )
+    {
+        // check and update internal storage
+        if( child == myLeftArg )
+        {
+            myLeftArg = null;
+        }
+        else if( child == myRightArg )
+        {
+            myRightArg = null;
+        }
     }
 
     public string InputConnection( LanguageObject whoAsking )
     {
-        // TODO
-        return "";
+        if( whoAsking == myLeftArg )
+        {
+            return string.Format( "{0}.myLeftInput", myStorageClass );
+        }
+        else if( whoAsking == myRightArg )
+        {
+            return string.Format( "{0}.myRightInput", myStorageClass );
+        }
+        else
+        {
+            return "blackhole";
+        }
     }
 
     public string OutputConnection()
     {
-        // TODO
-        return "";
+        return string.Format( "{0}.myOutput", myStorageClass );
     }
 
     public void GotChuck(ChuckInstance chuck)
@@ -124,10 +178,15 @@ public class OperationController : MonoBehaviour , ILanguageObjectListener , ICo
             external Event {2};
             public class {0}
             {{
-                static Gain @ myGain;
+                static Step @ myOutput;
+                static Gain @ myLeftInput;
+                static Gain @ myRightInput;
             }}
-            Gain g @=> {0}.myGain;
-            0.001 => {0}.myGain.gain;
+            Gain g1 @=> {0}.myLeftInput;
+            {0}.myLeftInput => blackhole;
+            Gain g2 @=> {0}.myRightInput;
+            {0}.myRightInput => blackhole;
+            Step s @=> {0}.myOutput;
 
             // wait until told to exit
             {1} => now;
@@ -137,7 +196,7 @@ public class OperationController : MonoBehaviour , ILanguageObjectListener , ICo
 
         if( myParent != null )
         {
-            chuck.RunCode(string.Format("{0} => {1};", OutputConnection(), myParent.InputConnection( myLO ) ) );
+            chuck.RunCode(string.Format( "{0} => {1};", OutputConnection(), myParent.InputConnection( myLO ) ) );
         }
     }
 
@@ -145,7 +204,7 @@ public class OperationController : MonoBehaviour , ILanguageObjectListener , ICo
     {
         if( myParent != null )
         {
-            chuck.RunCode(string.Format("{0} =< {1};", OutputConnection(), myParent.InputConnection( myLO ) ) );
+            chuck.RunCode(string.Format( "{0} =< {1};", OutputConnection(), myParent.InputConnection( myLO ) ) );
         }
 
         chuck.BroadcastEvent( myExitEvent );
@@ -154,7 +213,24 @@ public class OperationController : MonoBehaviour , ILanguageObjectListener , ICo
 
     public void UpdateMyOp()
     {
+        // end the last one by signaling the event at the beginning
+        myChuck.RunCode( string.Format( @"
+            external Event {1};
+            {1}.broadcast();
 
+            fun void DoTheOp()
+            {{
+                while( true )
+                {{
+                    ( {0}.myLeftInput.last() {2} {0}.myRightInput.last() ) => {0}.myOutput.next;
+                    0.5::ms => now;
+                }}
+            }}
+            
+            spork ~ DoTheOp();
+
+            {1} => now;
+        ", myStorageClass, myChangeOpEvent, myCurrentOp ) );
     }
 
     public void SizeChanged( float newSize )

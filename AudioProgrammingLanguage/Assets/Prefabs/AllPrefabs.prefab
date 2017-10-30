@@ -114,3 +114,7 @@ MonoBehaviour:
     prefab: {fileID: 1685811851115912, guid: e73f47057dc01b7439a9dc74d64049de, type: 2}
   - name: event visualizer
     prefab: {fileID: 1958857918817802, guid: 4829fe61b6549584fa39fd61887f937c, type: 2}
+  - name: language operation
+    prefab: {fileID: 1285042824787524, guid: 32297383d65418b459e717dac5a1295d, type: 2}
+  - name: event if
+    prefab: {fileID: 1538895659560822, guid: c36653b76b4f6a842b19f89bbac1fffc, type: 2}
