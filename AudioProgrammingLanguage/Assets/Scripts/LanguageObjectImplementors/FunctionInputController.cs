@@ -87,13 +87,20 @@ public class FunctionInputController : MonoBehaviour , ILanguageObjectListener
 
         ", myStorageClass, myExitEvent, myParent.InputConnection( myLO ) ));
 
+        // store chuck before telling function to pass on the message
+        // because the upcoming ugens will double check that this input has a chuck
+        myChuck = chuck;
+        // tell function that all its non-param children have a chuck now
         myFunction.TellUgenChildrenGotChuck( chuck );
 
-        myChuck = chuck;
     }
 
     public void LosingChuck( ChuckInstance chuck )
     {
+        // tell children losing chuck before I set mychuck to null
+        // because children will check whether I have chuck
+        // if I don't have chuck, they will assume I never had chuck in the first place
+        // and then not undo their own chucks
         myFunction.TellUgenChildrenLosingChuck( chuck );
         chuck.BroadcastEvent( myExitEvent );
         myChuck = null;
@@ -101,7 +108,7 @@ public class FunctionInputController : MonoBehaviour , ILanguageObjectListener
 
     public bool CurrentlyHaveChuck()
     {
-        return myChuck == null;
+        return myChuck != null;
     }
 
     public void SizeChanged( float newSize )
