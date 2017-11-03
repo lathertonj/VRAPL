@@ -70,7 +70,7 @@ public class ComputerMusicController : MonoBehaviour , ILanguageObjectListener
         return "computer music";
     }
 
-    public void GotChuck( ChuckInstance chuck )
+    public void GotChuck( ChuckSubInstance chuck )
     {
         // get a variable name
         myExitEvent = chuck.GetUniqueVariableName();
@@ -95,7 +95,7 @@ public class ComputerMusicController : MonoBehaviour , ILanguageObjectListener
         ", myExitEvent, myParent.InputConnection( myLO ) ));
     }
 
-    public void LosingChuck( ChuckInstance chuck )
+    public void LosingChuck( ChuckSubInstance chuck )
     {
         // Stop my script
         chuck.BroadcastEvent( myExitEvent );

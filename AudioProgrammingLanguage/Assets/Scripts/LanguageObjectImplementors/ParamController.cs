@@ -15,7 +15,7 @@ public class ParamController : MonoBehaviour , ILanguageObjectListener, IControl
     private string myParam;
     private int myParamIndex = 0;
     private bool amConnected = false;
-    private ChuckInstance myChuck = null;
+    private ChuckSubInstance myChuck = null;
 
     private ILanguageObjectListener myParent = null;
     private IParamAcceptor myParamAcceptor = null;
@@ -104,7 +104,7 @@ public class ParamController : MonoBehaviour , ILanguageObjectListener, IControl
         return string.Format("{0}.myGain", myStorageClass);
     }
 
-    public void GotChuck( ChuckInstance chuck )
+    public void GotChuck( ChuckSubInstance chuck )
     {
         myChuck = chuck;
 
@@ -132,7 +132,7 @@ public class ParamController : MonoBehaviour , ILanguageObjectListener, IControl
         }
     }
 
-    public void LosingChuck(ChuckInstance chuck)
+    public void LosingChuck( ChuckSubInstance chuck )
     {
         if( myNumChildren > 0 && myParamAcceptor != null )
         {

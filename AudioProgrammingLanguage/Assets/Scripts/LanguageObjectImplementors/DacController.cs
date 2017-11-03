@@ -72,12 +72,12 @@ public class DacController : MonoBehaviour , ILanguageObjectListener , IControll
         return "dac";
     }
 
-    public void GotChuck( ChuckInstance chuck )
+    public void GotChuck( ChuckSubInstance chuck )
     {
         // don't care
     }
 
-    public void LosingChuck( ChuckInstance chuck )
+    public void LosingChuck( ChuckSubInstance chuck )
     {
         // don't care
     }
@@ -104,14 +104,14 @@ public class DacController : MonoBehaviour , ILanguageObjectListener , IControll
         
         if( !myEnabled )
         {
-            GetComponent<LanguageObject>().TellChildrenLosingChuck( GetComponent<ChuckInstance>() );
+            GetComponent<LanguageObject>().TellChildrenLosingChuck( GetComponent<ChuckSubInstance>() );
         }
 
-        GetComponent<ChuckInstance>().SetRunning( myEnabled );
+        GetComponent<ChuckSubInstance>().SetRunning( myEnabled );
 
         if( myEnabled )
         {
-            GetComponent<LanguageObject>().TellChildrenHaveNewChuck( GetComponent<ChuckInstance>() );
+            GetComponent<LanguageObject>().TellChildrenHaveNewChuck( GetComponent<ChuckSubInstance>() );
         }
     }
 
@@ -181,6 +181,6 @@ public class DacController : MonoBehaviour , ILanguageObjectListener , IControll
         // whether enabled
         myEnabled = ( intParams[0] != 0 );
         SetColors();
-        GetComponent<ChuckInstance>().SetRunning( myEnabled );
+        GetComponent<ChuckSubInstance>().SetRunning( myEnabled );
     }
 }

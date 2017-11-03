@@ -177,8 +177,8 @@ public class LanguageObject : MonoBehaviour {
                 return;
             }
 
-            ChuckInstance myChuck = GetChuck();
-            ChuckInstance theirChuck = entering.GetChuck();
+            ChuckSubInstance myChuck = GetChuck();
+            ChuckSubInstance theirChuck = entering.GetChuck();
 
             if( ! ( ( (ILanguageObjectListener) entering.GetComponent( typeof(ILanguageObjectListener) ) )
                 .AcceptableChild( GetComponent<LanguageObject>() ) ) )
@@ -260,7 +260,7 @@ public class LanguageObject : MonoBehaviour {
 
     public virtual void RemoveFromParent()
     {
-        ChuckInstance myChuck = GetChuck();
+        ChuckSubInstance myChuck = GetChuck();
         if( !HaveOwnChuck() && myChuck != null )
         {
             // we don't have our own chuck, and we currently have access to one through
@@ -315,17 +315,17 @@ public class LanguageObject : MonoBehaviour {
         return null;
     }
 
-    public virtual ChuckInstance GetChuck()
+    public virtual ChuckSubInstance GetChuck()
     {
         if( HaveOwnChuck() )
         {
-            return gameObject.GetComponent<ChuckInstance>();
+            return gameObject.GetComponent<ChuckSubInstance>();
         }
         else if( GetComponent<ControlWorldObjectController>() != null )
         {
             // things looking for chuck on a ControlWorldObjectController really
             // need the global chuck, which only has blackhole connections
-            return TheChuck.Instance;
+            return TheSubChuck.Instance;
         }
         else if( myParent != null )
         {
@@ -342,15 +342,15 @@ public class LanguageObject : MonoBehaviour {
         DacController maybeDac = gameObject.GetComponent<DacController>();
         if( maybeDac != null )
         {
-            return maybeDac.IsEnabled() && maybeDac.GetComponent<ChuckInstance>() != null;
+            return maybeDac.IsEnabled() && maybeDac.GetComponent<ChuckSubInstance>() != null;
         }
         else
         {
-            return gameObject.GetComponent<ChuckInstance>() != null;
+            return gameObject.GetComponent<ChuckSubInstance>() != null;
         }
     }
 
-    public void TellChildrenHaveNewChuck( ChuckInstance chuck )
+    public void TellChildrenHaveNewChuck( ChuckSubInstance chuck )
     {
         // short circuit return before getting chuck if I am connecting to a function and its input doesn't have chuck
         if( FunctionChildShouldNotGetChuck() )
@@ -373,7 +373,7 @@ public class LanguageObject : MonoBehaviour {
         }
     }
 
-    public void TellChildrenLosingChuck( ChuckInstance chuck )
+    public void TellChildrenLosingChuck( ChuckSubInstance chuck )
     {
         // short circuit return before losing chuck if I am connecting to a function and its input doesn't have chuck
         if( FunctionChildShouldNotGetChuck() )
@@ -435,7 +435,7 @@ public class LanguageObject : MonoBehaviour {
         copy.prefabGeneratedFrom = prefabGeneratedFrom;
         ILanguageObjectListener copyListener = (ILanguageObjectListener) copy.GetComponent( typeof(ILanguageObjectListener) );
         
-        ChuckInstance parentChuck = parent != null ? parent.GetChuck() : null;
+        ChuckSubInstance parentChuck = parent != null ? parent.GetChuck() : null;
 
         // make it a child of the parent
         if( parent != null )
@@ -574,7 +574,7 @@ public class LanguageObject : MonoBehaviour {
         prefabGeneratedFrom = storage.prefabName;
         ILanguageObjectListener meListener = (ILanguageObjectListener) GetComponent( typeof(ILanguageObjectListener) );
         
-        ChuckInstance parentChuck = ( parent != null ) ? parent.GetChuck() : null;
+        ChuckSubInstance parentChuck = ( parent != null ) ? parent.GetChuck() : null;
 
         // make it a child of the parent
         if( parent != null )
@@ -633,8 +633,8 @@ public interface ILanguageObjectListener
     void NewChild( LanguageObject child );
     void ChildDisconnected( LanguageObject child );
     string VisibleName();
-    void GotChuck( ChuckInstance chuck );
-    void LosingChuck( ChuckInstance chuck );
+    void GotChuck( ChuckSubInstance chuck );
+    void LosingChuck( ChuckSubInstance chuck );
     string InputConnection( LanguageObject whoAsking );
     string OutputConnection();
     void SizeChanged( float newSize );

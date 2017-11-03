@@ -22,7 +22,7 @@ public class OperationController : MonoBehaviour , ILanguageObjectListener , ICo
     private LanguageObject myLO = null;
     private LanguageObject myLeftArg = null;
     private LanguageObject myRightArg = null;
-    private ChuckInstance myChuck = null;
+    private ChuckSubInstance myChuck = null;
 
 	// Use this for initialization
 	void Awake() 
@@ -166,7 +166,7 @@ public class OperationController : MonoBehaviour , ILanguageObjectListener , ICo
         return string.Format( "{0}.myOutput", myStorageClass );
     }
 
-    public void GotChuck(ChuckInstance chuck)
+    public void GotChuck(ChuckSubInstance chuck)
     {
         myChuck = chuck;
         myStorageClass = chuck.GetUniqueVariableName();
@@ -200,7 +200,7 @@ public class OperationController : MonoBehaviour , ILanguageObjectListener , ICo
         }
     }
 
-    public void LosingChuck(ChuckInstance chuck)
+    public void LosingChuck(ChuckSubInstance chuck)
     {
         if( myParent != null )
         {

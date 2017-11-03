@@ -110,12 +110,12 @@ public class ControlWorldObjectController : MonoBehaviour , ILanguageObjectListe
 
 
 
-    public void GotChuck( ChuckInstance chuck )
+    public void GotChuck( ChuckSubInstance chuck )
     {
         // don't care, shouldn't ever get a chuck
     }
 
-    public void LosingChuck( ChuckInstance chuck )
+    public void LosingChuck( ChuckSubInstance chuck )
     {
         // don't care, shouldn't ever get a chuck
     }

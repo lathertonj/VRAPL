@@ -15,7 +15,7 @@ public class UGenController : MonoBehaviour , ILanguageObjectListener, IParamAcc
     public float myDefaultParamMinimumValue;
     public string shaderColorName = "";
 
-    private ChuckInstance myChuck;
+    private ChuckSubInstance myChuck;
     private string myStorageClass;
     private string myExitEvent;
     private LanguageObject myParent = null;
@@ -152,10 +152,10 @@ public class UGenController : MonoBehaviour , ILanguageObjectListener, IParamAcc
 
     bool IsDac( LanguageObject other )
     {
-        return ( other.GetComponent<ChuckInstance>() != null );
+        return ( other.GetComponent<ChuckSubInstance>() != null );
     }
 
-    public void GotChuck(ChuckInstance chuck)
+    public void GotChuck(ChuckSubInstance chuck)
     {
         myChuck = chuck;
         myStorageClass = chuck.GetUniqueVariableName();
@@ -216,7 +216,7 @@ public class UGenController : MonoBehaviour , ILanguageObjectListener, IParamAcc
         SetMyDefaultParam();
     }
 
-    public void LosingChuck(ChuckInstance chuck)
+    public void LosingChuck(ChuckSubInstance chuck)
     {
         chuck.BroadcastEvent( myExitEvent );
         myChuck = null;

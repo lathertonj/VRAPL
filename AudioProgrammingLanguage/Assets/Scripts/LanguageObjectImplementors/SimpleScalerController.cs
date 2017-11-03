@@ -21,7 +21,7 @@ public class SimpleScalerController : MonoBehaviour , ILanguageObjectListener
     private Color myDefaultColor;
     private bool sendingData = false;
 
-    private ChuckInstance myChuck;
+    private ChuckSubInstance myChuck;
     private string myStorageClass;
     private string myExitEvent;
 
@@ -49,7 +49,7 @@ public class SimpleScalerController : MonoBehaviour , ILanguageObjectListener
     }
 
 
-    public void GotChuck( ChuckInstance chuck )
+    public void GotChuck( ChuckSubInstance chuck )
     {
         myChuck = chuck;
         myStorageClass = chuck.GetUniqueVariableName();
@@ -74,7 +74,7 @@ public class SimpleScalerController : MonoBehaviour , ILanguageObjectListener
         }
     }
 
-    public void LosingChuck( ChuckInstance chuck )
+    public void LosingChuck( ChuckSubInstance chuck )
     {
         if( sendingData )
         {

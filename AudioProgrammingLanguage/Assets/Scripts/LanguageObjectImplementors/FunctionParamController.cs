@@ -81,7 +81,7 @@ public class FunctionParamController : MonoBehaviour , ILanguageObjectListener
         // don't care
     }
 
-    public void GotChuck( ChuckInstance chuck )
+    public void GotChuck( ChuckSubInstance chuck )
     {
         myStorageClass = chuck.GetUniqueVariableName();
         myExitEvent = chuck.GetUniqueVariableName();
@@ -101,7 +101,7 @@ public class FunctionParamController : MonoBehaviour , ILanguageObjectListener
         ", myStorageClass, myExitEvent, myParent.InputConnection( myLO ) ));
     }
 
-    public void LosingChuck( ChuckInstance chuck )
+    public void LosingChuck( ChuckSubInstance chuck )
     {
         chuck.RunCode( string.Format(@"{0} =< {1};", OutputConnection(), myParent.InputConnection( myLO ) ) );
         chuck.BroadcastEvent( myExitEvent );

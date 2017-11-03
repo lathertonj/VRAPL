@@ -6,7 +6,7 @@ public class AudioTester : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		GetComponent<ChuckInstance>().RunCode(
+		GetComponent<ChuckSubInstance>().RunCode(
             @"
             TriOsc foo => dac;
             while( true )

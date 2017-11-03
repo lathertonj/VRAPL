@@ -25,7 +25,7 @@ public class SoundfileController : MonoBehaviour , ILanguageObjectListener, IPar
 
     private Vector2 lastAxis;
 
-    private ChuckInstance myChuck = null;
+    private ChuckSubInstance myChuck = null;
 
     private ILanguageObjectListener myParent;
     private LanguageObject myLO;
@@ -226,7 +226,7 @@ public class SoundfileController : MonoBehaviour , ILanguageObjectListener, IPar
         }
     }
 
-    public void GotChuck( ChuckInstance chuck )
+    public void GotChuck( ChuckSubInstance chuck )
     {
         myChuck = chuck;
 
@@ -269,7 +269,7 @@ public class SoundfileController : MonoBehaviour , ILanguageObjectListener, IPar
         chuck.RunCode( initCode );
     }
 
-    public void LosingChuck( ChuckInstance chuck )
+    public void LosingChuck( ChuckSubInstance chuck )
     {
         if( myParent != null )
         {

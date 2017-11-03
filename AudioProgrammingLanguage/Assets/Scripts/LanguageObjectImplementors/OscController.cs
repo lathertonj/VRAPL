@@ -10,7 +10,7 @@ public class OscController : MonoBehaviour , ILanguageObjectListener, IParamAcce
     public GameObject myShape;
     public string myOscillatorType;
 
-    private ChuckInstance myChuck;
+    private ChuckSubInstance myChuck;
     private string myStorageClass;
     private string myExitEvent;
     private LanguageObject myParent = null;
@@ -163,7 +163,7 @@ public class OscController : MonoBehaviour , ILanguageObjectListener, IParamAcce
         SwitchColors();
     }
 
-    public void GotChuck(ChuckInstance chuck)
+    public void GotChuck(ChuckSubInstance chuck)
     {
         myChuck = chuck;
         myStorageClass = chuck.GetUniqueVariableName();
@@ -220,7 +220,7 @@ public class OscController : MonoBehaviour , ILanguageObjectListener, IParamAcce
         ", myStorageClass, myExitEvent, connectMyOscTo, myOscillatorType, GetMyDefaultFrequency() ));
     }
 
-    public void LosingChuck(ChuckInstance chuck)
+    public void LosingChuck(ChuckSubInstance chuck)
     {
         chuck.BroadcastEvent( myExitEvent );
         myChuck = null;

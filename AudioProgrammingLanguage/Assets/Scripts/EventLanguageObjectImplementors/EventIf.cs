@@ -35,7 +35,7 @@ public class EventIf : MonoBehaviour , IEventLanguageObjectListener , IEventLang
 
     public void StartEmitTrigger() 
     {
-        ChuckInstance theChuck = TheChuck.Instance;
+        ChuckSubInstance theChuck = TheSubChuck.Instance;
         myStorageClass = theChuck.GetUniqueVariableName();
         myOutgoingTriggerEvent = theChuck.GetUniqueVariableName();
         myOverallExitEvent = theChuck.GetUniqueVariableName();
@@ -86,7 +86,7 @@ public class EventIf : MonoBehaviour , IEventLanguageObjectListener , IEventLang
         myThenBlock.material.color = Color.cyan;
     }
 
-    public void NewListenEvent( ChuckInstance theChuck, string incomingEvent )
+    public void NewListenEvent( ChuckSubInstance theChuck, string incomingEvent )
     {
         // listen for the new event
         mySmallerExitEvent = theChuck.GetUniqueVariableName();
@@ -112,7 +112,7 @@ public class EventIf : MonoBehaviour , IEventLanguageObjectListener , IEventLang
         ", myStorageClass, incomingEvent, myOutgoingTriggerEvent, mySmallerExitEvent ));
     }
 
-    public void LosingListenEvent( ChuckInstance theChuck, string losingEvent )
+    public void LosingListenEvent( ChuckSubInstance theChuck, string losingEvent )
     {
         // exit the shred that is listening to the old event
         theChuck.BroadcastEvent( mySmallerExitEvent );
@@ -153,12 +153,12 @@ public class EventIf : MonoBehaviour , IEventLanguageObjectListener , IEventLang
         return "event if";
     }
 
-    public void GotChuck( ChuckInstance chuck )
+    public void GotChuck( ChuckSubInstance chuck )
     {
         // don't care
     }
 
-    public void LosingChuck( ChuckInstance chuck )
+    public void LosingChuck( ChuckSubInstance chuck )
     {
         // don't care
     }

@@ -103,12 +103,12 @@ public class EventLanguageObject : LanguageObject {
         base.RemoveFromParent();
     }
 
-    public override ChuckInstance GetChuck()
+    public override ChuckSubInstance GetChuck()
     {
         // only connect things to TheChuck...
         // This might need to be here so that numbers, etc. know they are
         // properly hooked up when they are properly hooked up
-        return TheChuck.Instance;
+        return TheSubChuck.Instance;
     }
 
     private IEventLanguageObjectEmitter FindClosestEmitter()
@@ -152,7 +152,7 @@ public class EventLanguageObject : LanguageObject {
         if( myListeningTriggerEvent != "" )
         {
             // deregister
-            myMaybeListener.LosingListenEvent( TheChuck.Instance, myListeningTriggerEvent );
+            myMaybeListener.LosingListenEvent( TheSubChuck.Instance, myListeningTriggerEvent );
             TheChuck.Instance.StopListeningForChuckEvent( myListeningTriggerEvent, myIncomingTriggerCallback );
         }
         
@@ -161,7 +161,7 @@ public class EventLanguageObject : LanguageObject {
         if( myListeningTriggerEvent != "" )
         {
             TheChuck.Instance.StartListeningForChuckEvent( myListeningTriggerEvent, myIncomingTriggerCallback );
-            myMaybeListener.NewListenEvent( TheChuck.Instance, newTriggerEvent );
+            myMaybeListener.NewListenEvent( TheSubChuck.Instance, newTriggerEvent );
         }
     }
 
@@ -180,8 +180,8 @@ public class EventLanguageObject : LanguageObject {
 public interface IEventLanguageObjectListener : ILanguageObjectListener
 {
     void TickDoAction();
-    void NewListenEvent( ChuckInstance theChuck, string incomingEvent );
-    void LosingListenEvent( ChuckInstance theChuck, string losingEvent );
+    void NewListenEvent( ChuckSubInstance theChuck, string incomingEvent );
+    void LosingListenEvent( ChuckSubInstance theChuck, string losingEvent );
 }
 
 public interface IEventLanguageObjectEmitter : ILanguageObjectListener

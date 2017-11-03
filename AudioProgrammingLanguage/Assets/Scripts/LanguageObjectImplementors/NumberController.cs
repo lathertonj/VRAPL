@@ -23,7 +23,7 @@ public class NumberController : MonoBehaviour , ILanguageObjectListener , IContr
 
     private ILanguageObjectListener myParent = null;
     private LanguageObject myLO;
-    private ChuckInstance myChuck = null;
+    private ChuckSubInstance myChuck = null;
 
     // Use this for initialization
     void Awake()
@@ -88,7 +88,7 @@ public class NumberController : MonoBehaviour , ILanguageObjectListener , IContr
         // don't care
     }
 
-    public void GotChuck(ChuckInstance chuck)
+    public void GotChuck(ChuckSubInstance chuck)
     {
         myChuck = chuck;
         myStorageClass = chuck.GetUniqueVariableName();
@@ -113,7 +113,7 @@ public class NumberController : MonoBehaviour , ILanguageObjectListener , IContr
         }
     }
 
-    public void LosingChuck(ChuckInstance chuck)
+    public void LosingChuck(ChuckSubInstance chuck)
     {
         if( myParent != null )
         {

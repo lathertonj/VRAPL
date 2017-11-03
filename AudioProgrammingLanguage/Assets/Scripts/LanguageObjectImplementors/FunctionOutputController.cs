@@ -69,7 +69,7 @@ public class FunctionOutputController : MonoBehaviour , ILanguageObjectListener
         }
     }
 
-    public void GotChuck( ChuckInstance chuck )
+    public void GotChuck( ChuckSubInstance chuck )
     {
         myStorageClass = chuck.GetUniqueVariableName();
         myExitEvent = chuck.GetUniqueVariableName();
@@ -89,7 +89,7 @@ public class FunctionOutputController : MonoBehaviour , ILanguageObjectListener
         ", myStorageClass, myExitEvent, myFunction.GetFunctionParentConnection( myLO ) ));
     }
 
-    public void LosingChuck(ChuckInstance chuck)
+    public void LosingChuck(ChuckSubInstance chuck)
     {
         chuck.RunCode( string.Format(@"{0} =< {1};", OutputConnection(), myFunction.GetFunctionParentConnection( myLO ) ) );
         chuck.BroadcastEvent( myExitEvent );

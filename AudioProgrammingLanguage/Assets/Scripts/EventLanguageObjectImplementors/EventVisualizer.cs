@@ -24,12 +24,12 @@ public class EventVisualizer : MonoBehaviour , IEventLanguageObjectListener {
         myRenderer.material.color = Color.HSVToRGB( h, s, v );
     }
 
-    public void NewListenEvent( ChuckInstance theChuck, string incomingEvent )
+    public void NewListenEvent( ChuckSubInstance theChuck, string incomingEvent )
     {
         // don't care
     }
 
-    public void LosingListenEvent( ChuckInstance theChuck, string losingEvent)
+    public void LosingListenEvent( ChuckSubInstance theChuck, string losingEvent)
     {
         // don't care
     }
@@ -68,12 +68,12 @@ public class EventVisualizer : MonoBehaviour , IEventLanguageObjectListener {
         return "event visualizer";
     }
 
-    public void GotChuck( ChuckInstance chuck )
+    public void GotChuck( ChuckSubInstance chuck )
     {
         // don't care
     }
 
-    public void LosingChuck( ChuckInstance chuck )
+    public void LosingChuck( ChuckSubInstance chuck )
     {
         // don't care
     }

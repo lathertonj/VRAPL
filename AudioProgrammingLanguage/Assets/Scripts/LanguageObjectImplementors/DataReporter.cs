@@ -175,12 +175,12 @@ public class DataReporter : MonoBehaviour , ILanguageObjectListener , IDataSourc
         // don't care
     }
 
-    public void GotChuck( ChuckInstance chuck )
+    public void GotChuck( ChuckSubInstance chuck )
     {
         // don't care
     }
 
-    public void LosingChuck( ChuckInstance chuck )
+    public void LosingChuck( ChuckSubInstance chuck )
     {
         // don't care
     }

@@ -18,7 +18,7 @@ public class CommentController : MonoBehaviour, ILanguageObjectListener, IContro
 
     private ILanguageObjectListener myParent;
 
-    private ChuckInstance myChuck = null;
+    private ChuckSubInstance myChuck = null;
     private string myStorageClass;
     private string myExitEvent;
 
@@ -130,7 +130,7 @@ public class CommentController : MonoBehaviour, ILanguageObjectListener, IContro
         // don't care
     }
 
-    public void GotChuck( ChuckInstance chuck )
+    public void GotChuck( ChuckSubInstance chuck )
     {
         myChuck = chuck;
 
@@ -155,7 +155,7 @@ public class CommentController : MonoBehaviour, ILanguageObjectListener, IContro
         
     }
 
-    public void LosingChuck( ChuckInstance chuck )
+    public void LosingChuck( ChuckSubInstance chuck )
     {
         chuck.BroadcastEvent( myExitEvent );
         myChuck = null;

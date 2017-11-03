@@ -20,7 +20,7 @@ public class DurController : MonoBehaviour , ILanguageObjectListener , IControll
     private string myExitEvent;
     private ILanguageObjectListener myParent = null;
     private LanguageObject myLO = null;
-    private ChuckInstance myChuck = null;
+    private ChuckSubInstance myChuck = null;
 
 	// Use this for initialization
 	void Awake() 
@@ -131,7 +131,7 @@ public class DurController : MonoBehaviour , ILanguageObjectListener , IControll
         return string.Format("{0}.myGain", myStorageClass);
     }
 
-    public void GotChuck(ChuckInstance chuck)
+    public void GotChuck(ChuckSubInstance chuck)
     {
         myChuck = chuck;
         myStorageClass = chuck.GetUniqueVariableName();
@@ -158,7 +158,7 @@ public class DurController : MonoBehaviour , ILanguageObjectListener , IControll
         }
     }
 
-    public void LosingChuck(ChuckInstance chuck)
+    public void LosingChuck(ChuckSubInstance chuck)
     {
         if( myParent != null )
         {

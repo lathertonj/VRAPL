@@ -21,7 +21,7 @@ public class EventClock : MonoBehaviour , IEventLanguageObjectEmitter {
 
     public void StartEmitTrigger() 
     {
-        ChuckInstance theChuck = TheChuck.Instance;
+        ChuckSubInstance theChuck = TheSubChuck.Instance;
         myStorageClass = theChuck.GetUniqueVariableName();
         myTriggerEvent = theChuck.GetUniqueVariableName();
         myExitEvent = theChuck.GetUniqueVariableName();
@@ -142,12 +142,12 @@ public class EventClock : MonoBehaviour , IEventLanguageObjectEmitter {
         return "event clock";
     }
 
-    public void GotChuck( ChuckInstance chuck )
+    public void GotChuck( ChuckSubInstance chuck )
     {
         // don't care
     }
 
-    public void LosingChuck( ChuckInstance chuck )
+    public void LosingChuck( ChuckSubInstance chuck )
     {
         // don't care
     }

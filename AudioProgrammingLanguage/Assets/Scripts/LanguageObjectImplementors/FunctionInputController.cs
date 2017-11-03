@@ -12,7 +12,7 @@ public class FunctionInputController : MonoBehaviour , ILanguageObjectListener
     public Renderer myBox;
     public TextMesh myText;
 
-    private ChuckInstance myChuck = null;
+    private ChuckSubInstance myChuck = null;
     private string myStorageClass;
     private string myExitEvent;
     
@@ -68,7 +68,7 @@ public class FunctionInputController : MonoBehaviour , ILanguageObjectListener
         // don't care
     }
 
-    public void GotChuck( ChuckInstance chuck )
+    public void GotChuck( ChuckSubInstance chuck )
     {
         myStorageClass = chuck.GetUniqueVariableName();
         myExitEvent = chuck.GetUniqueVariableName();
@@ -95,7 +95,7 @@ public class FunctionInputController : MonoBehaviour , ILanguageObjectListener
 
     }
 
-    public void LosingChuck( ChuckInstance chuck )
+    public void LosingChuck( ChuckSubInstance chuck )
     {
         // tell children losing chuck before I set mychuck to null
         // because children will check whether I have chuck

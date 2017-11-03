@@ -37,7 +37,7 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
     // for copying changes over to other functions made out of this one
     private int myFunctionId = -1;
 
-    private ChuckInstance myChuck = null;
+    private ChuckSubInstance myChuck = null;
 
     private ILanguageObjectListener myParent = null;
 
@@ -192,7 +192,7 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
             {
                 // turn off chuck?
                 LanguageObject functionLanguageObject = fc.GetComponent<LanguageObject>();
-                ChuckInstance chuckOfFc = functionLanguageObject.GetChuck();
+                ChuckSubInstance chuckOfFc = functionLanguageObject.GetChuck();
                 bool shouldResetChuck = chuckOfFc != null;
                 if( shouldResetChuck )
                 {
@@ -374,7 +374,7 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
         // TODO: if child is param, ...
     }
 
-    public void GotChuck( ChuckInstance chuck )
+    public void GotChuck( ChuckSubInstance chuck )
     {
         myChuck = chuck;
         // tell my external params
@@ -383,7 +383,7 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
         myOutput.GetComponent<LanguageObject>().TellChildrenHaveNewChuck( chuck );
     }
 
-    public void LosingChuck( ChuckInstance chuck )
+    public void LosingChuck( ChuckSubInstance chuck )
     {
         // tell my output
         myOutput.GetComponent<LanguageObject>().TellChildrenLosingChuck( chuck );
@@ -518,7 +518,7 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
     }
 
     // helper functions called by my Input block
-    public void TellUgenChildrenGotChuck( ChuckInstance chuck )
+    public void TellUgenChildrenGotChuck( ChuckSubInstance chuck )
     {
         List<LanguageObject> myChildren = GetComponent< LanguageObject >().myChildren;
         foreach( LanguageObject child in myChildren )
@@ -534,7 +534,7 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
         }
     }
 
-    public void TellUgenChildrenLosingChuck( ChuckInstance chuck )
+    public void TellUgenChildrenLosingChuck( ChuckSubInstance chuck )
     {
         List<LanguageObject> myChildren = GetComponent< LanguageObject >().myChildren;
         foreach( LanguageObject child in myChildren )
@@ -550,7 +550,7 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
         }
     }
 
-    private void TellParamChildrenGotChuck( ChuckInstance chuck )
+    private void TellParamChildrenGotChuck( ChuckSubInstance chuck )
     {
         List<LanguageObject> myChildren = GetComponent< LanguageObject >().myChildren;
         foreach( LanguageObject child in myChildren )
@@ -563,7 +563,7 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
         }
     }
 
-    private void TellParamChildrenLosingChuck( ChuckInstance chuck )
+    private void TellParamChildrenLosingChuck( ChuckSubInstance chuck )
     {
         List<LanguageObject> myChildren = GetComponent< LanguageObject >().myChildren;
         foreach( LanguageObject child in myChildren )
