@@ -195,7 +195,7 @@ public class CommentController : MonoBehaviour, ILanguageObjectListener, IContro
         if( isPlayback )
         {
             // play back
-            TheChuck.Instance.RunCode( string.Format(
+            TheSubChuck.Instance.RunCode( string.Format(
                 @"SndBuf s => dac;
                 ""{0}"" => s.read;
                 s.length() => now;

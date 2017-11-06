@@ -34,8 +34,9 @@ public class EventLanguageObject : LanguageObject {
             // do setup
             myMaybeEmitter.StartEmitTrigger();
             // tell emitter when its trigger goes
-            TheChuck.Instance.StartListeningForChuckEvent( myMaybeEmitter.ExternalEventSource(),
+            bool ret = TheSubChuck.Instance.StartListeningForChuckEvent( myMaybeEmitter.ExternalEventSource(),
                 myOutgoingTriggerCallback );
+            Debug.Log("emitter listening successful? " + (ret?"yes":"no"));
         }
     }
 
@@ -105,7 +106,7 @@ public class EventLanguageObject : LanguageObject {
 
     public override ChuckSubInstance GetChuck()
     {
-        // only connect things to TheChuck...
+        // only connect things to TheSubChuck...
         // This might need to be here so that numbers, etc. know they are
         // properly hooked up when they are properly hooked up
         return TheSubChuck.Instance;
@@ -153,25 +154,27 @@ public class EventLanguageObject : LanguageObject {
         {
             // deregister
             myMaybeListener.LosingListenEvent( TheSubChuck.Instance, myListeningTriggerEvent );
-            TheChuck.Instance.StopListeningForChuckEvent( myListeningTriggerEvent, myIncomingTriggerCallback );
+            TheSubChuck.Instance.StopListeningForChuckEvent( myListeningTriggerEvent, myIncomingTriggerCallback );
         }
         
         // register
         myListeningTriggerEvent = newTriggerEvent;
         if( myListeningTriggerEvent != "" )
         {
-            TheChuck.Instance.StartListeningForChuckEvent( myListeningTriggerEvent, myIncomingTriggerCallback );
+            TheSubChuck.Instance.StartListeningForChuckEvent( myListeningTriggerEvent, myIncomingTriggerCallback );
             myMaybeListener.NewListenEvent( TheSubChuck.Instance, newTriggerEvent );
         }
     }
 
     private void ListenTriggerCallback()
     {
+        Debug.Log("callback called!");
         myIncomingTriggerCount++;
     }
 
     private void EmitTriggerCallback()
     {
+        Debug.Log("emit callback called!");
         myOutgoingTriggerCount++;
     }
 

@@ -169,7 +169,7 @@ public class EventWait : MonoBehaviour , IEventLanguageObjectListener , IEventLa
             // is it the first number source? --> turn off my default
             if( myNumNumberChildren == 1 )
             {
-                TheChuck.Instance.RunCode( string.Format( 
+                TheSubChuck.Instance.RunCode( string.Format( 
                     "0 => {0}.myDefaultValue.gain;", myStorageClass 
                 ) );
             }
@@ -185,7 +185,7 @@ public class EventWait : MonoBehaviour , IEventLanguageObjectListener , IEventLa
             // is it the last number source? --> turn on my default
             if( myNumNumberChildren == 0 )
             {
-                TheChuck.Instance.RunCode( string.Format( 
+                TheSubChuck.Instance.RunCode( string.Format( 
                     "1 => {0}.myDefaultValue.gain;", myStorageClass 
                 ) );
             }

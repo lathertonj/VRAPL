@@ -149,7 +149,7 @@ Transform:
   m_GameObject: {fileID: 1436063526721912}
   m_LocalRotation: {x: 0, y: 0, z: 0.5, w: 0.8660254}
   m_LocalPosition: {x: -0.03, y: -0.07, z: 0}
-  m_LocalScale: {x: 0.15, y: 0.08, z: 0.1}
+  m_LocalScale: {x: 0.15, y: 0.08, z: 0.09}
   m_Children: []
   m_Father: {fileID: 4005015771631866}
   m_RootOrder: 2
@@ -162,7 +162,7 @@ Transform:
   m_GameObject: {fileID: 1538895659560822}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.72, y: 1.28, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.99999994, y: 0.9999999, z: 1}
   m_Children:
   - {fileID: 4005015771631866}
   m_Father: {fileID: 0}
@@ -175,13 +175,13 @@ MeshRenderer:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1836250805672282}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 0
   m_ReceiveShadows: 1
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 82c92644bc1ff4d4c98ebd8e87e053ca, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -207,7 +207,7 @@ MeshRenderer:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1854889877986876}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 0
   m_ReceiveShadows: 1
   m_MotionVectors: 1
   m_LightProbeUsage: 1
@@ -239,13 +239,13 @@ MeshRenderer:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1436063526721912}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 0
   m_ReceiveShadows: 1
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 82c92644bc1ff4d4c98ebd8e87e053ca, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -288,8 +288,8 @@ Rigidbody:
   m_Mass: 1
   m_Drag: 0
   m_AngularDrag: 0.05
-  m_UseGravity: 1
-  m_IsKinematic: 0
+  m_UseGravity: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
@@ -380,7 +380,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4791e947d7e7f7a43a9a8b66db2d7512, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  myChildren: []
+  myChildren:
+  - {fileID: 0}
+  - {fileID: 0}
   myParent: {fileID: 0}
   prefabGeneratedFrom: event if
 --- !u!114 &114899969947063770

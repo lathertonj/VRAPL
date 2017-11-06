@@ -33,11 +33,11 @@ public class ControlWorldObjectController : MonoBehaviour , ILanguageObjectListe
         defaultAllowedControls = new string[] { "object" };
         myAllowedControls = defaultAllowedControls;
 
-        myStorageClass = TheChuck.Instance.GetUniqueVariableName();
-        myExitEvent = TheChuck.Instance.GetUniqueVariableName();
-        mySampleGetter = TheChuck.Instance.GetUniqueVariableName();
+        myStorageClass = TheSubChuck.Instance.GetUniqueVariableName();
+        myExitEvent = TheSubChuck.Instance.GetUniqueVariableName();
+        mySampleGetter = TheSubChuck.Instance.GetUniqueVariableName();
 
-        TheChuck.Instance.RunCode( string.Format(
+        TheSubChuck.Instance.RunCode( string.Format(
             @"
             external Event {1};
             external float {2};
@@ -70,7 +70,7 @@ public class ControlWorldObjectController : MonoBehaviour , ILanguageObjectListe
 	
 	private void Update () {
         // fetch myGain.last() into myCurrent
-        TheChuck.Instance.GetFloat( mySampleGetter, myValueGetterCallback );
+        TheSubChuck.Instance.GetFloat( mySampleGetter, myValueGetterCallback );
 	}
 
     private void UpdateText()
@@ -81,7 +81,7 @@ public class ControlWorldObjectController : MonoBehaviour , ILanguageObjectListe
 
     private void OnDestroy()
     {
-        TheChuck.Instance.BroadcastEvent( myExitEvent );
+        TheSubChuck.Instance.BroadcastEvent( myExitEvent );
     }
 
     void GetMyCurrentValueCallback( double value )
