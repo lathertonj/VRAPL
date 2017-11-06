@@ -280,7 +280,10 @@ public class ChuckSubInstance : MonoBehaviour {
 		myOutBuffer = new float[myBufferLength * myNumChannels];
 		myMonoBuffer = new float[myBufferLength];
 
-		mySource = GetComponent<AudioSource>();
+		// setup group for reliable ordering
+        mySource = GetComponent<AudioSource>();
+        mySource.outputAudioMixerGroup = Chuck.FindAudioMixerGroup( "ChuckSubInstanceDestination" );
+        // other settings
 		mySource.loop = true;
 		mySource.playOnAwake = true;
 		// medium priority
