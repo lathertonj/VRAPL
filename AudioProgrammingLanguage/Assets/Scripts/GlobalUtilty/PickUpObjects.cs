@@ -22,6 +22,7 @@ public class PickUpObjects : MonoBehaviour {
     private GameObject objectBeingScaled = null;
     private IControllerInputAcceptor touchpadObject = null;
     private GameObject touchpadGameObject = null;
+    private GameObject doubleGrabObject = null;
     private Vector3 scaleStartDifference;
     private Vector3 scaleInitialLocalTransformPosition;
     private float scaleStart;
@@ -320,6 +321,18 @@ public class PickUpObjects : MonoBehaviour {
         }
     }
 
+    private void StartDoubleGrabbingObject( GameObject o )
+    {
+        // start drawing a wire
+    }
+
+    private void StopDoubleGrabbingObject()
+    {
+        // if we're intersecting another object, try finalizing the wire between the two objects
+
+        // otherwise, delete the wire
+    }
+
     public void Update()
     {
         // continue scaling or stop scaling the object
@@ -390,6 +403,10 @@ public class PickUpObjects : MonoBehaviour {
         // send touchpad events
         if( Controller.GetPressDown( SteamVR_Controller.ButtonMask.Touchpad ) )
         {
+            // TODO: if grabbed object exists, let's make a wire come out of it
+
+            // TODO:
+            // else
             if( CollidingWithTouchpadReceiver() )
             {
                 touchpadObject = GetTouchpadReceiver();
@@ -401,6 +418,7 @@ public class PickUpObjects : MonoBehaviour {
         // stop sending touchpad events if the touchpad is no longer being clicked
         if( Controller.GetPressUp( SteamVR_Controller.ButtonMask.Touchpad ) )
         {
+            // TODO if doubleGrab object exists, let's clean up
             if( touchpadObject != null )
             {
                 touchpadObject.TouchpadUp();
@@ -469,7 +487,7 @@ public class PickUpObjects : MonoBehaviour {
 
     public bool UsingTouchpad()
     {
-        return ( touchpadObject != null ) || CollidingWithTouchpadReceiver();
+        return ( touchpadObject != null ) || CollidingWithTouchpadReceiver() || ( doubleGrabObject != null );
     }
 
     private bool CollidingWithTouchpadReceiver()
