@@ -22,7 +22,8 @@ public class PickUpObjects : MonoBehaviour {
     private GameObject objectBeingScaled = null;
     private IControllerInputAcceptor touchpadObject = null;
     private GameObject touchpadGameObject = null;
-    private GameObject doubleGrabObject = null;
+    private Transform doubleGrabObject = null;
+    private WireController doubleGrabWire = null;
     private Vector3 scaleStartDifference;
     private Vector3 scaleInitialLocalTransformPosition;
     private float scaleStart;
@@ -324,13 +325,43 @@ public class PickUpObjects : MonoBehaviour {
     private void StartDoubleGrabbingObject( GameObject o )
     {
         // start drawing a wire
+        doubleGrabObject = o.transform;
+        doubleGrabWire = Instantiate( PrefabStorage.GetPrefab( "wire" ) ).GetComponent<WireController>();
+        // draw wire from o to controller
+        doubleGrabWire.SetEndpoints( doubleGrabObject, transform );
     }
 
     private void StopDoubleGrabbingObject()
     {
         // if we're intersecting another object, try finalizing the wire between the two objects
-
+        if( collidingObject != null && collidingObject.transform != doubleGrabObject )
+        {
+            // TODO: check if it's ok to draw the wire between these two things!
+            doubleGrabWire.SetEndpoints( doubleGrabObject, collidingObject.transform );
+        }
         // otherwise, delete the wire
+        else
+        {
+            Destroy( doubleGrabWire.gameObject );
+        }
+
+        // reset my storage
+        doubleGrabObject = null;
+        doubleGrabWire = null;
+    }
+
+    private void DoOnTriggerUp()
+    {
+        // stop moving or scaling
+        if( objectInHand )
+        {
+            ReleaseObject( objectInHand );
+            objectInHand = null;
+        }
+        else if( objectBeingScaled )
+        {
+            StopScalingObject();
+        }
     }
 
     public void Update()
@@ -390,24 +421,23 @@ public class PickUpObjects : MonoBehaviour {
         // stop moving or scaling
         if( Controller.GetHairTriggerUp() )
         {
-            if( objectInHand )
-            {
-                ReleaseObject( objectInHand );
-            }
-            else if( objectBeingScaled )
-            {
-                StopScalingObject();
-            }
+            DoOnTriggerUp();
         }
 
         // send touchpad events
         if( Controller.GetPressDown( SteamVR_Controller.ButtonMask.Touchpad ) )
         {
             // TODO: if grabbed object exists, let's make a wire come out of it
-
-            // TODO:
-            // else
-            if( CollidingWithTouchpadReceiver() )
+            if( objectInHand != null )
+            {
+                GameObject objectToDoubleGrab = objectInHand;
+                // simulate trigger being released
+                DoOnTriggerUp();
+                // start double-grab
+                StartDoubleGrabbingObject( objectToDoubleGrab );
+            }
+            // otherwise, try to communicate with touchpad receiver
+            else if( CollidingWithTouchpadReceiver() )
             {
                 touchpadObject = GetTouchpadReceiver();
                 touchpadGameObject = collidingObject;
@@ -418,7 +448,13 @@ public class PickUpObjects : MonoBehaviour {
         // stop sending touchpad events if the touchpad is no longer being clicked
         if( Controller.GetPressUp( SteamVR_Controller.ButtonMask.Touchpad ) )
         {
-            // TODO if doubleGrab object exists, let's clean up
+            // if doubleGrab object exists, let's clean up
+            if( doubleGrabObject != null )
+            {
+                StopDoubleGrabbingObject();
+            }
+
+            // if touchpadObject is receiving data, lets send data end and clean up
             if( touchpadObject != null )
             {
                 touchpadObject.TouchpadUp();
@@ -460,6 +496,7 @@ public class PickUpObjects : MonoBehaviour {
             if( grippedObject )
             {
                 ReleaseObject( grippedObject );
+                grippedObject = null;
             }
         }
 

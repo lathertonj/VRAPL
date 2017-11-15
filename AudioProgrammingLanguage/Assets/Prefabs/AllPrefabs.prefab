@@ -33,7 +33,7 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1897675061315462}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
@@ -118,3 +118,5 @@ MonoBehaviour:
     prefab: {fileID: 1285042824787524, guid: 32297383d65418b459e717dac5a1295d, type: 2}
   - name: event if
     prefab: {fileID: 1538895659560822, guid: c36653b76b4f6a842b19f89bbac1fffc, type: 2}
+  - name: wire
+    prefab: {fileID: 1423401713174432, guid: 72386171870c6164c99943395e6d61d2, type: 2}
