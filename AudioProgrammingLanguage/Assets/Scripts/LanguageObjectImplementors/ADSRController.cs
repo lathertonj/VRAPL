@@ -27,7 +27,9 @@ public class ADSRController : MonoBehaviour , ILanguageObjectListener, IParamAcc
     private Dictionary<EventNotifyController, bool> myNotifiers;
 
     // Use this for initialization
-    void Awake() {
+    public void InitLanguageObject( ChuckSubInstance chuck )
+    {
+        // awake section
 		myAcceptableParams = new string[] { "attack time", "decay time", "sustain time", "sustain level", "release time" };
         //myParamDefaults = new string[] { "10::ms", "20::ms", "0.5::second", "0.5", "0.5::second" };
         numParamConnections = new Dictionary<string, int>();
@@ -37,12 +39,144 @@ public class ADSRController : MonoBehaviour , ILanguageObjectListener, IParamAcc
         }
         myNotifiers = new Dictionary<EventNotifyController, bool>();
         myLO = GetComponent<LanguageObject>();
+
+        // chuck section
+        myChuck = chuck;
+        myStorageClass = chuck.GetUniqueVariableName();
+        myExitEvent = chuck.GetUniqueVariableName();
+
+        chuck.RunCode(string.Format(@"
+            external Event {1};
+            public class {0}
+            {{
+                static Gain @ myInput;
+                static Gain @ myOutput;
+                static dur myNoteLength;
+
+                static Gain @ myAttackTime;
+                static Step @ myDefaultAttackTime;
+                static Gain @ myDecayTime;
+                static Step @ myDefaultDecayTime;
+                static Gain @ mySustainTime;
+                static Step @ myDefaultSustainTime;
+                static Gain @ mySustainLevel;
+                static Step @ myDefaultSustainLevel;
+                static Gain @ myReleaseTime;
+                static Step @ myDefaultReleaseTime;
+            }}
+            Gain input @=> {0}.myInput;
+            Gain output @=> {0}.myOutput;
+
+            Gain g1 @=> {0}.myAttackTime;
+            Gain g2 @=> {0}.myDecayTime;
+            Gain g3 @=> {0}.mySustainTime;
+            Gain g4 @=> {0}.mySustainLevel;
+            Gain g5 @=> {0}.myReleaseTime;
+
+            Step s1 @=> {0}.myDefaultAttackTime;
+            Step s2 @=> {0}.myDefaultDecayTime;
+            Step s3 @=> {0}.myDefaultSustainTime;
+            Step s4 @=> {0}.myDefaultSustainLevel;
+            Step s5 @=> {0}.myDefaultReleaseTime;
+
+            0.01 => {0}.myDefaultAttackTime.next;
+            0.02 => {0}.myDefaultDecayTime.next;
+            0.5 => {0}.myDefaultSustainTime.next;
+            0.5 => {0}.myDefaultSustainLevel.next;
+            0.5 => {0}.myDefaultReleaseTime.next;
+
+            {0}.myDefaultAttackTime => {0}.myAttackTime => blackhole;
+            {0}.myDefaultDecayTime => {0}.myDecayTime => blackhole;
+            {0}.myDefaultSustainTime => {0}.mySustainTime => blackhole;
+            {0}.myDefaultSustainLevel => {0}.mySustainLevel => blackhole;
+            {0}.myDefaultReleaseTime => {0}.myReleaseTime => blackhole;
+
+            // wait until told to exit
+            {1} => now;
+            ", myStorageClass, myExitEvent
+        ));
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+
+    public void CleanupLanguageObject( ChuckSubInstance chuck )
+    {
+        chuck.BroadcastEvent( myExitEvent );
+        myChuck = null;
+    }
+    
+
+
+    public void ParentConnected( LanguageObject parent, ILanguageObjectListener parentListener )
+    {
+        SwitchColors();
+        myParent = parentListener;
+    }
+
+    public void ParentDisconnected( LanguageObject parent, ILanguageObjectListener parentListener )
+    {
+        SwitchColors();
+        myParent = null;
+    }
+    
+    public bool AcceptableChild( LanguageObject other, ILanguageObjectListener otherListener )
+    {
+        if( other.GetComponent<ParamController>() != null ||
+            other.GetComponent<EventNotifyController>() != null ||
+            other.GetComponent<SoundProducer>() != null )
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public void ChildConnected( LanguageObject child, ILanguageObjectListener childListener )
+    {
+        EventNotifyController nc = child.GetComponent<EventNotifyController>();
+        if( nc != null )
+        {
+            myNotifiers[nc] = true;
+            nc.AddListener( GetComponent<EventNotifyController>() );
+        }
+
+        if( child.GetComponent<SoundProducer>() != null )
+        {
+            LanguageObject.HookTogetherListeners( myChuck, child, myLO );
+        }
+    }
+
+    public void ChildDisconnected( LanguageObject child, ILanguageObjectListener childListener )
+    {
+        EventNotifyController nc = child.GetComponent<EventNotifyController>();
+        if( nc != null && myNotifiers.ContainsKey( nc ) )
+        {
+            nc.RemoveListener( GetComponent<EventNotifyController>() );
+            myNotifiers.Remove( nc );
+        }
+
+        if( child.GetComponent<SoundProducer>() != null )
+        {
+            LanguageObject.UnhookListeners( myChuck, child, myLO );
+        }
+    }
+
+    public void SizeChanged( float newSize )
+    {
+        // don't care about my size
+    }
+
+    public string InputConnection( LanguageObject whoAsking )
+    {
+        return string.Format( "{0}.myInput", myStorageClass );
+    }
+
+    public string OutputConnection()
+    {
+        return string.Format( "{0}.myOutput", myStorageClass );
+    }
+
+    public string VisibleName()
+    {
+        return "adsr";
+    }
 
     void SwitchColors()
     {
@@ -54,6 +188,7 @@ public class ADSRController : MonoBehaviour , ILanguageObjectListener, IParamAcc
         }
     }
 
+    // EVENT RESPONDER
     public void RespondToEvent( float intensity )
     {
         if( myChuck != null )
@@ -76,6 +211,7 @@ public class ADSRController : MonoBehaviour , ILanguageObjectListener, IParamAcc
         }
     }
 
+    // PARAM CONTROLLABLE
     public string[] AcceptableParams()
     {
         return myAcceptableParams;
@@ -251,151 +387,8 @@ public class ADSRController : MonoBehaviour , ILanguageObjectListener, IParamAcc
         }
     }
 
-    public bool AcceptableChild( LanguageObject other )
-    {
-        if( other.GetComponent<ParamController>() != null ||
-            other.GetComponent<EventNotifyController>() != null ||
-            other.GetComponent<SoundProducer>() != null )
-        {
-            return true;
-        }
-        return false;
-    }
-
-    public void NewParent( LanguageObject parent )
-    {
-        ILanguageObjectListener lo = (ILanguageObjectListener) parent.GetComponent( typeof( ILanguageObjectListener ) );
-        if( lo != null )
-        {
-            SwitchColors();
-            myParent = lo;
-        }
-    }
-
-    public void ParentDisconnected( LanguageObject parent )
-    {
-        ILanguageObjectListener lo = (ILanguageObjectListener) parent.GetComponent( typeof( ILanguageObjectListener ) );
-        if( lo != null )
-        {
-            SwitchColors();
-            myParent = null;
-        }
-    }
-
-    public void NewChild( LanguageObject child )
-    {
-        EventNotifyController nc = child.GetComponent<EventNotifyController>();
-        if( nc != null )
-        {
-            myNotifiers[nc] = true;
-            nc.AddListener( GetComponent<EventNotifyController>() );
-        }
-    }
-
-    public void ChildDisconnected( LanguageObject child )
-    {
-        EventNotifyController nc = child.GetComponent<EventNotifyController>();
-        if( nc != null && myNotifiers.ContainsKey( nc ) )
-        {
-            nc.RemoveListener( GetComponent<EventNotifyController>() );
-            myNotifiers.Remove( nc );
-        }
-    }
-
-    public void GotChuck( ChuckSubInstance chuck )
-    {
-        myChuck = chuck;
-
-        myStorageClass = chuck.GetUniqueVariableName();
-        myExitEvent = chuck.GetUniqueVariableName();
-
-
-        chuck.RunCode(string.Format(@"
-            external Event {1};
-            public class {0}
-            {{
-                static Gain @ myInput;
-                static Gain @ myOutput;
-                static dur myNoteLength;
-
-                static Gain @ myAttackTime;
-                static Step @ myDefaultAttackTime;
-                static Gain @ myDecayTime;
-                static Step @ myDefaultDecayTime;
-                static Gain @ mySustainTime;
-                static Step @ myDefaultSustainTime;
-                static Gain @ mySustainLevel;
-                static Step @ myDefaultSustainLevel;
-                static Gain @ myReleaseTime;
-                static Step @ myDefaultReleaseTime;
-            }}
-            Gain input @=> {0}.myInput;
-            Gain output @=> {0}.myOutput;
-
-            Gain g1 @=> {0}.myAttackTime;
-            Gain g2 @=> {0}.myDecayTime;
-            Gain g3 @=> {0}.mySustainTime;
-            Gain g4 @=> {0}.mySustainLevel;
-            Gain g5 @=> {0}.myReleaseTime;
-
-            Step s1 @=> {0}.myDefaultAttackTime;
-            Step s2 @=> {0}.myDefaultDecayTime;
-            Step s3 @=> {0}.myDefaultSustainTime;
-            Step s4 @=> {0}.myDefaultSustainLevel;
-            Step s5 @=> {0}.myDefaultReleaseTime;
-
-            0.01 => {0}.myDefaultAttackTime.next;
-            0.02 => {0}.myDefaultDecayTime.next;
-            0.5 => {0}.myDefaultSustainTime.next;
-            0.5 => {0}.myDefaultSustainLevel.next;
-            0.5 => {0}.myDefaultReleaseTime.next;
-
-            {0}.myDefaultAttackTime => {0}.myAttackTime => blackhole;
-            {0}.myDefaultDecayTime => {0}.myDecayTime => blackhole;
-            {0}.myDefaultSustainTime => {0}.mySustainTime => blackhole;
-            {0}.myDefaultSustainLevel => {0}.mySustainLevel => blackhole;
-            {0}.myDefaultReleaseTime => {0}.myReleaseTime => blackhole;
-
-
-            {0}.myOutput => {2};
-
-            // wait until told to exit
-            {1} => now;
-            ", myStorageClass, myExitEvent, myParent.InputConnection( myLO )
-        ));
-    }
-
-    public void LosingChuck( ChuckSubInstance chuck )
-    {
-        if( myParent != null )
-        {
-            chuck.RunCode(string.Format("{0} =< {1};", OutputConnection(), myParent.InputConnection( myLO ) ) );
-        }
-
-        chuck.BroadcastEvent( myExitEvent );
-        myChuck = null;
-    }
-
-    public void SizeChanged( float newSize )
-    {
-        // don't care about my size
-    }
-
-    public string InputConnection( LanguageObject whoAsking )
-    {
-        return string.Format( "{0}.myInput", myStorageClass );
-    }
-
-    public string OutputConnection()
-    {
-        return string.Format( "{0}.myOutput", myStorageClass );
-    }
-
-    public string VisibleName()
-    {
-        return "adsr";
-    }
-
+    
+    // TOUCHPAD
     public void TouchpadDown()
     {
         RespondToEvent( 1.0f );
@@ -416,6 +409,8 @@ public class ADSRController : MonoBehaviour , ILanguageObjectListener, IParamAcc
         // don't care
     }
 
+
+    // CLONING AND SERIALIZATION
     public void CloneYourselfFrom( LanguageObject original, LanguageObject newParent )
     {
         // no settings to be copied over

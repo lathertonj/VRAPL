@@ -26,6 +26,8 @@ public class LanguageObject : MonoBehaviour {
     private Dictionary<LanguageObject, Collider> exitingDebounceColliders;
     private int debounceFramesToWait = 1;
 
+    private ILanguageObjectListener myLOListener;
+
     protected void Awake()
     {
         // recursively make sure all my colliders are trigger colliders and that my rigidbodies do not use gravity, etc
@@ -35,7 +37,15 @@ public class LanguageObject : MonoBehaviour {
         enteringDebounceObjects = new Dictionary<LanguageObject, int>();
         exitingDebounceObjects = new Dictionary<LanguageObject, int>();
         enteringDebounceColliders = new Dictionary<LanguageObject, Collider>();
-        exitingDebounceColliders = new Dictionary<LanguageObject, Collider>();        
+        exitingDebounceColliders = new Dictionary<LanguageObject, Collider>();
+        
+        myLOListener = (ILanguageObjectListener) GetComponent(typeof(ILanguageObjectListener));
+        myLOListener.InitLanguageObject( TheSubChuck.Instance );
+    }
+
+    protected void OnDestroy()
+    {
+        myLOListener.CleanupLanguageObject( TheSubChuck.Instance );
     }
 
     void EnsureTriggerBehavior( Transform self )
@@ -180,16 +190,14 @@ public class LanguageObject : MonoBehaviour {
             ChuckSubInstance myChuck = GetChuck();
             ChuckSubInstance theirChuck = entering.GetChuck();
 
-            if( ! ( ( (ILanguageObjectListener) entering.GetComponent( typeof(ILanguageObjectListener) ) )
-                .AcceptableChild( GetComponent<LanguageObject>() ) ) )
+            if( !entering.myLOListener.AcceptableChild( this, myLOListener ) )
             {
                 // "entering" will not consider me as a child
 
                 // will I consider "entering" as a child if they don't already have a parent?
                 // TODO: in this region, should "collisionWith" be passed as null? because the relationship
                 // is flipped so I don't know what the actual collision on the parent was?
-                if( ( ( (ILanguageObjectListener) GetComponent( typeof(ILanguageObjectListener) ) )
-                    .AcceptableChild( entering ) ) && 
+                if( myLOListener.AcceptableChild( entering, entering.myLOListener ) && 
                     entering.myParent == null && 
                     ValidParentRelationship( entering, this ) )
                 {
@@ -201,16 +209,16 @@ public class LanguageObject : MonoBehaviour {
                     GetComponent<MovableController>().additionalRelationshipChild = entering.transform;
                     GetComponent<MovableController>().additionalRelationshipParent = transform;
                     // Signal to outside entering has parent now
-                    ( (ILanguageObjectListener) entering.GetComponent( typeof(ILanguageObjectListener) ) ).NewParent( GetComponent<LanguageObject>() );
+                    entering.myLOListener.ParentConnected( this, myLOListener );
                     // Signal to outside-me that I have a new child, which is entering
-                    ( (ILanguageObjectListener) GetComponent( typeof(ILanguageObjectListener) ) ).NewChild( entering.GetComponent<LanguageObject>() );
+                    myLOListener.ChildConnected( entering, entering.myLOListener );
                     
-                    // entering has become my child.
-                    if( myChuck != null && theirChuck == null )
-                    {
-                        // I will tell them they have a chuck now.
-                        entering.TellChildrenHaveNewChuck( myChuck );
-                    }
+                    //// entering has become my child.
+                    //if( myChuck != null && theirChuck == null )
+                    //{
+                    //    // I will tell them they have a chuck now.
+                    //    entering.TellChildrenHaveNewChuck( myChuck );
+                    //}
                 }
             }
             // Entering will consider me as a child, but is this a valid relationship?
@@ -223,16 +231,16 @@ public class LanguageObject : MonoBehaviour {
                 // Make me a child of the parent when the move is finished
                 GetComponent<MovableController>().parentAfterMovement = myParent.transform;
                 // Signal to outside I have a parent now
-                ( (ILanguageObjectListener) GetComponent( typeof(ILanguageObjectListener) ) ).NewParent( myParent );
+                myLOListener.ParentConnected( myParent, myParent.myLOListener );
                 // Signal to outside that it has a new child, me.
-                ( (ILanguageObjectListener) entering.GetComponent( typeof(ILanguageObjectListener) ) ).NewChild( GetComponent<LanguageObject>() );
+                entering.myLOListener.ChildConnected( this, myLOListener );
                 
-                // I have become entering's child
-                if( myChuck == null && theirChuck != null )
-                {
-                    // I will tell my children that now we have a chuck!
-                    TellChildrenHaveNewChuck( theirChuck );
-                }
+                //// I have become entering's child
+                //if( myChuck == null && theirChuck != null )
+                //{
+                //    // I will tell my children that now we have a chuck!
+                //    TellChildrenHaveNewChuck( theirChuck );
+                //}
             }
         }
         
@@ -260,19 +268,19 @@ public class LanguageObject : MonoBehaviour {
 
     public virtual void RemoveFromParent()
     {
-        ChuckSubInstance myChuck = GetChuck();
-        if( !HaveOwnChuck() && myChuck != null )
-        {
-            // we don't have our own chuck, and we currently have access to one through
-            // our parent. so, we will lose our chuck
-            TellChildrenLosingChuck( myChuck );
-        }
+        //ChuckSubInstance myChuck = GetChuck();
+        //if( !HaveOwnChuck() && myChuck != null )
+        //{
+        //    // we don't have our own chuck, and we currently have access to one through
+        //    // our parent. so, we will lose our chuck
+        //    TellChildrenLosingChuck( myChuck );
+        //}
         // remove self from parent's children
         myParent.myChildren.Remove( this );
-        // signal to outside that parent is being disconnected
-        ( (ILanguageObjectListener) GetComponent( typeof(ILanguageObjectListener) ) ).ParentDisconnected( myParent );
         // signal to my parent that they are losing me as a child
-        ( (ILanguageObjectListener) myParent.GetComponent( typeof(ILanguageObjectListener) ) ).ChildDisconnected( GetComponent<LanguageObject>() );
+        myParent.myLOListener.ChildDisconnected( this, myLOListener );
+        // signal to outside that parent is being disconnected
+        myLOListener.ParentDisconnected( myParent, myParent.myLOListener );
         // restore parent when the movement is finished to be the current "room", or top-level if we are top-level
         if( TheRoom.InAFunction() )
         {
@@ -350,7 +358,7 @@ public class LanguageObject : MonoBehaviour {
         }
     }
 
-    public void TellChildrenHaveNewChuck( ChuckSubInstance chuck )
+    /*public void TellChildrenHaveNewChuck( ChuckSubInstance chuck )
     {
         // short circuit return before getting chuck if I am connecting to a function and its input doesn't have chuck
         if( FunctionChildShouldNotGetChuck() )
@@ -371,9 +379,9 @@ public class LanguageObject : MonoBehaviour {
         {
             child.TellChildrenHaveNewChuck( chuck );
         }
-    }
+    }*/
 
-    public void TellChildrenLosingChuck( ChuckSubInstance chuck )
+    /*public void TellChildrenLosingChuck( ChuckSubInstance chuck )
     {
         // short circuit return before losing chuck if I am connecting to a function and its input doesn't have chuck
         if( FunctionChildShouldNotGetChuck() )
@@ -392,9 +400,9 @@ public class LanguageObject : MonoBehaviour {
         
         // tell myself
         ((ILanguageObjectListener) GetComponent(typeof(ILanguageObjectListener))).LosingChuck( chuck );
-    }
+    }*/
 
-    private bool FunctionChildShouldNotGetChuck()
+    /*private bool FunctionChildShouldNotGetChuck()
     {
         // param controllers get connected automatically if fn has chuck
         // otherwise, if it's not a paramcontroller, and the parent is a function, and the function's
@@ -410,6 +418,7 @@ public class LanguageObject : MonoBehaviour {
         }
         return false;
     }
+    */
 
     public LanguageObject GetClone()
     {
@@ -448,14 +457,15 @@ public class LanguageObject : MonoBehaviour {
             copy.transform.parent = parent.transform;
 
             // notify the objects
-            copyListener.NewParent( parent );
-            parentListener.NewChild( copy );
+            copyListener.ParentConnected( parent, parentListener );
+            parentListener.ChildConnected( copy, copy.myLOListener );
 
             // do I have a chuck now?
             if( parentChuck != null )
             {
                 // I will tell myself and my children that now we have a chuck!
-                TellChildrenHaveNewChuck( parentChuck );
+                // TODO: fix serialization
+                // TellChildrenHaveNewChuck( parentChuck );
             }
         }
 
@@ -584,8 +594,8 @@ public class LanguageObject : MonoBehaviour {
             parent.AddToChildren( this );
 
             // notify the objects
-            meListener.NewParent( parent );
-            parentListener.NewChild( this );
+            meListener.ParentConnected( parent, parentListener );
+            parentListener.ChildConnected( this, meListener );
         }
 
         // clone object-specific settings
@@ -599,7 +609,8 @@ public class LanguageObject : MonoBehaviour {
             // (children are deserialized below, so this is just really myself
             //  and any children created via SerializeLoad(), such as
             //  a function's FunctionOutputController)
-            TellChildrenHaveNewChuck( parentChuck );
+            // TODO: fix serialization
+            // TellChildrenHaveNewChuck( parentChuck );
         }
         
         // clone other settings such as size from MovableController and what else?
@@ -622,19 +633,37 @@ public class LanguageObject : MonoBehaviour {
         RendererController renderer = GetComponent<RendererController>();
         renderer.Restart();
     }
+
+    public static void HookTogetherListeners( ChuckSubInstance chuck, 
+        LanguageObject source, LanguageObject dest )
+    {
+        chuck.RunCode( string.Format(@"
+            external {0} => external {1};
+        ", source.myLOListener.OutputConnection(), dest.myLOListener.InputConnection( source ) 
+        ));
+    }
+
+    public static void UnhookListeners( ChuckSubInstance chuck, 
+        LanguageObject source, LanguageObject dest )
+    {
+        chuck.RunCode( string.Format(@"
+            external {0}; external {1}; {0} =< {1};
+        ", source.myLOListener.OutputConnection(), dest.myLOListener.InputConnection( source ) 
+        ));
+    }
 }
 
 
 public interface ILanguageObjectListener
 {
-    bool AcceptableChild( LanguageObject other );
-    void NewParent( LanguageObject parent );
-    void ParentDisconnected( LanguageObject parent );
-    void NewChild( LanguageObject child );
-    void ChildDisconnected( LanguageObject child );
+    void InitLanguageObject( ChuckSubInstance chuck );
+    void CleanupLanguageObject( ChuckSubInstance chuck );
+    void ParentConnected( LanguageObject parent, ILanguageObjectListener parentListener );
+    void ParentDisconnected( LanguageObject parent, ILanguageObjectListener parentListener );
+    bool AcceptableChild( LanguageObject other, ILanguageObjectListener otherListener );
+    void ChildConnected( LanguageObject child, ILanguageObjectListener childListener );
+    void ChildDisconnected( LanguageObject child, ILanguageObjectListener childListener );
     string VisibleName();
-    void GotChuck( ChuckSubInstance chuck );
-    void LosingChuck( ChuckSubInstance chuck );
     string InputConnection( LanguageObject whoAsking );
     string OutputConnection();
     void SizeChanged( float newSize );
