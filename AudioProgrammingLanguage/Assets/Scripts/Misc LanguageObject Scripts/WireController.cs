@@ -1,11 +1,15 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WireController : MonoBehaviour {
+public class WireController : MonoBehaviour , IControllerInputAcceptor {
+
+    public Transform myCylinder;
+    public Color textColor;
 
     // for changing size
-    private MeshRenderer myRenderer;
+    public MeshRenderer myRenderer;
     private float myXScale;
     private float myZScale;
 
@@ -22,13 +26,11 @@ public class WireController : MonoBehaviour {
     private string myStartConnection = "";
     private string myEndConnection = "";
 
-
     private void Awake()
     {
         // renderer
-        myRenderer = GetComponent<MeshRenderer>();
-        myXScale = transform.localScale.x;
-        myZScale = transform.localScale.z;
+        myXScale = myCylinder.localScale.x;
+        myZScale = myCylinder.localScale.z;
         UpdateTextureTiling();
 
         // moving
@@ -59,9 +61,8 @@ public class WireController : MonoBehaviour {
         }
     }
 
-    public void SetEndpoints( Transform start, Transform end )
+    private void UndoCurrenctConnection()
     {
-        // undo old chuck connection
         if( myStartConnection != "" && myEndConnection != "" )
         {
             myChuck.RunCode( string.Format( @"
@@ -75,6 +76,17 @@ public class WireController : MonoBehaviour {
                 myStartConnection, myGain, myEndConnection
             ));
         }
+    }
+
+    private void OnDestroy()
+    {
+        UndoCurrenctConnection();
+    }
+
+    public void SetEndpoints( Transform start, Transform end )
+    {
+        // undo old chuck connection
+        UndoCurrenctConnection();
 
         // store new connection
         myStart = start;
@@ -105,18 +117,91 @@ public class WireController : MonoBehaviour {
         Vector3 offset = end - start;
 
         // set angle
-        transform.up = offset;
+        myCylinder.up = offset;
 
         // set position
         transform.position = start + offset / 2;
 
         // set scale: 
-        transform.localScale = new Vector3( myXScale, offset.magnitude / 2, myZScale );
+        myCylinder.localScale = new Vector3( myXScale, offset.magnitude / 2, myZScale );
         UpdateTextureTiling();
     }
 
     private void UpdateTextureTiling()
     {
-        myRenderer.material.mainTextureScale = new Vector2( 1, transform.localScale.y * 50 );
+        myRenderer.material.mainTextureScale = new Vector2( 1, myCylinder.localScale.y * 50 );
+    }
+
+    bool touchpadJustPressed = false;
+    Vector3 touchpadInitialPosition;
+    Vector3 touchpadCurrentPosition;
+    float verticalThreshold = 0.1f;
+    TextMesh touchpadText = null;
+
+    public void TouchpadDown()
+    {
+        touchpadJustPressed = true;  
+        Debug.Log("TOUCHPAD PRESSED~");
+    }
+
+    public void TouchpadUp()
+    {
+        if( touchpadText != null )
+        {
+            Destroy( touchpadText.gameObject );
+            if( touchpadCurrentPosition.y - touchpadInitialPosition.y > verticalThreshold )
+            {
+                // delete wire
+                Destroy( gameObject );
+            }
+            else if( touchpadCurrentPosition.y - touchpadInitialPosition.y < -verticalThreshold )
+            {
+                // TODO: switch wire direction
+            }
+            else
+            {
+                // do nothing
+            }
+        }
+    }
+
+    public void TouchpadAxis( Vector2 pos )
+    {
+        // don't care
+    }
+
+    public void TouchpadTransform( Transform touchpad )
+    {
+        touchpadCurrentPosition = touchpad.position;
+        // check if this is the first time we heard about it
+        if( touchpadJustPressed )
+        {
+            touchpadJustPressed = false;
+            touchpadInitialPosition = touchpad.position;
+            touchpadText = Instantiate( 
+                BasicTextHolder.basicTextPrefab, touchpadInitialPosition, 
+                Quaternion.identity, transform
+            ).GetComponent<TextMesh>();
+            // move it up a bit
+            touchpadText.transform.localPosition += Vector3.up * 0.1f;
+            // color it green
+            touchpadText.color = textColor;
+            // face it toward my head
+            touchpadText.transform.rotation = Quaternion.LookRotation( 
+                touchpadText.transform.position - TheRoom.theEye.position );
+        }
+
+        if( touchpadCurrentPosition.y - touchpadInitialPosition.y > verticalThreshold )
+        {
+            touchpadText.text = "delete wire?";
+        }
+        else if( touchpadCurrentPosition.y - touchpadInitialPosition.y < -verticalThreshold )
+        {
+            touchpadText.text = "switch wire direction?";
+        }
+        else
+        {
+            touchpadText.text = "\u2191\n\u2193";
+        }
     }
 }

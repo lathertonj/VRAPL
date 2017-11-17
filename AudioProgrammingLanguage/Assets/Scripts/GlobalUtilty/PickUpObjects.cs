@@ -17,6 +17,8 @@ public class PickUpObjects : MonoBehaviour {
 
 
     private GameObject collidingObject = null;
+    private IControllerInputAcceptor collidingControllable = null;
+    private GameObject collidingControllableObject = null;
     private GameObject objectInHand = null;
     private GameObject grippedObject = null;
     private GameObject objectBeingScaled = null;
@@ -62,6 +64,23 @@ public class PickUpObjects : MonoBehaviour {
             objectToTest = objectToTest.parent;
         }
 
+        // If we got here, we didn't find a colliding object.
+        // this means we didn't collide with something that can be moved.
+        // Check instead if we collided with something that can be controlled.
+        objectToTest = col.transform;
+        while( objectToTest )
+        {
+            IControllerInputAcceptor controllableToTest = (IControllerInputAcceptor) 
+                objectToTest.GetComponent(typeof(IControllerInputAcceptor));
+            if( controllableToTest != null )
+            {
+                collidingControllable = controllableToTest;
+                collidingControllableObject = objectToTest.gameObject;
+                return;
+            }
+            objectToTest = objectToTest.parent;
+        }
+
     }
 
     public void OnTriggerEnter(Collider other)
@@ -78,6 +97,8 @@ public class PickUpObjects : MonoBehaviour {
     {
         StopOutliningObject();
         collidingObject = null;
+        collidingControllable = null;
+        collidingControllableObject = null;
         collidedFrom = null;
     }
 
@@ -440,7 +461,7 @@ public class PickUpObjects : MonoBehaviour {
             else if( CollidingWithTouchpadReceiver() )
             {
                 touchpadObject = GetTouchpadReceiver();
-                touchpadGameObject = collidingObject;
+                touchpadGameObject = ( collidingControllableObject != null ) ? collidingControllableObject : collidingObject;
                 touchpadObject.TouchpadDown();
             }
         }
@@ -529,13 +550,13 @@ public class PickUpObjects : MonoBehaviour {
 
     private bool CollidingWithTouchpadReceiver()
     {
-        if( collidingObject )
+        if( collidingObject || collidingControllable != null )
         {
             IControllerInputAcceptor inputAcceptor = GetTouchpadReceiver();
             if( inputAcceptor != null )
             {
                 // only send info if it's being rendered right now
-                RendererController canRender = collidingObject.GetComponent<RendererController>();
+                RendererController canRender = collidingControllableObject.GetComponent<RendererController>();
                 if( canRender == null || canRender.beingRendered )
                 {
                     return true;
@@ -547,6 +568,10 @@ public class PickUpObjects : MonoBehaviour {
 
     private IControllerInputAcceptor GetTouchpadReceiver()
     {
+        if( collidingControllable != null )
+        {
+            return collidingControllable;
+        }
         return (IControllerInputAcceptor) collidingObject.GetComponent(typeof(IControllerInputAcceptor));
     }
 }
