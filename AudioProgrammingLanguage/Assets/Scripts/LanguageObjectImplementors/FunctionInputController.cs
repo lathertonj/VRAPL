@@ -7,6 +7,7 @@ using UnityEngine;
 [RequireComponent(typeof(SoundProducer))]
 public class FunctionInputController : MonoBehaviour , ILanguageObjectListener
 {
+    // TODO: delete?
     public FunctionController myFunction;
 
     public Renderer myBox;
@@ -20,56 +21,12 @@ public class FunctionInputController : MonoBehaviour , ILanguageObjectListener
     private ILanguageObjectListener myParent;
 
     // Use this for initialization
-    void Awake()
+    public void InitLanguageObject( ChuckSubInstance chuck )
     {
+        // object init 
 	    myLO = GetComponent<LanguageObject>();	
-	}
-	
-	void SwitchColors()
-    {
-        Color temp = myText.color;
-        myText.color = myBox.material.color;
-        myBox.material.color = temp;
-    }
 
-    public bool AcceptableChild( LanguageObject other )
-    {
-        return false;
-    }
-
-    public void NewParent( LanguageObject parent )
-    {
-        ILanguageObjectListener newParent = (ILanguageObjectListener) parent.GetComponent(typeof(ILanguageObjectListener));
-        if( newParent != null )
-        {
-            SwitchColors();
-            myParent = newParent;
-        }
-        
-    }
-
-    public void ParentDisconnected( LanguageObject parent )
-    {
-        ILanguageObjectListener losingParent = (ILanguageObjectListener) parent.GetComponent(typeof(ILanguageObjectListener));
-        if( losingParent == myParent )
-        {
-            SwitchColors();
-            myParent = null;
-        }
-    }
-    
-    public void NewChild( LanguageObject child )
-    {
-        // don't care
-    }
-
-    public void ChildDisconnected( LanguageObject child )
-    {
-        // don't care
-    }
-
-    public void GotChuck( ChuckSubInstance chuck )
-    {
+        // chuck init 
         myStorageClass = chuck.GetUniqueVariableName();
         myExitEvent = chuck.GetUniqueVariableName();
 
@@ -87,23 +44,51 @@ public class FunctionInputController : MonoBehaviour , ILanguageObjectListener
 
         ", myStorageClass, myExitEvent, myParent.InputConnection( myLO ) ));
 
-        // store chuck before telling function to pass on the message
-        // because the upcoming ugens will double check that this input has a chuck
+        // store chuck
         myChuck = chuck;
-        // tell function that all its non-param children have a chuck now
-        myFunction.TellUgenChildrenGotChuck( chuck );
+	}
 
-    }
-
-    public void LosingChuck( ChuckSubInstance chuck )
+    public void CleanupLanguageObject( ChuckSubInstance chuck )
     {
-        // tell children losing chuck before I set mychuck to null
-        // because children will check whether I have chuck
-        // if I don't have chuck, they will assume I never had chuck in the first place
-        // and then not undo their own chucks
-        myFunction.TellUgenChildrenLosingChuck( chuck );
         chuck.BroadcastEvent( myExitEvent );
         myChuck = null;
+    }
+	
+	void SwitchColors()
+    {
+        Color temp = myText.color;
+        myText.color = myBox.material.color;
+        myBox.material.color = temp;
+    }
+
+    public void ParentConnected( LanguageObject parent, ILanguageObjectListener parentListener )
+    {
+        SwitchColors();
+        myParent = parentListener;
+    }
+
+    public void ParentDisconnected( LanguageObject parent, ILanguageObjectListener parentListener )
+    {
+        if( parentListener == myParent )
+        {
+            SwitchColors();
+            myParent = null;
+        }
+    }
+    
+    public bool AcceptableChild( LanguageObject other, ILanguageObjectListener otherListener )
+    {
+        return false;
+    }
+
+    public void ChildConnected( LanguageObject child, ILanguageObjectListener childListener )
+    {
+        // don't care -- no children
+    }
+
+    public void ChildDisconnected( LanguageObject child, ILanguageObjectListener childListener )
+    {
+        // don't care -- no children
     }
 
     public bool CurrentlyHaveChuck()

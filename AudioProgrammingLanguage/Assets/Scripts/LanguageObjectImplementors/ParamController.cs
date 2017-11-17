@@ -16,96 +16,16 @@ public class ParamController : MonoBehaviour , ILanguageObjectListener, IControl
     private int myParamIndex = 0;
     private bool amConnected = false;
     private ChuckSubInstance myChuck = null;
+    private LanguageObject myLO;
 
     private ILanguageObjectListener myParent = null;
     private IParamAcceptor myParamAcceptor = null;
 
-    // Use this for initialization
-	void Start () {
-		
-	}
-	
-	private void SwitchColors()
+    public void InitLanguageObject( ChuckSubInstance chuck )
     {
-        Color tempColor = myText.GetComponent<TextMesh>().color;
-        myText.GetComponent<TextMesh>().color = myShape.GetComponent<Renderer>().material.color;
-        myShape.GetComponent<Renderer>().material.color = tempColor;
-    }
+        myLO = GetComponent<LanguageObject>();
 
-    public bool AcceptableChild( LanguageObject other )
-    {
-        // todo: accept others?
-        if( other.GetComponent<NumberProducer>() != null ||
-            other.GetComponent<SoundProducer>() != null )
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-    public void NewParent( LanguageObject parent )
-    {
-        IParamAcceptor parentParamAcceptor = (IParamAcceptor) parent.GetComponent( typeof(IParamAcceptor) );
-        if( parentParamAcceptor != null )
-        {
-            myParamAcceptor = parentParamAcceptor;
-            myParamIndex = 0;
-            myParam = myParamAcceptor.AcceptableParams()[myParamIndex];
-            myText.GetComponent<TextMesh>().text = myParam;
-            SwitchColors();
-            myParent = (ILanguageObjectListener) parent.GetComponent( typeof(ILanguageObjectListener) );
-        }
-    }
-
-    public void ParentDisconnected( LanguageObject parent )
-    {
-        if( myParamAcceptor != null )
-        {
-            SwitchColors();
-            myParam = "param";
-            myText.GetComponent<TextMesh>().text = myParam;
-            myParamAcceptor = null;
-            myParent = null;
-        }
-    }
-
-    public void NewChild( LanguageObject child )
-    {
-        myNumChildren++;
-        // if I got my first child after I was already hooked up to a chuck,
-        // I need to hook up myself now.
-        if( myNumChildren == 1 && myParamAcceptor != null && myChuck != null )
-        {
-            myParamAcceptor.ConnectParam( myParam, OutputConnection() );
-            amConnected = true;
-        }
-    }
-    
-    public void ChildDisconnected( LanguageObject child )
-    {
-        myNumChildren--;
-        // if I lost my last child while I was hooked up to a chuck,
-        // I need to disconnect myself now
-        if( myNumChildren == 0 && myParamAcceptor != null && myChuck != null )
-        {
-            myParamAcceptor.DisconnectParam( myParam, OutputConnection() );
-            amConnected = false;
-        }
-    }
-
-    public string InputConnection( LanguageObject whoAsking )
-    {
-        return OutputConnection();
-    }
-
-    public string OutputConnection()
-    {
-        return string.Format("{0}.myGain", myStorageClass);
-    }
-
-    public void GotChuck( ChuckSubInstance chuck )
-    {
+        // init chuck
         myChuck = chuck;
 
         myStorageClass = chuck.GetUniqueVariableName();
@@ -126,13 +46,14 @@ public class ParamController : MonoBehaviour , ILanguageObjectListener, IControl
 
         if( myNumChildren > 0 && myParamAcceptor != null )
         {
+            Debug.LogError("Refactored ParamController has children during its Awake()?");
             // if I already have some children when I get a chuck, I need to hook myself up
             myParamAcceptor.ConnectParam( myParam, OutputConnection() );
             amConnected = true;
         }
     }
 
-    public void LosingChuck( ChuckSubInstance chuck )
+    public void CleanupLanguageObject( ChuckSubInstance chuck )
     {
         if( myNumChildren > 0 && myParamAcceptor != null )
         {
@@ -143,6 +64,90 @@ public class ParamController : MonoBehaviour , ILanguageObjectListener, IControl
 
         chuck.BroadcastEvent( myExitEvent );
         myChuck = null;
+    }
+	
+	private void SwitchColors()
+    {
+        Color tempColor = myText.GetComponent<TextMesh>().color;
+        myText.GetComponent<TextMesh>().color = myShape.GetComponent<Renderer>().material.color;
+        myShape.GetComponent<Renderer>().material.color = tempColor;
+    }
+
+    public void ParentConnected( LanguageObject parent, ILanguageObjectListener parentListener )
+    {
+        IParamAcceptor parentParamAcceptor = (IParamAcceptor) parent.GetComponent( typeof(IParamAcceptor) );
+        if( parentParamAcceptor != null )
+        {
+            myParamAcceptor = parentParamAcceptor;
+            myParamIndex = 0;
+            myParam = myParamAcceptor.AcceptableParams()[myParamIndex];
+            myText.GetComponent<TextMesh>().text = myParam;
+            SwitchColors();
+            myParent = parentListener;
+        }
+    }
+
+    public void ParentDisconnected( LanguageObject parent, ILanguageObjectListener parentListener )
+    {
+        if( myParamAcceptor != null )
+        {
+            SwitchColors();
+            myParam = "param";
+            myText.GetComponent<TextMesh>().text = myParam;
+            myParamAcceptor = null;
+            myParent = null;
+        }
+    }
+
+    public bool AcceptableChild( LanguageObject other, ILanguageObjectListener otherListener )
+    {
+        // todo: accept others?
+        if( other.GetComponent<NumberProducer>() != null ||
+            other.GetComponent<SoundProducer>() != null )
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+
+    public void ChildConnected( LanguageObject child, ILanguageObjectListener childListener )
+    {
+        LanguageObject.HookTogetherLanguageObjects( myChuck, child, myLO );
+
+        myNumChildren++;
+        // if I got my first child after I was already hooked up to a chuck,
+        // I need to hook up myself now.
+        if( myNumChildren == 1 && myParamAcceptor != null && myChuck != null )
+        {
+            myParamAcceptor.ConnectParam( myParam, OutputConnection() );
+            amConnected = true;
+        }
+    }
+    
+    public void ChildDisconnected( LanguageObject child, ILanguageObjectListener childListener )
+    {
+        LanguageObject.UnhookLanguageObjects( myChuck, child, myLO );
+
+        myNumChildren--;
+        // if I lost my last child while I was hooked up to a chuck,
+        // I need to disconnect myself now
+        if( myNumChildren == 0 && myParamAcceptor != null && myChuck != null )
+        {
+            myParamAcceptor.DisconnectParam( myParam, OutputConnection() );
+            amConnected = false;
+        }
+    }
+
+    public string InputConnection( LanguageObject whoAsking )
+    {
+        return OutputConnection();
+    }
+
+    public string OutputConnection()
+    {
+        return string.Format("{0}.myGain", myStorageClass);
     }
 
     public void SizeChanged( float newSize )

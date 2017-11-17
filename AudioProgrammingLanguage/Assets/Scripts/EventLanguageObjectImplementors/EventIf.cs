@@ -10,37 +10,26 @@ public class EventIf : MonoBehaviour , IEventLanguageObjectListener , IEventLang
     private int numFramesToShowThenBlock = 0;
     private Color originalThenBlockColor;
 
+    private ChuckSubInstance myChuck;
+    private LanguageObject myLO;
     private string myStorageClass;
     private string myOutgoingTriggerEvent;
     private string myOverallExitEvent;
     private string mySmallerExitEvent;
 
-    private void Awake()
+    public void InitLanguageObject( ChuckSubInstance chuck )
     {
+        // init object
+        myLO = GetComponent<EventLanguageObject>();
         originalThenBlockColor = myThenBlock.material.color;
-    }
 
-    private void Update()
-    {
-        // disable then block color?
-        if( numFramesToShowThenBlock > 0 )
-        {
-            numFramesToShowThenBlock--;
-        }
-        else
-        {
-            myThenBlock.material.color = originalThenBlockColor;
-        }
-    }
+        // init chuck
+        myChuck = chuck;
+        myStorageClass = myChuck.GetUniqueVariableName();
+        myOutgoingTriggerEvent = myChuck.GetUniqueVariableName();
+        myOverallExitEvent = myChuck.GetUniqueVariableName();
 
-    public void StartEmitTrigger() 
-    {
-        ChuckSubInstance theChuck = TheSubChuck.Instance;
-        myStorageClass = theChuck.GetUniqueVariableName();
-        myOutgoingTriggerEvent = theChuck.GetUniqueVariableName();
-        myOverallExitEvent = theChuck.GetUniqueVariableName();
-
-        theChuck.RunCode( string.Format( @"
+        myChuck.RunCode( string.Format( @"
             external Event {1};
             external Event {2};
 
@@ -57,6 +46,25 @@ public class EventIf : MonoBehaviour , IEventLanguageObjectListener , IEventLang
 
             ", myStorageClass, myOverallExitEvent, myOutgoingTriggerEvent    
         ));
+    }
+
+    public void CleanupLanguageObject( ChuckSubInstance chuck )
+    {
+        myChuck.BroadcastEvent( myOverallExitEvent );
+        myChuck = null;
+    }
+
+    private void Update()
+    {
+        // disable then block color?
+        if( numFramesToShowThenBlock > 0 )
+        {
+            numFramesToShowThenBlock--;
+        }
+        else
+        {
+            myThenBlock.material.color = originalThenBlockColor;
+        }
     }
 
     public string ExternalEventSource()
@@ -118,7 +126,17 @@ public class EventIf : MonoBehaviour , IEventLanguageObjectListener , IEventLang
         theChuck.BroadcastEvent( mySmallerExitEvent );
     }
     
-    public bool AcceptableChild( LanguageObject other )
+    public void ParentConnected( LanguageObject parent, ILanguageObjectListener parentListener )
+    {
+        // don't care (will I ever have a parent?)
+    }
+
+    public void ParentDisconnected( LanguageObject parent, ILanguageObjectListener parentListener )
+    {
+        // don't care (will I ever have a parent?)
+    }
+
+    public bool AcceptableChild( LanguageObject other, ILanguageObjectListener otherListener )
     {
         if( other.GetComponent<NumberProducer>() != null ||
             other is EventLanguageObject )
@@ -128,39 +146,25 @@ public class EventIf : MonoBehaviour , IEventLanguageObjectListener , IEventLang
         return false;
     }
 
-    public void NewParent( LanguageObject parent )
+    public void ChildConnected( LanguageObject child, ILanguageObjectListener childListener )
     {
-        // don't care (will I ever have a parent?)
+        if( child.GetComponent<NumberProducer>() != null )
+        {
+            LanguageObject.HookTogetherLanguageObjects( myChuck, child, myLO );
+        }
     }
 
-    public void ParentDisconnected( LanguageObject parent )
+    public void ChildDisconnected( LanguageObject child, ILanguageObjectListener childListener )
     {
-        // don't care (will I ever have a parent?)
-    }
-
-    public void NewChild( LanguageObject child )
-    {
-        // don't care -- children just have to send me something that isn't 0
-    }
-
-    public void ChildDisconnected( LanguageObject child )
-    {
-       // don't care
+        if( child.GetComponent<NumberProducer>() != null )
+        {
+            LanguageObject.UnhookLanguageObjects( myChuck, child, myLO );
+        }
     }
 
     public string VisibleName()
     {
         return "event if";
-    }
-
-    public void GotChuck( ChuckSubInstance chuck )
-    {
-        // don't care
-    }
-
-    public void LosingChuck( ChuckSubInstance chuck )
-    {
-        // don't care
     }
 
     public void SizeChanged( float newSize )

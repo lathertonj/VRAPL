@@ -19,15 +19,74 @@ public class OscController : MonoBehaviour , ILanguageObjectListener, IParamAcce
     private string[] myAcceptableParams;
     private Dictionary<string, int> numParamConnections;
 
-    void Awake()
+    public void InitLanguageObject( ChuckSubInstance chuck )
     {
+        // init object
         myAcceptableParams = new string[] { "freq", "gain" };
         numParamConnections = new Dictionary<string, int>();
         for( int i = 0; i < myAcceptableParams.Length; i++ ) { 
             numParamConnections[myAcceptableParams[i]] = 0; 
         }
         myLO = GetComponent<LanguageObject>();
+
+        // init chuck
+        myChuck = chuck;
+        myStorageClass = chuck.GetUniqueVariableName();
+        myExitEvent = chuck.GetUniqueVariableName();
+
+        chuck.RunCode(string.Format(@"
+            external Event {1};
+            public class {0}
+            {{
+                static {2} @ myOsc;
+                static Gain @ myGain;
+                static Gain @ myFreq;
+                static Step @ myDefaultGain;
+                static Step @ myDefaultFreq;
+            }}
+            {2} o @=> {0}.myOsc;
+            Gain g1 @=> {0}.myGain;
+            Gain g2 @=> {0}.myFreq;
+            Step s1 @=> {0}.myDefaultGain;
+            Step s2 @=> {0}.myDefaultFreq;
+            {3} => {0}.myDefaultFreq.next;
+            1 => {0}.myDefaultGain.next;
+            {0}.myGain => blackhole;
+            {0}.myFreq => blackhole;
+            {0}.myDefaultGain => blackhole;
+            {0}.myDefaultFreq => blackhole;
+
+            fun void listenForGainChanges()
+            {{
+                while( true )
+                {{
+                    {0}.myGain.last() + {0}.myDefaultGain.last() => {0}.myOsc.gain;
+                    1::ms => now;
+                }}
+            }}
+
+            fun void listenForFreqChanges()
+            {{
+                while( true )
+                {{
+                    {0}.myFreq.last() + {0}.myDefaultFreq.last() => {0}.myOsc.freq;
+                    1::ms => now;
+                }}
+            }}
+
+            spork ~ listenForGainChanges();
+            spork ~ listenForFreqChanges();
+
+            // wait until told to exit
+            {1} => now;
+        ", myStorageClass, myExitEvent, myOscillatorType, GetMyDefaultFrequency() ));
 	}
+
+    public void CleanupLanguageObject( ChuckSubInstance chuck )
+    {
+        chuck.BroadcastEvent( myExitEvent );
+        myChuck = null;
+    }
 
     private float GetMyDefaultFrequency()
     {
@@ -36,7 +95,21 @@ public class OscController : MonoBehaviour , ILanguageObjectListener, IParamAcce
         return Mathf.Max( 440.0f / ( 1 + 2 * ( GetComponent<MovableController>().GetScale() - 1 ) ), 20.0f );
     }
     
-    public bool AcceptableChild( LanguageObject other )
+    public void ParentConnected( LanguageObject parent, ILanguageObjectListener parentListener )
+    {
+        myParent = parent;
+        myParentListener = parentListener;
+        SwitchColors();
+    }
+
+    public void ParentDisconnected( LanguageObject parent, ILanguageObjectListener parentListener )
+    {
+        myParent = null;
+        myParentListener = null;
+        SwitchColors();
+    }
+
+    public bool AcceptableChild( LanguageObject other, ILanguageObjectListener otherListener )
     {
         // allow params to be my child
         if( other.GetComponent<ParamController>() != null )
@@ -44,6 +117,16 @@ public class OscController : MonoBehaviour , ILanguageObjectListener, IParamAcce
             return true;
         }
         return false;
+    }
+
+    public void ChildConnected( LanguageObject child, ILanguageObjectListener childListener )
+    {
+        // don't care -- param will connect itself to me
+    }
+
+    public void ChildDisconnected( LanguageObject child, ILanguageObjectListener childListener )
+    {
+        // don't care -- param will connect itself to me
     }
 
     public string InputConnection( LanguageObject whoAsking )
@@ -148,83 +231,7 @@ public class OscController : MonoBehaviour , ILanguageObjectListener, IParamAcce
         myShape.GetComponent<Renderer>().material.color = tempColor;
     }
 
-    public void NewParent( LanguageObject newParent )
-    {
-        myParent = newParent;
-        myParentListener = (ILanguageObjectListener) myParent.GetComponent(typeof(ILanguageObjectListener));
-        SwitchColors();
-        
-    }
-
-    public void ParentDisconnected( LanguageObject parent )
-    {
-        myParent = null;
-        myParentListener = null;
-        SwitchColors();
-    }
-
-    public void GotChuck(ChuckSubInstance chuck)
-    {
-        myChuck = chuck;
-        myStorageClass = chuck.GetUniqueVariableName();
-        myExitEvent = chuck.GetUniqueVariableName();
-        string connectMyOscTo = myParentListener.InputConnection( myLO );
-
-        chuck.RunCode(string.Format(@"
-            external Event {1};
-            public class {0}
-            {{
-                static {3} @ myOsc;
-                static Gain @ myGain;
-                static Gain @ myFreq;
-                static Step @ myDefaultGain;
-                static Step @ myDefaultFreq;
-            }}
-            {3} o @=> {0}.myOsc;
-            Gain g1 @=> {0}.myGain;
-            Gain g2 @=> {0}.myFreq;
-            Step s1 @=> {0}.myDefaultGain;
-            Step s2 @=> {0}.myDefaultFreq;
-            {4} => {0}.myDefaultFreq.next;
-            1 => {0}.myDefaultGain.next;
-            {0}.myGain => blackhole;
-            {0}.myFreq => blackhole;
-            {0}.myDefaultGain => blackhole;
-            {0}.myDefaultFreq => blackhole;
-
-            fun void listenForGainChanges()
-            {{
-                while( true )
-                {{
-                    {0}.myGain.last() + {0}.myDefaultGain.last() => {0}.myOsc.gain;
-                    1::ms => now;
-                }}
-            }}
-
-            fun void listenForFreqChanges()
-            {{
-                while( true )
-                {{
-                    {0}.myFreq.last() + {0}.myDefaultFreq.last() => {0}.myOsc.freq;
-                    1::ms => now;
-                }}
-            }}
-
-            spork ~ listenForGainChanges();
-            spork ~ listenForFreqChanges();
-
-            {0}.myOsc => {2};
-
-            // wait until told to exit
-            {1} => now;
-        ", myStorageClass, myExitEvent, connectMyOscTo, myOscillatorType, GetMyDefaultFrequency() ));
-    }
-
-    public void LosingChuck(ChuckSubInstance chuck)
-    {
-        chuck.BroadcastEvent( myExitEvent );
-        myChuck = null;
-    }
+    
 
     public void SizeChanged( float newSize )
     {
@@ -235,16 +242,6 @@ public class OscController : MonoBehaviour , ILanguageObjectListener, IParamAcce
                 "{1} => {0}.myDefaultFreq.next;", myStorageClass, GetMyDefaultFrequency()
             ));
         }
-    }
-
-    public void NewChild( LanguageObject child )
-    {
-        // don't care
-    }
-
-    public void ChildDisconnected( LanguageObject child )
-    {
-        // don't care
     }
     
     public string VisibleName()

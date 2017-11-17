@@ -33,8 +33,9 @@ public class CommentController : MonoBehaviour, ILanguageObjectListener, IContro
 
 
     // Use this for initialization
-    void Awake()
+    public void InitLanguageObject( ChuckSubInstance chuck )
     {
+        // init object properties
         commentDir = Application.persistentDataPath + "/audio/comments";
         Debug.Log( commentDir );
         // make sure exists
@@ -49,7 +50,35 @@ public class CommentController : MonoBehaviour, ILanguageObjectListener, IContro
 
         // get my name
         myFilename = CommentController.GetNextName();
+
+        // init chuck
+        myChuck = chuck;
+
+        myStorageClass = chuck.GetUniqueVariableName();
+        myExitEvent = chuck.GetUniqueVariableName();
+
+        myChuck.RunCode( string.Format(
+            @"external Event {1};
+            public class {0}
+            {{
+                static Gain @ myInput;
+                static Gain @ myOutput;
+            }}
+            Gain input @=> {0}.myInput;
+            Gain output @=> {0}.myOutput;
+
+
+            // wait until told to exit
+            {1} => now; 
+            ", myStorageClass, myExitEvent
+        ));
 	}
+
+    public void CleanupLanguageObject( ChuckSubInstance chuck )
+    {
+        chuck.BroadcastEvent( myExitEvent );
+        myChuck = null;
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -95,70 +124,31 @@ public class CommentController : MonoBehaviour, ILanguageObjectListener, IContro
     }
 
 
-    public bool AcceptableChild( LanguageObject other )
+    public void ParentConnected( LanguageObject parent, ILanguageObjectListener parentListener )
+    {
+        SwitchColors();
+        myParent = parentListener;
+    }
+
+    public void ParentDisconnected( LanguageObject parent, ILanguageObjectListener parentListenr )
+    {
+        SwitchColors();
+        myParent = null;
+    }
+
+    public bool AcceptableChild( LanguageObject other, ILanguageObjectListener otherListener )
     {
         return false;
     }
 
-    public void NewParent( LanguageObject parent )
-    {
-        ILanguageObjectListener lo = (ILanguageObjectListener) parent.GetComponent( typeof( ILanguageObjectListener ) );
-        if( lo != null )
-        {
-            SwitchColors();
-            myParent = lo;
-        }
-    }
-
-    public void ParentDisconnected( LanguageObject parent )
-    {
-        ILanguageObjectListener lo = (ILanguageObjectListener) parent.GetComponent( typeof( ILanguageObjectListener ) );
-        if( lo != null )
-        {
-            SwitchColors();
-            myParent = null;
-        }
-    }
-
-    public void NewChild( LanguageObject child )
+    public void ChildConnected( LanguageObject child, ILanguageObjectListener childListener )
     {
         // don't care
     }
 
-    public void ChildDisconnected( LanguageObject child )
+    public void ChildDisconnected( LanguageObject child, ILanguageObjectListener childListener )
     {
         // don't care
-    }
-
-    public void GotChuck( ChuckSubInstance chuck )
-    {
-        myChuck = chuck;
-
-        myStorageClass = chuck.GetUniqueVariableName();
-        myExitEvent = chuck.GetUniqueVariableName();
-
-        myChuck.RunCode( string.Format(
-            @"external Event {1};
-            public class {0}
-            {{
-                static Gain @ myInput;
-                static Gain @ myOutput;
-            }}
-            Gain input @=> {0}.myInput;
-            Gain output @=> {0}.myOutput;
-
-
-            // wait until told to exit
-            {1} => now; 
-            ", myStorageClass, myExitEvent
-        ));
-        
-    }
-
-    public void LosingChuck( ChuckSubInstance chuck )
-    {
-        chuck.BroadcastEvent( myExitEvent );
-        myChuck = null;
     }
 
     public void SizeChanged( float newSize )

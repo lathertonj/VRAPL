@@ -24,8 +24,9 @@ public class ControllerDataReporter : MonoBehaviour , ILanguageObjectListener , 
     public Transform myControllerPosition = null;
 
     // Use this for initialization
-    void Awake()
+    public void InitLanguageObject( ChuckSubInstance chuck )
     {
+        // init object
 		modes = new string[] { "position: x", "position: y", "position: z",
                                "movement: x", "movement: y", "movement: z", "movement: any",
                                "rotation: x", "rotation: y", "rotation: z", "rotation: any" };
@@ -38,7 +39,14 @@ public class ControllerDataReporter : MonoBehaviour , ILanguageObjectListener , 
         myMinColor = Color.black;
         myMaxColor = Color.white;
         UpdateMinAndMax();
+
+        // init chuck? don't care
 	}
+
+    public void CleanupLanguageObject( ChuckSubInstance chuck )
+    {
+        // no chuck storage to clean up
+    }
 	
 	// Update is called once per frame
 	void Update() 
@@ -132,23 +140,34 @@ public class ControllerDataReporter : MonoBehaviour , ILanguageObjectListener , 
         }
     }
 
-    public bool AcceptableChild( LanguageObject other )
+    public void ParentConnected( LanguageObject parent, ILanguageObjectListener parentListener )
+    {
+        // change color -- set in Update
+        useChangingColor = true;
+        // use white text to see against changing color
+        myText.color = Color.white;
+    }
+
+    public void ParentDisconnected( LanguageObject parent, ILanguageObjectListener parentListener )
+    {
+        // change color back
+        useChangingColor = false;
+        myShape.material.color = myOriginalColor;
+        myText.color = myOriginalTextColor;
+    }
+
+    public bool AcceptableChild( LanguageObject other, ILanguageObjectListener otherListener )
     {
         // no children for me!
         return false;
     }
 
-    public void ChildDisconnected( LanguageObject child )
+    public void ChildConnected( LanguageObject child, ILanguageObjectListener childListener )
     {
         // don't care
     }
 
-    public void GotChuck( ChuckSubInstance chuck )
-    {
-        // don't care
-    }
-
-    public void LosingChuck( ChuckSubInstance chuck )
+    public void ChildDisconnected( LanguageObject child, ILanguageObjectListener childListener )
     {
         // don't care
     }
@@ -169,26 +188,6 @@ public class ControllerDataReporter : MonoBehaviour , ILanguageObjectListener , 
         return "";
     }
 
-    public void NewChild( LanguageObject child )
-    {
-        // don't care
-    }
-
-    public void NewParent(LanguageObject parent)
-    {
-        // change color -- set in Update
-        useChangingColor = true;
-        // use white text to see against changing color
-        myText.color = Color.white;
-    }
-
-    public void ParentDisconnected(LanguageObject parent)
-    {
-        // change color back
-        useChangingColor = false;
-        myShape.material.color = myOriginalColor;
-        myText.color = myOriginalTextColor;
-    }
 
     public void TouchpadAxis(Vector2 pos)
     {

@@ -634,7 +634,7 @@ public class LanguageObject : MonoBehaviour {
         renderer.Restart();
     }
 
-    public static void HookTogetherListeners( ChuckSubInstance chuck, 
+    public static void HookTogetherLanguageObjects( ChuckSubInstance chuck, 
         LanguageObject source, LanguageObject dest )
     {
         chuck.RunCode( string.Format(@"
@@ -643,7 +643,7 @@ public class LanguageObject : MonoBehaviour {
         ));
     }
 
-    public static void UnhookListeners( ChuckSubInstance chuck, 
+    public static void UnhookLanguageObjects( ChuckSubInstance chuck, 
         LanguageObject source, LanguageObject dest )
     {
         chuck.RunCode( string.Format(@"

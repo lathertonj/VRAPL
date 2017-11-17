@@ -23,29 +23,105 @@ public class UGenController : MonoBehaviour , ILanguageObjectListener, IParamAcc
     ILanguageObjectListener myParentListener = null;
     private Dictionary<string, int> numParamConnections;
 
-    void Awake() {
+    public void InitLanguageObject( ChuckSubInstance chuck)
+    {
+        // init object
         numParamConnections = new Dictionary<string, int>();
         for( int i = 0; i < myParams.Length; i++ ) { 
             numParamConnections[myParams[i]] = 0; 
         }
         myLO = GetComponent<LanguageObject>();
+
+        // init chuck
+        myChuck = chuck;
+        myStorageClass = chuck.GetUniqueVariableName();
+        myExitEvent = chuck.GetUniqueVariableName();
+
+        string classDeclarations = "";
+        string oscDeclarations = "";
+        string defaultValues = "";
+        string blackholeConnections = "";
+        string functionListeners = "";
+
+        for( int i = 0; i < myParams.Length; i++ )
+        {
+            classDeclarations += string.Format( "static Gain @ my{0}; static Step @ myDefault{0}; \n", myParams[i] );
+            oscDeclarations += string.Format( "Gain g{2} @=> {0}.my{1}; Step s{2} @=> {0}.myDefault{1}; \n", myStorageClass, myParams[i], i );
+            defaultValues += string.Format("{0} => {1}.myDefault{2}.next; \n", myParamDefaultValues[i], myStorageClass, myParams[i] );
+            blackholeConnections += string.Format( "{0}.my{1} => blackhole; {0}.myDefault{1} => blackhole; \n", myStorageClass, myParams[i] );
+            functionListeners += string.Format( @"
+                fun void listenFor{1}Changes()
+                {{
+                    while( true )
+                    {{
+                        {0}.my{1}.last() + {0}.myDefault{1}.last() => {0}.myOsc.{1};
+                        1::ms => now;
+                    }}
+                }}
+                spork ~ listenFor{1}Changes();
+            ", myStorageClass, myParams[i] );
+        }
+
+        string oscCreation = string.Format(@"
+            external Event {1};
+            public class {0}
+            {{
+                static {2} @ myOsc;
+                {3}
+            }}
+
+            {2} o @=> {0}.myOsc;
+            {4}
+            {5}
+            {6}
+            {7}
+
+            {0}.myOsc.last();
+            
+            // wait until told to exit
+            {1} => now;
+            ", 
+            myStorageClass, myExitEvent, myType, 
+            classDeclarations, oscDeclarations, defaultValues, blackholeConnections, functionListeners 
+        );
+
+        chuck.RunCode( oscCreation );
+        SetMyDefaultParam();
 	}
 
-    private void Update()
+    public void CleanupLanguageObject( ChuckSubInstance chuck )
     {
-
+        chuck.BroadcastEvent( myExitEvent );
+        myChuck = null;
     }
 
     private float GetMyDefaultParam()
     {
         // divide param by increase in size
         // min param for a param set in this way is 20
-        return Mathf.Max( myParamDefaultValues[0] / ( 1 + 2 * ( GetComponent<MovableController>().GetScale() - 1 ) ), myDefaultParamMinimumValue );
+        return Mathf.Max( 
+            myParamDefaultValues[0] / 
+                ( 1 + 2 * ( GetComponent<MovableController>().GetScale() - 1 ) ),
+            myDefaultParamMinimumValue 
+        ); 
+    }
 
+    public void ParentConnected( LanguageObject parent, ILanguageObjectListener parentListener )
+    {
+        myParent = parent;
+        myParentListener = parentListener;
+        SwitchColors();
         
     }
+
+    public void ParentDisconnected( LanguageObject parent, ILanguageObjectListener parentListener )
+    {
+        myParent = null;
+        myParentListener = null;
+        SwitchColors();
+    }
     
-    public bool AcceptableChild( LanguageObject other )
+    public bool AcceptableChild( LanguageObject other, ILanguageObjectListener otherListener )
     {
         // allow params to be my child
         if( other.GetComponent<ParamController>() != null )
@@ -59,6 +135,22 @@ public class UGenController : MonoBehaviour , ILanguageObjectListener, IParamAcc
         }
 
         return false;
+    }
+        
+    public void ChildConnected( LanguageObject child, ILanguageObjectListener childListener )
+    {
+        if( child.GetComponent<SoundProducer>() != null )
+        {
+            LanguageObject.HookTogetherLanguageObjects( myChuck, child, myLO );
+        }
+    }
+
+    public void ChildDisconnected( LanguageObject child, ILanguageObjectListener childListener )
+    {
+        if( child.GetComponent<SoundProducer>() != null )
+        {
+            LanguageObject.UnhookLanguageObjects( myChuck, child, myLO );
+        }
     }
 
     public string InputConnection( LanguageObject whoAsking )
@@ -135,93 +227,6 @@ public class UGenController : MonoBehaviour , ILanguageObjectListener, IParamAcc
         }
     }
 
-    public void NewParent( LanguageObject newParent )
-    {
-        myParent = newParent;
-        myParentListener = (ILanguageObjectListener) myParent.GetComponent(typeof(ILanguageObjectListener));
-        SwitchColors();
-        
-    }
-
-    public void ParentDisconnected( LanguageObject parent )
-    {
-        myParent = null;
-        myParentListener = null;
-        SwitchColors();
-    }
-
-    bool IsDac( LanguageObject other )
-    {
-        return ( other.GetComponent<ChuckSubInstance>() != null );
-    }
-
-    public void GotChuck(ChuckSubInstance chuck)
-    {
-        myChuck = chuck;
-        myStorageClass = chuck.GetUniqueVariableName();
-        myExitEvent = chuck.GetUniqueVariableName();
-        string connectMyOscTo = myParentListener.InputConnection( myLO );
-
-        string classDeclarations = "";
-        string oscDeclarations = "";
-        string defaultValues = "";
-        string blackholeConnections = "";
-        string functionListeners = "";
-
-        for( int i = 0; i < myParams.Length; i++ )
-        {
-            classDeclarations += string.Format( "static Gain @ my{0}; static Step @ myDefault{0}; \n", myParams[i] );
-            oscDeclarations += string.Format( "Gain g{2} @=> {0}.my{1}; Step s{2} @=> {0}.myDefault{1}; \n", myStorageClass, myParams[i], i );
-            defaultValues += string.Format("{0} => {1}.myDefault{2}.next; \n", myParamDefaultValues[i], myStorageClass, myParams[i] );
-            blackholeConnections += string.Format( "{0}.my{1} => blackhole; {0}.myDefault{1} => blackhole; \n", myStorageClass, myParams[i] );
-            functionListeners += string.Format( @"
-                fun void listenFor{1}Changes()
-                {{
-                    while( true )
-                    {{
-                        {0}.my{1}.last() + {0}.myDefault{1}.last() => {0}.myOsc.{1};
-                        1::ms => now;
-                    }}
-                }}
-                spork ~ listenFor{1}Changes();
-            ", myStorageClass, myParams[i] );
-        }
-
-        string oscCreation = string.Format(@"
-            external Event {1};
-            public class {0}
-            {{
-                static {3} @ myOsc;
-                {4}
-            }}
-
-            {3} o @=> {0}.myOsc;
-            {5}
-            {6}
-            {7}
-            {8}
-
-            {0}.myOsc.last();
-            {2}.last();
-            {0}.myOsc => {2};
-
-            // wait until told to exit
-            {1} => now;
-            ", 
-            myStorageClass, myExitEvent, connectMyOscTo, myType, 
-            classDeclarations, oscDeclarations, defaultValues, blackholeConnections, functionListeners 
-        );
-
-        chuck.RunCode( oscCreation );
-        SetMyDefaultParam();
-    }
-
-    public void LosingChuck(ChuckSubInstance chuck)
-    {
-        chuck.BroadcastEvent( myExitEvent );
-        myChuck = null;
-    }
-
     public void SizeChanged( float newSize )
     {
         SetMyDefaultParam();
@@ -236,16 +241,6 @@ public class UGenController : MonoBehaviour , ILanguageObjectListener, IParamAcc
                 "{0:0.000} => {1}.myDefault{2}.next;", GetMyDefaultParam(), myStorageClass, myParams[0]
             ));
         }
-    }
-
-    public void NewChild( LanguageObject child )
-    {
-        // don't care
-    }
-
-    public void ChildDisconnected( LanguageObject child )
-    {
-        // don't care
     }
     
     public string VisibleName()

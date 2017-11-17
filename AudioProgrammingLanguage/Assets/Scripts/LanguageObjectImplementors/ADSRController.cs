@@ -139,7 +139,7 @@ public class ADSRController : MonoBehaviour , ILanguageObjectListener, IParamAcc
 
         if( child.GetComponent<SoundProducer>() != null )
         {
-            LanguageObject.HookTogetherListeners( myChuck, child, myLO );
+            LanguageObject.HookTogetherLanguageObjects( myChuck, child, myLO );
         }
     }
 
@@ -154,7 +154,7 @@ public class ADSRController : MonoBehaviour , ILanguageObjectListener, IParamAcc
 
         if( child.GetComponent<SoundProducer>() != null )
         {
-            LanguageObject.UnhookListeners( myChuck, child, myLO );
+            LanguageObject.UnhookLanguageObjects( myChuck, child, myLO );
         }
     }
 

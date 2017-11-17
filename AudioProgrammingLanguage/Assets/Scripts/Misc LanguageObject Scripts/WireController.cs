@@ -87,7 +87,7 @@ public class WireController : MonoBehaviour {
 
         // if they both have language objects, and the end object would accept the start one as a child,
         if( myStartLO != null && myEndLO != null &&
-            myEndLO.AcceptableChild( startLanguageObject ) )
+            myEndLO.AcceptableChild( startLanguageObject, myStartLO ) )
         {
             // then connect them to my gain!
             myStartConnection = myStartLO.OutputConnection();

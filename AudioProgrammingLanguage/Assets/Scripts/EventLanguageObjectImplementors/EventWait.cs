@@ -11,20 +11,58 @@ public class EventWait : MonoBehaviour , IEventLanguageObjectListener , IEventLa
     private int numFramesToShowInput = 0;
     private int numFramesToShowOutput = 0;
 
+    private ChuckSubInstance myChuck;
+    private LanguageObject myLO;
     private string myStorageClass;
     private string myOutgoingTriggerEvent;
     private string myOverallExitEvent;
     private string mySmallerExitEvent;
     private int myNumNumberChildren = 0;
 
-    private void Awake()
+    public void InitLanguageObject( ChuckSubInstance chuck )
     {
+        // init object
+        myLO = GetComponent<EventLanguageObject>();
+
         // set colors
         myInputSphere.material.color = myOutputSphere.material.color = Color.blue;
 
         // set active
         myInputSphere.gameObject.SetActive( false );
         myOutputSphere.gameObject.SetActive( false );
+
+        // init chuck
+        myChuck = chuck;
+        myStorageClass = myChuck.GetUniqueVariableName();
+        myOutgoingTriggerEvent = myChuck.GetUniqueVariableName();
+        myOverallExitEvent = myChuck.GetUniqueVariableName();
+
+        myChuck.RunCode( string.Format( @"
+            external Event {1};
+            external Event {2};
+
+            public class {0}
+            {{
+                static Gain @ myGain;
+                static Step @ myDefaultValue;
+            }}
+
+            Gain g @=> {0}.myGain;
+            Step s @=> {0}.myDefaultValue;
+            0.5 => {0}.myDefaultValue.next;
+            {0}.myDefaultValue => {0}.myGain => blackhole;
+
+            // wait until told to exit
+            {1} => now;
+
+            ", myStorageClass, myOverallExitEvent, myOutgoingTriggerEvent    
+        ));
+    }
+
+    public void CleanupLanguageObject( ChuckSubInstance chuck )
+    {
+        myChuck.BroadcastEvent( myOverallExitEvent );
+        myChuck = null;
     }
 
     private void Update()
@@ -48,35 +86,6 @@ public class EventWait : MonoBehaviour , IEventLanguageObjectListener , IEventLa
         {
             myOutputSphere.gameObject.SetActive( false );
         }
-    }
-
-    public void StartEmitTrigger() 
-    {
-        ChuckSubInstance theChuck = TheSubChuck.Instance;
-        myStorageClass = theChuck.GetUniqueVariableName();
-        myOutgoingTriggerEvent = theChuck.GetUniqueVariableName();
-        myOverallExitEvent = theChuck.GetUniqueVariableName();
-
-        theChuck.RunCode( string.Format( @"
-            external Event {1};
-            external Event {2};
-
-            public class {0}
-            {{
-                static Gain @ myGain;
-                static Step @ myDefaultValue;
-            }}
-
-            Gain g @=> {0}.myGain;
-            Step s @=> {0}.myDefaultValue;
-            0.5 => {0}.myDefaultValue.next;
-            {0}.myDefaultValue => {0}.myGain => blackhole;
-
-            // wait until told to exit
-            {1} => now;
-
-            ", myStorageClass, myOverallExitEvent, myOutgoingTriggerEvent    
-        ));
     }
 
     public string ExternalEventSource()
@@ -140,7 +149,17 @@ public class EventWait : MonoBehaviour , IEventLanguageObjectListener , IEventLa
         theChuck.BroadcastEvent( mySmallerExitEvent );
     }
     
-    public bool AcceptableChild( LanguageObject other )
+    public void ParentConnected( LanguageObject parent, ILanguageObjectListener parentListener )
+    {
+        // don't care 
+    }
+
+    public void ParentDisconnected( LanguageObject parent, ILanguageObjectListener parentListener )
+    {
+        // don't care
+    }
+
+    public bool AcceptableChild( LanguageObject other, ILanguageObjectListener otherListener )
     {
         if( other.GetComponent<NumberProducer>() != null ||
             other is EventLanguageObject )
@@ -150,37 +169,31 @@ public class EventWait : MonoBehaviour , IEventLanguageObjectListener , IEventLa
         return false;
     }
 
-    public void NewParent( LanguageObject parent )
-    {
-        // don't care (will I ever have a parent?)
-    }
-
-    public void ParentDisconnected( LanguageObject parent )
-    {
-        // don't care (will I ever have a parent?)
-    }
-
-    public void NewChild( LanguageObject child )
+    public void ChildConnected( LanguageObject child, ILanguageObjectListener childListener )
     {
         // is it a new number source?
         if( child.GetComponent<NumberProducer>() != null )
         {
+            LanguageObject.HookTogetherLanguageObjects( myChuck, child, myLO );
+
             myNumNumberChildren++;
             // is it the first number source? --> turn off my default
             if( myNumNumberChildren == 1 )
             {
-                TheSubChuck.Instance.RunCode( string.Format( 
+                myChuck.RunCode( string.Format( 
                     "0 => {0}.myDefaultValue.gain;", myStorageClass 
                 ) );
             }
         }
     }
 
-    public void ChildDisconnected( LanguageObject child )
+    public void ChildDisconnected( LanguageObject child, ILanguageObjectListener childListener )
     {
        // is it a number source?
         if( child.GetComponent<NumberProducer>() != null )
         {
+            LanguageObject.UnhookLanguageObjects( myChuck, child, myLO );
+
             myNumNumberChildren--;
             // is it the last number source? --> turn on my default
             if( myNumNumberChildren == 0 )
@@ -195,16 +208,6 @@ public class EventWait : MonoBehaviour , IEventLanguageObjectListener , IEventLa
     public string VisibleName()
     {
         return "event wait";
-    }
-
-    public void GotChuck( ChuckSubInstance chuck )
-    {
-        // don't care
-    }
-
-    public void LosingChuck( ChuckSubInstance chuck )
-    {
-        // don't care
     }
 
     public void SizeChanged( float newSize )

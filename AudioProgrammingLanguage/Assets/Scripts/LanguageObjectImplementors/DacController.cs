@@ -13,34 +13,26 @@ public class DacController : MonoBehaviour , ILanguageObjectListener , IControll
 
     private bool myEnabled = true;
 
-    public void NewParent(LanguageObject parent)
-    {
-        // at the moment, dacs cannot be the children of anything.
-    }
-
-    public void ParentDisconnected(LanguageObject parent)
-    {
-        // at the moment, dacs cannot be the children of anything
-    }
-
-    public bool AcceptableChild( LanguageObject other )
-    {
-        // only accept things that can make sound
-        if( other.GetComponent<SoundProducer>() != null )
-        {
-            return true;
-        }
-
-        return false;
-    }
+    private LanguageObject myLO;
+    private ChuckSubInstance myChuck;
 
     // Use this for initialization
-    void Awake() {
+    public void InitLanguageObject( ChuckSubInstance chuck )
+    {
 		darkColor = myText.color;
         lightColor = myShapes[0].material.color;
         SetColors();
+
+        myLO = GetComponent<LanguageObject>();
+        // ignore the passed-in ChuckSubInstance -- I have my own
+        myChuck = GetComponent<ChuckSubInstance>();
 	}
-	
+
+    public void CleanupLanguageObject( ChuckSubInstance chuck )
+    {
+        // do nothing
+    }
+
 	private void SetColors()
     {
         Color bodyColor, textColor;
@@ -62,6 +54,39 @@ public class DacController : MonoBehaviour , ILanguageObjectListener , IControll
         }
     }
 
+    public void ParentConnected( LanguageObject parent, ILanguageObjectListener parentListener )
+    {
+        // at the moment, dacs cannot be the children of anything.
+    }
+
+    public void ParentDisconnected( LanguageObject parent, ILanguageObjectListener parentListener)
+    {
+        // at the moment, dacs cannot be the children of anything
+    }
+
+    public bool AcceptableChild( LanguageObject other, ILanguageObjectListener otherListener )
+    {
+        // only accept things that can make sound
+        if( other.GetComponent<SoundProducer>() != null )
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public void ChildConnected( LanguageObject child, ILanguageObjectListener childListener )
+    {
+        // connect soundproducer
+        LanguageObject.HookTogetherLanguageObjects( myChuck, child, myLO );
+    }
+
+    public void ChildDisconnected( LanguageObject child, ILanguageObjectListener childListener )
+    {
+        // disconnect soundproducer
+        LanguageObject.UnhookLanguageObjects( myChuck, child, myLO );
+    }
+
     public string InputConnection( LanguageObject whoAsking )
     {
         return OutputConnection();
@@ -72,29 +97,9 @@ public class DacController : MonoBehaviour , ILanguageObjectListener , IControll
         return "dac";
     }
 
-    public void GotChuck( ChuckSubInstance chuck )
-    {
-        // don't care
-    }
-
-    public void LosingChuck( ChuckSubInstance chuck )
-    {
-        // don't care
-    }
-
     public void SizeChanged( float newSize )
     {
         // don't care about my size
-    }
-
-    public void NewChild( LanguageObject child )
-    {
-        // don't care
-    }
-
-    public void ChildDisconnected(LanguageObject child)
-    {
-        // don't care
     }
 
     public void TouchpadDown()
@@ -102,17 +107,7 @@ public class DacController : MonoBehaviour , ILanguageObjectListener , IControll
         myEnabled = !myEnabled;
         SetColors();
         
-        if( !myEnabled )
-        {
-            GetComponent<LanguageObject>().TellChildrenLosingChuck( GetComponent<ChuckSubInstance>() );
-        }
-
-        GetComponent<ChuckSubInstance>().SetRunning( myEnabled );
-
-        if( myEnabled )
-        {
-            GetComponent<LanguageObject>().TellChildrenHaveNewChuck( GetComponent<ChuckSubInstance>() );
-        }
+        myChuck.SetRunning( myEnabled );
     }
 
     public void TouchpadUp()

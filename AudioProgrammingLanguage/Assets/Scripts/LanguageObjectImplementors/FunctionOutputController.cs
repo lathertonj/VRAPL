@@ -10,67 +10,22 @@ public class FunctionOutputController : MonoBehaviour , ILanguageObjectListener
     public Renderer myBox;
     public TextMesh myText;
 
+    // TODO: delete?
     public FunctionController myFunction;
 
     private string myStorageClass;
     private string myExitEvent;
     private LanguageObject myLO;
+    private ChuckSubInstance myChuck;
 
     private int numChildren;
 
     // Use this for initialization
-    void Awake()
+    public void InitLanguageObject( ChuckSubInstance chuck )
     {
 	    myLO = GetComponent<LanguageObject>();	
-	}
-	
-	void SwitchColors()
-    {
-        Color temp = myText.color;
-        myText.color = myBox.material.color;
-        myBox.material.color = temp;
-    }
+        myChuck = chuck;
 
-    public bool AcceptableChild( LanguageObject other )
-    {
-        if( other.GetComponent<SoundProducer>() != null )
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-    public void NewParent( LanguageObject parent )
-    {
-        // don't care
-    }
-
-    public void ParentDisconnected( LanguageObject parent )
-    {
-        // don't care
-    }
-    
-    public void NewChild( LanguageObject child )
-    {
-        numChildren++;
-        if( numChildren == 1 )
-        {
-            SwitchColors();
-        }
-    }
-
-    public void ChildDisconnected( LanguageObject child )
-    {
-        numChildren--;
-        if( numChildren == 0 )
-        {
-            SwitchColors();
-        }
-    }
-
-    public void GotChuck( ChuckSubInstance chuck )
-    {
         myStorageClass = chuck.GetUniqueVariableName();
         myExitEvent = chuck.GetUniqueVariableName();
 
@@ -82,17 +37,65 @@ public class FunctionOutputController : MonoBehaviour , ILanguageObjectListener
             }}
 
             Gain g @=> {0}.myGain;
-            {0}.myGain => {2};
 
             {1} => now;
 
-        ", myStorageClass, myExitEvent, myFunction.GetFunctionParentConnection( myLO ) ));
+        ", myStorageClass, myExitEvent ));
+	}
+
+    public void CleanupLanguageObject( ChuckSubInstance chuck )
+    {
+        chuck.BroadcastEvent( myExitEvent );
+        myChuck = null;
+    }
+	
+	void SwitchColors()
+    {
+        Color temp = myText.color;
+        myText.color = myBox.material.color;
+        myBox.material.color = temp;
     }
 
-    public void LosingChuck(ChuckSubInstance chuck)
+    public void ParentConnected( LanguageObject parent, ILanguageObjectListener parentListener )
     {
-        chuck.RunCode( string.Format(@"{0} =< {1};", OutputConnection(), myFunction.GetFunctionParentConnection( myLO ) ) );
-        chuck.BroadcastEvent( myExitEvent );
+        // don't care -- won't ever have a parent
+    }
+
+    public void ParentDisconnected( LanguageObject parent, ILanguageObjectListener parentListener )
+    {
+        // don't care -- won't ever have a parent
+    }
+    
+    public bool AcceptableChild( LanguageObject other, ILanguageObjectListener otherListener )
+    {
+        if( other.GetComponent<SoundProducer>() != null )
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public void ChildConnected( LanguageObject child, ILanguageObjectListener childListener )
+    {
+        numChildren++;
+        if( numChildren == 1 )
+        {
+            SwitchColors();
+        }
+
+        LanguageObject.HookTogetherLanguageObjects( myChuck, child, myLO );
+    }
+
+    public void ChildDisconnected( LanguageObject child, ILanguageObjectListener childListener )
+    {
+        numChildren--;
+        if( numChildren == 0 )
+        {
+            SwitchColors();
+        }
+
+        LanguageObject.UnhookLanguageObjects( myChuck, child, myLO );
     }
 
     public void SizeChanged( float newSize )

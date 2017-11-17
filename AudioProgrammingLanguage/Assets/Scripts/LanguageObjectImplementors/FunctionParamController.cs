@@ -20,8 +20,9 @@ public class FunctionParamController : MonoBehaviour , ILanguageObjectListener
     public FunctionController myFunction;
 
     // Use this for initialization
-    void Awake()
+    public void InitLanguageObject( ChuckSubInstance chuck )
     {
+        // init object
         if( myFunction == null )
         {
             if( TheRoom.GetCurrentFunction() != null )
@@ -30,7 +31,29 @@ public class FunctionParamController : MonoBehaviour , ILanguageObjectListener
             }
         }
         myLO = GetComponent<LanguageObject>();
+
+        // init chuck
+        myStorageClass = chuck.GetUniqueVariableName();
+        myExitEvent = chuck.GetUniqueVariableName();
+        
+        chuck.RunCode( string.Format( @"
+            external Event {1};
+            public class {0} 
+            {{
+                static Gain @ myGain;
+            }}
+
+            Gain g @=> {0}.myGain;
+
+            {1} => now;
+
+        ", myStorageClass, myExitEvent ));
 	}
+
+    public void CleanupLanguageObject( ChuckSubInstance chuck )
+    {
+        chuck.BroadcastEvent( myExitEvent );
+    }
 	
 	void SwitchColors()
     {
@@ -39,12 +62,7 @@ public class FunctionParamController : MonoBehaviour , ILanguageObjectListener
         myShape.material.color = temp;
     }
 
-    public bool AcceptableChild( LanguageObject other )
-    {
-        return false;
-    }
-
-    public void NewParent( LanguageObject parent )
+    public void ParentConnected( LanguageObject parent, ILanguageObjectListener parentListener )
     {
         ParamController newParam = parent.GetComponent<ParamController>();
         if( newParam != null )
@@ -55,7 +73,7 @@ public class FunctionParamController : MonoBehaviour , ILanguageObjectListener
         }
     }
     
-    public void ParentDisconnected( LanguageObject parent )
+    public void ParentDisconnected( LanguageObject parent, ILanguageObjectListener parentListener )
     {
         ParamController losingParam = parent.GetComponent<ParamController>();
         if( losingParam == myParent )
@@ -71,40 +89,19 @@ public class FunctionParamController : MonoBehaviour , ILanguageObjectListener
         // don't care about my size
     }
 
-    public void NewChild( LanguageObject child )
+    public bool AcceptableChild( LanguageObject other, ILanguageObjectListener otherListener )
     {
-        // don't care
+        return false;
+    }
+
+    public void ChildConnected( LanguageObject child, ILanguageObjectListener otherListener )
+    {
+        // don't care -- no children
     }
     
-    public void ChildDisconnected( LanguageObject child )
+    public void ChildDisconnected( LanguageObject child, ILanguageObjectListener otherListener )
     {
-        // don't care
-    }
-
-    public void GotChuck( ChuckSubInstance chuck )
-    {
-        myStorageClass = chuck.GetUniqueVariableName();
-        myExitEvent = chuck.GetUniqueVariableName();
-        
-        chuck.RunCode( string.Format( @"
-            external Event {1};
-            public class {0} 
-            {{
-                static Gain @ myGain;
-            }}
-
-            Gain g @=> {0}.myGain;
-            {0}.myGain => {2};
-
-            {1} => now;
-
-        ", myStorageClass, myExitEvent, myParent.InputConnection( myLO ) ));
-    }
-
-    public void LosingChuck( ChuckSubInstance chuck )
-    {
-        chuck.RunCode( string.Format(@"{0} =< {1};", OutputConnection(), myParent.InputConnection( myLO ) ) );
-        chuck.BroadcastEvent( myExitEvent );
+        // don't care -- no children
     }
     
     public string InputConnection( LanguageObject whoAsking )

@@ -13,72 +13,29 @@ public class ComputerMusicController : MonoBehaviour , ILanguageObjectListener
     public GameObject myShape;
 
     private string myExitEvent;
+    private string myStorageClass;
     private ILanguageObjectListener myParent;
     private LanguageObject myLO;
 
-    private void Awake()
+    public void InitLanguageObject( ChuckSubInstance chuck )
     {
+        // init object
         myLO = GetComponent<LanguageObject>();
-    }
 
-    private void SwitchColors()
-    {
-        Color tempColor = myText.GetComponent<TextMesh>().color;
-        myText.GetComponent<TextMesh>().color = myShape.GetComponent<Renderer>().material.color;
-        myShape.GetComponent<Renderer>().material.color = tempColor;
-    }
-
-    public void NewParent( LanguageObject newParent )
-    {
-        ILanguageObjectListener lo = (ILanguageObjectListener) newParent.GetComponent( typeof(ILanguageObjectListener) );
-        if( lo != null )
-        {
-            SwitchColors();
-            myParent = lo;
-        }
-    }
-
-    public void ParentDisconnected( LanguageObject parent )
-    {
-        ILanguageObjectListener lo = (ILanguageObjectListener) parent.GetComponent( typeof(ILanguageObjectListener) );
-        if( lo == myParent )
-        {
-            SwitchColors();
-            myParent = null;
-        }
-    }
-
-    public bool AcceptableChild( LanguageObject other )
-    {
-        // computer music cannot have any children.
-        return false;
-    }
-
-    public string InputConnection( LanguageObject whoAsking )
-    {
-        return OutputConnection();
-    }
-
-    public string OutputConnection()
-    {
-        // nothing should be connecting to ComputerMusicController anyway
-        return "";
-    }
-
-    public string VisibleName()
-    {
-        return "computer music";
-    }
-
-    public void GotChuck( ChuckSubInstance chuck )
-    {
+        // init chuck
         // get a variable name
         myExitEvent = chuck.GetUniqueVariableName();
+        myStorageClass = chuck.GetUniqueVariableName();
 
         // run my script
         chuck.RunCode(string.Format(@"
             external Event {0};
-            TriOsc foo => {1};
+            public class {1}
+            {{
+                static TriOsc @ myOsc;
+            }}
+
+            TriOsc foo @=> {1}.myOsc;
             fun void playMusic()
             {{
                 while( true )
@@ -89,31 +46,72 @@ public class ComputerMusicController : MonoBehaviour , ILanguageObjectListener
             }}
             spork ~ playMusic();
 
-            {0} => now;
-            foo =< dac;
-            
-        ", myExitEvent, myParent.InputConnection( myLO ) ));
+            {0} => now;            
+        ", myExitEvent, myStorageClass ));
     }
 
-    public void LosingChuck( ChuckSubInstance chuck )
+    public void CleanupLanguageObject( ChuckSubInstance chuck )
     {
         // Stop my script
         chuck.BroadcastEvent( myExitEvent );
     }
 
+    private void SwitchColors()
+    {
+        Color tempColor = myText.GetComponent<TextMesh>().color;
+        myText.GetComponent<TextMesh>().color = myShape.GetComponent<Renderer>().material.color;
+        myShape.GetComponent<Renderer>().material.color = tempColor;
+    }
+
+    public void ParentConnected( LanguageObject newParent, ILanguageObjectListener parentListener )
+    {
+        SwitchColors();
+        myParent = parentListener;
+    }
+
+    public void ParentDisconnected( LanguageObject parent, ILanguageObjectListener parentListener )
+    {
+        if( parentListener == myParent )
+        {
+            SwitchColors();
+            myParent = null;
+        }
+    }
+
+    public bool AcceptableChild( LanguageObject other, ILanguageObjectListener otherListener )
+    {
+        // computer music cannot have any children.
+        return false;
+    }
+
+    public void ChildConnected( LanguageObject child, ILanguageObjectListener childListener )
+    {
+        // don't care
+    }
+
+    public void ChildDisconnected( LanguageObject child, ILanguageObjectListener childListener )
+    {
+        // don't care
+    }
+
+    public string InputConnection( LanguageObject whoAsking )
+    {
+        return OutputConnection();
+    }
+
+    public string OutputConnection()
+    {
+        return string.Format( "{0}.myOsc", myStorageClass );
+    }
+
+    public string VisibleName()
+    {
+        return "computer music";
+    }
+
     public void SizeChanged( float newSize )
     {
         // don't care about my size
-    }
-
-    public void NewChild( LanguageObject child )
-    {
-        // don't care
-    }
-
-    public void ChildDisconnected( LanguageObject child )
-    {
-        // don't care
     }
 
     public void CloneYourselfFrom( LanguageObject original, LanguageObject newParent )

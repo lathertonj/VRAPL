@@ -20,15 +20,11 @@ public class DataReporter : MonoBehaviour , ILanguageObjectListener , IDataSourc
     private int currentModeIndex;
     private string currentMode;
 
-    private void Awake()
+    // TODO: data shaper block (?)
+    public void InitLanguageObject( ChuckSubInstance chuck )
     {
         CreateMyText();
-    }
-
-    // TODO: data shaper block
-
-    // Use this for initialization
-    void Start () {
+    
         // TODO: modes for events!
         // TODO: what to do for things that don't have a min / max value???
 		modes = new string[] { "movement: x", "movement: y", "movement: z", "movement: any",
@@ -39,7 +35,14 @@ public class DataReporter : MonoBehaviour , ILanguageObjectListener , IDataSourc
         myText.text = currentMode;
 
         UpdateMinAndMax();
+
+        // don't care about chuck
 	}
+
+    public void CleanupLanguageObject( ChuckSubInstance chuck )
+    {
+        // don't care about chuck
+    }
 
     void CreateMyText()
     {
@@ -129,17 +132,32 @@ public class DataReporter : MonoBehaviour , ILanguageObjectListener , IDataSourc
     }
 
 
-    public void NewParent( LanguageObject parent )
+    public void ParentConnected( LanguageObject parent, ILanguageObjectListener parentListener )
     {
         myText.color = Color.black;
     }
 
 
-    public void ParentDisconnected( LanguageObject parent )
+    public void ParentDisconnected( LanguageObject parent, ILanguageObjectListener parentListener )
     {
         myText.color = Color.white;
     }
     
+    public bool AcceptableChild( LanguageObject other, ILanguageObjectListener otherListener )
+    {
+        return false;
+    }
+
+    public void ChildConnected( LanguageObject child, ILanguageObjectListener childListener )
+    {
+        // don't care
+    }
+
+    public void ChildDisconnected( LanguageObject child, ILanguageObjectListener childListener )
+    {
+        // don't care
+    }
+
     public float CurrentValue()
     {
         return myCurrent;
@@ -158,31 +176,6 @@ public class DataReporter : MonoBehaviour , ILanguageObjectListener , IDataSourc
     public float NormValue()
     {
         return Mathf.Clamp01( ( myCurrent - myMin ) / ( myMax - myMin ) );
-    }
-
-    public bool AcceptableChild( LanguageObject other )
-    {
-        return false;
-    }
-
-    public void NewChild( LanguageObject child )
-    {
-        // don't care
-    }
-
-    public void ChildDisconnected( LanguageObject child )
-    {
-        // don't care
-    }
-
-    public void GotChuck( ChuckSubInstance chuck )
-    {
-        // don't care
-    }
-
-    public void LosingChuck( ChuckSubInstance chuck )
-    {
-        // don't care
     }
 
     public void SizeChanged( float newSize )

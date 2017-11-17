@@ -8,9 +8,17 @@ public class EventVisualizer : MonoBehaviour , IEventLanguageObjectListener {
 
     public MeshRenderer myRenderer;
 
-    private void Awake()
+    public void InitLanguageObject( ChuckSubInstance chuck )
     {
+        // init object
         myRenderer.material.color = Color.HSVToRGB( 1, 0.15f, 1 );
+
+        // no chuck to init
+    }
+
+    public void CleanupLanguageObject( ChuckSubInstance chuck )
+    {
+        // no chuck to cleanup
     }
 
     public void TickDoAction()
@@ -33,8 +41,18 @@ public class EventVisualizer : MonoBehaviour , IEventLanguageObjectListener {
     {
         // don't care
     }
+
+    public void ParentConnected( LanguageObject parent, ILanguageObjectListener parentListener )
+    {
+        // don't care (will I ever have a parent?)
+    }
+
+    public void ParentDisconnected( LanguageObject parent, ILanguageObjectListener parentListener )
+    {
+        // don't care (will I ever have a parent?)
+    }
     
-    public bool AcceptableChild( LanguageObject other )
+    public bool AcceptableChild( LanguageObject other, ILanguageObjectListener otherListener )
     {
         if( other.GetComponent<EventLanguageObject>() != null )
         {
@@ -43,22 +61,12 @@ public class EventVisualizer : MonoBehaviour , IEventLanguageObjectListener {
         return false;
     }
 
-    public void NewParent( LanguageObject parent )
-    {
-        // don't care (will I ever have a parent?)
-    }
-
-    public void ParentDisconnected( LanguageObject parent )
-    {
-        // don't care (will I ever have a parent?)
-    }
-
-    public void NewChild( LanguageObject child )
+    public void ChildConnected( LanguageObject child, ILanguageObjectListener childListener )
     {
         // don't care
     }
 
-    public void ChildDisconnected( LanguageObject child )
+    public void ChildDisconnected( LanguageObject child, ILanguageObjectListener childListener )
     {
         // don't care
     }

@@ -31,8 +31,6 @@ public class EventLanguageObject : LanguageObject {
         // if I'm an emitter, set me up
         if( myMaybeEmitter != null )
         {
-            // do setup
-            myMaybeEmitter.StartEmitTrigger();
             // tell emitter when its trigger goes
             bool ret = TheSubChuck.Instance.StartListeningForChuckEvent( myMaybeEmitter.ExternalEventSource(),
                 myOutgoingTriggerCallback );
@@ -191,6 +189,5 @@ public interface IEventLanguageObjectEmitter : ILanguageObjectListener
 {
     // return a string which is the Event people should listen to
     string ExternalEventSource();
-    void StartEmitTrigger();
     void ShowEmit();
 }

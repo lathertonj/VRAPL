@@ -25,14 +25,70 @@ public class OperationController : MonoBehaviour , ILanguageObjectListener , ICo
     private ChuckSubInstance myChuck = null;
 
 	// Use this for initialization
-	void Awake() 
+	public void InitLanguageObject( ChuckSubInstance chuck ) 
     {
+        // init object
 		myOps = new string[] { ">", "<", ">=", "<=" };
         myCurrentIndex = 0;
         myCurrentOp = myOps[myCurrentIndex];
         myText.text = myCurrentOp;
         myLO = GetComponent<LanguageObject>();
-	}
+
+        // init chuck
+        myChuck = chuck;
+        myStorageClass = chuck.GetUniqueVariableName();
+        myExitEvent = chuck.GetUniqueVariableName();
+        myChangeOpEvent = chuck.GetUniqueVariableName();
+
+        chuck.RunCode(string.Format(@"
+            external Event {1};
+            external Event {2};
+            public class {0}
+            {{
+                static Step @ myOutput;
+                static Gain @ myLeftInput;
+                static Gain @ myRightInput;
+            }}
+            Gain g1 @=> {0}.myLeftInput;
+            {0}.myLeftInput => blackhole;
+            Gain g2 @=> {0}.myRightInput;
+            {0}.myRightInput => blackhole;
+            Step s @=> {0}.myOutput;
+
+            // wait until told to exit
+            {1} => now;
+        ", myStorageClass, myExitEvent, myChangeOpEvent ));
+
+        UpdateMyOp();
+    }
+
+    public void CleanupLanguageObject( ChuckSubInstance chuck )
+    {
+        chuck.BroadcastEvent( myExitEvent );
+        myChuck = null;
+    }
+
+    public void UpdateMyOp()
+    {
+        // end the last one by signaling the event at the beginning
+        myChuck.RunCode( string.Format( @"
+            external Event {1};
+            {1}.broadcast();
+
+            fun void DoTheOp()
+            {{
+                while( true )
+                {{
+                    ( {0}.myLeftInput.last() {2} {0}.myRightInput.last() ) => {0}.myOutput.next;
+                    0.5::ms => now;
+                }}
+            }}
+            
+            spork ~ DoTheOp();
+
+            {1} => now;
+        ", myStorageClass, myChangeOpEvent, myCurrentOp ) );
+    }
 	
 	void SwitchColors()
     {
@@ -41,32 +97,22 @@ public class OperationController : MonoBehaviour , ILanguageObjectListener , ICo
         myShape.material.color = temp;
     }
 
-    public void TouchpadDown()
+    public void ParentConnected( LanguageObject parent, ILanguageObjectListener parentListener )
     {
-        myCurrentIndex++;
-        myCurrentIndex %= myOps.Length;
-        myCurrentOp = myOps[myCurrentIndex];
-        myText.text = myCurrentOp;
-        UpdateMyOp();
+        myParent = parentListener;
+        SwitchColors();
     }
 
-
-    public void TouchpadUp()
+    public void ParentDisconnected( LanguageObject parent, ILanguageObjectListener parentListener )
     {
-        // don't care
+        if( parentListener == myParent )
+        {
+            SwitchColors();
+            myParent = null;
+        }
     }
 
-    public void TouchpadAxis(Vector2 pos)
-    {
-        // don't care
-    }
-
-    public void TouchpadTransform( Transform t )
-    {
-        // don't care
-    }
-
-    public bool AcceptableChild( LanguageObject other )
+    public bool AcceptableChild( LanguageObject other, ILanguageObjectListener otherListener )
     {
         // is it incorrect type?
         if( other.GetComponent<SoundProducer>() == null &&
@@ -89,25 +135,6 @@ public class OperationController : MonoBehaviour , ILanguageObjectListener , ICo
         }
     }
 
-    public void NewParent( LanguageObject parent )
-    {
-        ILanguageObjectListener lo = (ILanguageObjectListener) parent.GetComponent( typeof( ILanguageObjectListener ) );
-        if( lo != null )
-        {
-            myParent = lo;
-            SwitchColors();
-        }
-    }
-
-    public void ParentDisconnected( LanguageObject parent )
-    {
-        ILanguageObjectListener lo = (ILanguageObjectListener) parent.GetComponent( typeof( ILanguageObjectListener ) );
-        if( lo == myParent )
-        {
-            SwitchColors();
-            myParent = null;
-        }
-    }
 
     private bool WouldBeLeft( LanguageObject potentialChild )
     {
@@ -120,7 +147,7 @@ public class OperationController : MonoBehaviour , ILanguageObjectListener , ICo
         return localXPos <= 0;
     }
 
-    public void NewChild( LanguageObject child )
+    public void ChildConnected( LanguageObject child, ILanguageObjectListener childListener )
     {
         if( WouldBeLeft( child ) )
         {
@@ -130,10 +157,12 @@ public class OperationController : MonoBehaviour , ILanguageObjectListener , ICo
         {
             myRightArg = child;
         }
+        LanguageObject.HookTogetherLanguageObjects( myChuck, child, myLO );
     }
 
-    public void ChildDisconnected( LanguageObject child )
+    public void ChildDisconnected( LanguageObject child, ILanguageObjectListener childListener )
     {
+        LanguageObject.UnhookLanguageObjects( myChuck, child, myLO );
         // check and update internal storage
         if( child == myLeftArg )
         {
@@ -166,73 +195,6 @@ public class OperationController : MonoBehaviour , ILanguageObjectListener , ICo
         return string.Format( "{0}.myOutput", myStorageClass );
     }
 
-    public void GotChuck(ChuckSubInstance chuck)
-    {
-        myChuck = chuck;
-        myStorageClass = chuck.GetUniqueVariableName();
-        myExitEvent = chuck.GetUniqueVariableName();
-        myChangeOpEvent = chuck.GetUniqueVariableName();
-
-        chuck.RunCode(string.Format(@"
-            external Event {1};
-            external Event {2};
-            public class {0}
-            {{
-                static Step @ myOutput;
-                static Gain @ myLeftInput;
-                static Gain @ myRightInput;
-            }}
-            Gain g1 @=> {0}.myLeftInput;
-            {0}.myLeftInput => blackhole;
-            Gain g2 @=> {0}.myRightInput;
-            {0}.myRightInput => blackhole;
-            Step s @=> {0}.myOutput;
-
-            // wait until told to exit
-            {1} => now;
-        ", myStorageClass, myExitEvent, myChangeOpEvent ));
-
-        UpdateMyOp();
-
-        if( myParent != null )
-        {
-            chuck.RunCode(string.Format( "{0} => {1};", OutputConnection(), myParent.InputConnection( myLO ) ) );
-        }
-    }
-
-    public void LosingChuck(ChuckSubInstance chuck)
-    {
-        if( myParent != null )
-        {
-            chuck.RunCode(string.Format( "{0} =< {1};", OutputConnection(), myParent.InputConnection( myLO ) ) );
-        }
-
-        chuck.BroadcastEvent( myExitEvent );
-        myChuck = null;
-    }
-
-    public void UpdateMyOp()
-    {
-        // end the last one by signaling the event at the beginning
-        myChuck.RunCode( string.Format( @"
-            external Event {1};
-            {1}.broadcast();
-
-            fun void DoTheOp()
-            {{
-                while( true )
-                {{
-                    ( {0}.myLeftInput.last() {2} {0}.myRightInput.last() ) => {0}.myOutput.next;
-                    0.5::ms => now;
-                }}
-            }}
-            
-            spork ~ DoTheOp();
-
-            {1} => now;
-        ", myStorageClass, myChangeOpEvent, myCurrentOp ) );
-    }
-
     public void SizeChanged( float newSize )
     {
         // don't care about my size
@@ -241,6 +203,30 @@ public class OperationController : MonoBehaviour , ILanguageObjectListener , ICo
     public string VisibleName()
     {
         return myText.text;
+    }
+
+    public void TouchpadDown()
+    {
+        myCurrentIndex++;
+        myCurrentIndex %= myOps.Length;
+        myCurrentOp = myOps[myCurrentIndex];
+        myText.text = myCurrentOp;
+        UpdateMyOp();
+    }
+
+    public void TouchpadUp()
+    {
+        // don't care
+    }
+
+    public void TouchpadAxis(Vector2 pos)
+    {
+        // don't care
+    }
+
+    public void TouchpadTransform( Transform t )
+    {
+        // don't care
     }
 
     public void CloneYourselfFrom( LanguageObject original, LanguageObject newParent )

@@ -9,19 +9,20 @@ public class EventClock : MonoBehaviour , IEventLanguageObjectEmitter {
     public Transform myClockHand;
     public MeshRenderer myClockHandMesh;
 
+    private ChuckSubInstance myChuck;
     private string myStorageClass;
     private string myTriggerEvent;
     private string myExitEvent;
     private int myNumNumberChildren = 0;
 
-    private void Awake()
+    public void InitLanguageObject( ChuckSubInstance chuck )
     {
+        // object init
         myClockHandMesh.material.color = Color.black;
-    }
 
-    public void StartEmitTrigger() 
-    {
-        ChuckSubInstance theChuck = TheSubChuck.Instance;
+        // chuck init
+        ChuckSubInstance theChuck = chuck;
+        myChuck = theChuck;
         myStorageClass = theChuck.GetUniqueVariableName();
         myTriggerEvent = theChuck.GetUniqueVariableName();
         myExitEvent = theChuck.GetUniqueVariableName();
@@ -62,6 +63,12 @@ public class EventClock : MonoBehaviour , IEventLanguageObjectEmitter {
         ));
     }
 
+    public void CleanupLanguageObject( ChuckSubInstance chuck )
+    {
+        myChuck.BroadcastEvent( myExitEvent );
+        myChuck = null;
+    }
+
     public string ExternalEventSource()
     {
         return myTriggerEvent;
@@ -84,8 +91,18 @@ public class EventClock : MonoBehaviour , IEventLanguageObjectEmitter {
     {
         return string.Format( "{0}.myGain", myStorageClass );
     }
+
+    public void ParentConnected( LanguageObject parent, ILanguageObjectListener parentListener )
+    {
+        // don't care (will I ever have a parent?)
+    }
+
+    public void ParentDisconnected( LanguageObject parent, ILanguageObjectListener parentListener )
+    {
+        // don't care (will I ever have a parent?)
+    }
     
-    public bool AcceptableChild( LanguageObject other )
+    public bool AcceptableChild( LanguageObject other, ILanguageObjectListener otherListener )
     {
         if( other.GetComponent<NumberProducer>() != null ||
             other is EventLanguageObject )
@@ -95,17 +112,7 @@ public class EventClock : MonoBehaviour , IEventLanguageObjectEmitter {
         return false;
     }
 
-    public void NewParent( LanguageObject parent )
-    {
-        // don't care (will I ever have a parent?)
-    }
-
-    public void ParentDisconnected( LanguageObject parent )
-    {
-        // don't care (will I ever have a parent?)
-    }
-
-    public void NewChild( LanguageObject child )
+    public void ChildConnected( LanguageObject child, ILanguageObjectListener childListener )
     {
         // is it a new number source?
         if( child.GetComponent<NumberProducer>() != null )
@@ -114,14 +121,14 @@ public class EventClock : MonoBehaviour , IEventLanguageObjectEmitter {
             // is it the first number source? --> turn off my default
             if( myNumNumberChildren == 1 )
             {
-                TheSubChuck.Instance.RunCode( string.Format( 
+                myChuck.RunCode( string.Format( 
                     "0 => {0}.myDefaultValue.gain;", myStorageClass 
                 ) );
             }
         }
     }
 
-    public void ChildDisconnected( LanguageObject child )
+    public void ChildDisconnected( LanguageObject child, ILanguageObjectListener childListener )
     {
        // is it a number source?
         if( child.GetComponent<NumberProducer>() != null )
@@ -130,7 +137,7 @@ public class EventClock : MonoBehaviour , IEventLanguageObjectEmitter {
             // is it the last number source? --> turn on my default
             if( myNumNumberChildren == 0 )
             {
-                TheSubChuck.Instance.RunCode( string.Format( 
+                myChuck.RunCode( string.Format( 
                     "1 => {0}.myDefaultValue.gain;", myStorageClass 
                 ) );
             }

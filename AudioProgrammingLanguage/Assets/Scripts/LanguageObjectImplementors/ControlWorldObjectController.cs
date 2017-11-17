@@ -17,27 +17,36 @@ public class ControlWorldObjectController : MonoBehaviour , ILanguageObjectListe
 
     private IControllable myParent = null;
 
+    private ChuckSubInstance myChuck;
+    private LanguageObject myLO;
+
     private int myControl = 0;
     private int myPrevControl = 0;
     private string[] defaultAllowedControls;
     private string[] myAllowedControls;
 
 
-    private void Start () {
+    public void InitLanguageObject( ChuckSubInstance chuck )
+    {
+        // init object 
 		myCurrent = 0;
         myMin = -1;
         myMax = 1;
+
+        myLO = GetComponent<LanguageObject>();
 
         myValueGetterCallback = Chuck.CreateGetFloatCallback( GetMyCurrentValueCallback );
 
         defaultAllowedControls = new string[] { "object" };
         myAllowedControls = defaultAllowedControls;
 
+        // init chuck
         myStorageClass = TheSubChuck.Instance.GetUniqueVariableName();
         myExitEvent = TheSubChuck.Instance.GetUniqueVariableName();
         mySampleGetter = TheSubChuck.Instance.GetUniqueVariableName();
 
-        TheSubChuck.Instance.RunCode( string.Format(
+        myChuck = chuck;
+        chuck.RunCode( string.Format(
             @"
             external Event {1};
             external float {2};
@@ -67,6 +76,12 @@ public class ControlWorldObjectController : MonoBehaviour , ILanguageObjectListe
 
         UpdateText();
 	}
+
+    public void CleanupLanguageObject( ChuckSubInstance chuck )
+    {
+        chuck.BroadcastEvent( myExitEvent );
+        myChuck = null;
+    }
 	
 	private void Update () {
         // fetch myGain.last() into myCurrent
@@ -79,10 +94,7 @@ public class ControlWorldObjectController : MonoBehaviour , ILanguageObjectListe
 " + myAllowedControls[myControl];
     }
 
-    private void OnDestroy()
-    {
-        TheSubChuck.Instance.BroadcastEvent( myExitEvent );
-    }
+
 
     void GetMyCurrentValueCallback( double value )
     {
@@ -96,66 +108,17 @@ public class ControlWorldObjectController : MonoBehaviour , ILanguageObjectListe
         myShape.material.color = temp;
     }
 
-    // ILanguageObjectListener
-    public bool AcceptableChild( LanguageObject other )
-    {
-        if( other.GetComponent<SoundProducer>() != null ||
-            other.GetComponent<NumberProducer>() != null )
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-
-
-    public void GotChuck( ChuckSubInstance chuck )
-    {
-        // don't care, shouldn't ever get a chuck
-    }
-
-    public void LosingChuck( ChuckSubInstance chuck )
-    {
-        // don't care, shouldn't ever get a chuck
-    }
-
-    public void SizeChanged( float newSize )
-    {
-        // don't care about my size
-    }
-
-    public string InputConnection( LanguageObject whoAsking )
-    {
-        return OutputConnection();
-    }
-
-    public string OutputConnection()
-    {
-        return string.Format( "{0}.myGain", myStorageClass );
-    }
-
-    public void NewChild( LanguageObject child )
-    {
-        // don't care
-    }
-
-    public void ChildDisconnected( LanguageObject child )
-    {
-        // don't care 
-    }
-
-    public void NewParent( LanguageObject parent )
+    public void ParentConnected( LanguageObject parent, ILanguageObjectListener parentListener )
     {
         // don't care, shouldn't ever have a LanguageObjct as a parent
     }
 
-    public void ParentDisconnected( LanguageObject parent )
+    public void ParentDisconnected( LanguageObject parent, ILanguageObjectListener parentListener )
     {
         // don't care, shouldn't ever have a LanguageObject as a parent
     }
 
-    public void NewParent( IControllable parent )
+    public void ParentConnected( IControllable parent )
     {
         myParent = parent;
         SwitchColors();
@@ -175,6 +138,46 @@ public class ControlWorldObjectController : MonoBehaviour , ILanguageObjectListe
         myControl = 0;
         UpdateText();
     }
+
+    // ILanguageObjectListener
+    public bool AcceptableChild( LanguageObject other, ILanguageObjectListener otherListener )
+    {
+        if( other.GetComponent<SoundProducer>() != null ||
+            other.GetComponent<NumberProducer>() != null )
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public void ChildConnected( LanguageObject child, ILanguageObjectListener childListener )
+    {
+        // if SoundProducer or NumberProducer (currently all children...)
+        LanguageObject.HookTogetherLanguageObjects( myChuck, child, myLO );
+    }
+
+    public void ChildDisconnected( LanguageObject child, ILanguageObjectListener childListener )
+    {
+        // if SoundProducer or NumberProducer (currently all children...)
+        LanguageObject.UnhookLanguageObjects( myChuck, child, myLO );
+    }
+
+    public void SizeChanged( float newSize )
+    {
+        // don't care about my size
+    }
+
+    public string InputConnection( LanguageObject whoAsking )
+    {
+        return OutputConnection();
+    }
+
+    public string OutputConnection()
+    {
+        return string.Format( "{0}.myGain", myStorageClass );
+    }
+
 
     // IDataSource
     public float MaxValue()

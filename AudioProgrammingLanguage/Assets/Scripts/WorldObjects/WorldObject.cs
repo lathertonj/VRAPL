@@ -146,7 +146,7 @@ public class WorldObject : MonoBehaviour
             // track it on myself
             if( myControllable != null )
             {
-                maybeController.NewParent( myControllable );
+                maybeController.ParentConnected( myControllable );
             }
         }
     }

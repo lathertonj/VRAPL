@@ -26,13 +26,38 @@ public class NumberController : MonoBehaviour , ILanguageObjectListener , IContr
     private ChuckSubInstance myChuck = null;
 
     // Use this for initialization
-    void Awake()
+    public void InitLanguageObject( ChuckSubInstance chuck )
     {
+        // init object
 		UpdateMyNumber();
         originalTextColor = myText.GetComponent<TextMesh>().color;
         originalBodyColor = myShape.GetComponent<Renderer>().material.color;
         myLO = GetComponent<LanguageObject>();
+
+        // init chuck
+        myChuck = chuck;
+        myStorageClass = chuck.GetUniqueVariableName();
+        myExitEvent = chuck.GetUniqueVariableName();
+
+        chuck.RunCode(string.Format(@"
+            external Event {1};
+            public class {0}
+            {{
+                static Step @ myStep;
+            }}
+            Step s @=> {0}.myStep;
+            {2} => {0}.myStep.next;
+
+            // wait until told to exit
+            {1} => now;
+        ", myStorageClass, myExitEvent, myNumber.ToString("0.00") ));
 	}
+
+    public void CleanupLanguageObject( ChuckSubInstance chuck )
+    {
+        chuck.BroadcastEvent( myExitEvent );
+        myChuck = null;
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -52,76 +77,35 @@ public class NumberController : MonoBehaviour , ILanguageObjectListener , IContr
         myShape.GetComponent<Renderer>().material.color = tempColor;
     }
 
-    
-    public bool AcceptableChild( LanguageObject other )
+    public void ParentConnected( LanguageObject parent, ILanguageObjectListener parentListener)
     {
-        return false;
+        myParent = parentListener;
+        SwitchColors();
     }
 
-    public void NewChild( LanguageObject child )
+    public void ParentDisconnected( LanguageObject parent, ILanguageObjectListener parentListener )
     {
-        // don't care
-    }
-
-    public void NewParent(LanguageObject parent)
-    {
-        ILanguageObjectListener p = (ILanguageObjectListener) parent.GetComponent(typeof(ILanguageObjectListener));
-        if( p != null )
-        {
-            myParent = p;
-            SwitchColors();
-        }
-    }
-
-    public void ParentDisconnected(LanguageObject parent)
-    {
-        if( myParent != null )
+        if( myParent == parentListener)
         {
             // SwitchColors();
             SetColors( originalBodyColor, originalTextColor );
             myParent = null;
         }
     }
+    
+    public bool AcceptableChild( LanguageObject other, ILanguageObjectListener otherListener )
+    {
+        return false;
+    }
 
-    public void ChildDisconnected(LanguageObject child)
+    public void ChildConnected( LanguageObject child, ILanguageObjectListener childListener )
     {
         // don't care
     }
 
-    public void GotChuck(ChuckSubInstance chuck)
+    public void ChildDisconnected( LanguageObject child, ILanguageObjectListener childListener )
     {
-        myChuck = chuck;
-        myStorageClass = chuck.GetUniqueVariableName();
-        myExitEvent = chuck.GetUniqueVariableName();
-
-        chuck.RunCode(string.Format(@"
-            external Event {1};
-            public class {0}
-            {{
-                static Step @ myStep;
-            }}
-            Step s @=> {0}.myStep;
-            {2} => {0}.myStep.next;
-
-            // wait until told to exit
-            {1} => now;
-        ", myStorageClass, myExitEvent, myNumber.ToString("0.00") ));
-
-        if( myParent != null )
-        {
-            chuck.RunCode(string.Format("{0} => {1};", OutputConnection(), myParent.InputConnection( myLO ) ) );
-        }
-    }
-
-    public void LosingChuck(ChuckSubInstance chuck)
-    {
-        if( myParent != null )
-        {
-            chuck.RunCode(string.Format("{0} =< {1};", OutputConnection(), myParent.InputConnection( myLO ) ) );
-        }
-
-        chuck.BroadcastEvent( myExitEvent );
-        myChuck = null;
+        // don't care
     }
 
     public void SizeChanged( float newSize )

@@ -33,8 +33,9 @@ public class SoundfileController : MonoBehaviour , ILanguageObjectListener, IPar
     private Dictionary<EventNotifyController, bool> myNotifiers;
 
     // Use this for initialization
-    void Awake()
+    public void InitLanguageObject( ChuckSubInstance chuck )
     {
+        // init object
         myLO = GetComponent<LanguageObject>();
 		myAcceptableParams = new string[] { "rate", "gain" };
         numParamConnections = new Dictionary<string, int>();
@@ -58,7 +59,102 @@ public class SoundfileController : MonoBehaviour , ILanguageObjectListener, IPar
         myText.text = myFilename;
 
         lastAxis = Vector2.zero;
+
+        // init chuck
+        myChuck = chuck;
+
+        myStorageClass = chuck.GetUniqueVariableName();
+        myExitEvent = chuck.GetUniqueVariableName();
+
+        string initCode = string.Format( @"
+            external Event {1};
+            public class {0}
+            {{
+                static Gain @ myOutput;
+
+                static Gain @ myRate;
+                static Step @ myDefaultRate;
+                static Gain @ myGain;
+                static Step @ myDefaultGain;
+                
+            }}
+            Gain g @=> {0}.myOutput;
+
+            Gain g1 @=> {0}.myRate;
+            Gain g2 @=> {0}.myGain;
+
+            Step s1 @=> {0}.myDefaultRate;
+            Step s2 @=> {0}.myDefaultGain;
+
+            1 => {0}.myDefaultRate.next;
+            1 => {0}.myDefaultGain.next;
+            
+            {0}.myDefaultRate => {0}.myRate => blackhole;
+            {0}.myDefaultGain => {0}.myGain => blackhole;
+
+            // wait until told to exit
+            {1} => now;
+            ", myStorageClass, myExitEvent
+        );
+
+        chuck.RunCode( initCode );
 	}
+
+    public void CleanupLanguageObject( ChuckSubInstance chuck )
+    {
+        chuck.BroadcastEvent( myExitEvent );
+        myChuck = null;
+    }
+
+    public void ParentConnected( LanguageObject parent,ILanguageObjectListener parentListener )
+    {
+        SwitchColors();
+        myParent = parentListener;
+    }
+
+    public void ParentDisconnected( LanguageObject parent, ILanguageObjectListener parentListener )
+    {
+        if( myParent == parentListener )
+        {
+            SwitchColors();
+            myParent = null;
+        }
+    }
+
+    public bool AcceptableChild( LanguageObject other, ILanguageObjectListener otherListener )
+    {
+        if( other.GetComponent<ParamController>() != null )
+        {
+            return true;
+        }
+        else if( other.GetComponent<EventNotifyController>() != null )
+        {
+            return true;
+        }
+        return false;
+    }
+    
+    public void ChildConnected( LanguageObject child, ILanguageObjectListener childListener )
+    {
+        // neither ParamController nor EventNotifyController needs to be hooked up to me!
+        EventNotifyController nc = child.GetComponent<EventNotifyController>();
+        if( nc != null )
+        {
+            myNotifiers[nc] = true;
+            nc.AddListener( GetComponent<EventNotifyController>() );
+        }
+    }
+
+    public void ChildDisconnected( LanguageObject child, ILanguageObjectListener childListener )
+    {
+        // neither ParamController nor EventNotifyController needs to be unhooked from me!
+        EventNotifyController nc = child.GetComponent<EventNotifyController>();
+        if( nc != null && myNotifiers.ContainsKey( nc ) )
+        {
+            nc.RemoveListener( GetComponent<EventNotifyController>() );
+            myNotifiers.Remove( nc );
+        }
+    }
 	
 	void SwitchColors()
     {
@@ -171,113 +267,6 @@ public class SoundfileController : MonoBehaviour , ILanguageObjectListener, IPar
             }
         }
         
-    }
-
-    public bool AcceptableChild( LanguageObject other )
-    {
-        if( other.GetComponent<ParamController>() != null )
-        {
-            return true;
-        }
-        else if( other.GetComponent<EventNotifyController>() != null )
-        {
-            return true;
-        }
-        return false;
-    }
-
-    public void NewParent( LanguageObject parent )
-    {
-        ILanguageObjectListener lo = (ILanguageObjectListener) parent.GetComponent( typeof( ILanguageObjectListener ) );
-        if( lo != null )
-        {
-            SwitchColors();
-            myParent = lo;
-        }
-    }
-
-    public void ParentDisconnected( LanguageObject parent )
-    {
-        ILanguageObjectListener lo = (ILanguageObjectListener) parent.GetComponent( typeof( ILanguageObjectListener ) );
-        if( lo != null )
-        {
-            SwitchColors();
-            myParent = null;
-        }
-    }
-
-    public void NewChild( LanguageObject child )
-    {
-        EventNotifyController nc = child.GetComponent<EventNotifyController>();
-        if( nc != null )
-        {
-            myNotifiers[nc] = true;
-            nc.AddListener( GetComponent<EventNotifyController>() );
-        }
-    }
-
-    public void ChildDisconnected( LanguageObject child )
-    {
-        EventNotifyController nc = child.GetComponent<EventNotifyController>();
-        if( nc != null && myNotifiers.ContainsKey( nc ) )
-        {
-            nc.RemoveListener( GetComponent<EventNotifyController>() );
-            myNotifiers.Remove( nc );
-        }
-    }
-
-    public void GotChuck( ChuckSubInstance chuck )
-    {
-        myChuck = chuck;
-
-        myStorageClass = chuck.GetUniqueVariableName();
-        myExitEvent = chuck.GetUniqueVariableName();
-
-        string initCode = string.Format( @"
-            external Event {1};
-            public class {0}
-            {{
-                static Gain @ myOutput;
-
-                static Gain @ myRate;
-                static Step @ myDefaultRate;
-                static Gain @ myGain;
-                static Step @ myDefaultGain;
-                
-            }}
-            Gain g @=> {0}.myOutput;
-
-            Gain g1 @=> {0}.myRate;
-            Gain g2 @=> {0}.myGain;
-
-            Step s1 @=> {0}.myDefaultRate;
-            Step s2 @=> {0}.myDefaultGain;
-
-            1 => {0}.myDefaultRate.next;
-            1 => {0}.myDefaultGain.next;
-            
-            {0}.myDefaultRate => {0}.myRate => blackhole;
-            {0}.myDefaultGain => {0}.myGain => blackhole;
-
-            {0}.myOutput => {2};
-
-            // wait until told to exit
-            {1} => now;
-            ", myStorageClass, myExitEvent, myParent.InputConnection( myLO )
-        );
-
-        chuck.RunCode( initCode );
-    }
-
-    public void LosingChuck( ChuckSubInstance chuck )
-    {
-        if( myParent != null )
-        {
-            chuck.RunCode(string.Format("{0} =< {1};", OutputConnection(), myParent.InputConnection( myLO ) ) );
-        }
-
-        chuck.BroadcastEvent( myExitEvent );
-        myChuck = null;
     }
 
     public void SizeChanged( float newSize )

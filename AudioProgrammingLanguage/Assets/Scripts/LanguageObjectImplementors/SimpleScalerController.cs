@@ -25,12 +25,60 @@ public class SimpleScalerController : MonoBehaviour , ILanguageObjectListener
     private string myStorageClass;
     private string myExitEvent;
 
-    private void Awake()
+    public void InitLanguageObject( ChuckSubInstance chuck )
     {
+        // init object
         myLO = GetComponent<LanguageObject>();
+        myDefaultColor = myMinMaxConnection.material.color;
+
+        // init chuck
+        myChuck = chuck;
+        myStorageClass = chuck.GetUniqueVariableName();
+        myExitEvent = chuck.GetUniqueVariableName();
+
+        chuck.RunCode(string.Format(@"
+            external Event {1};
+            public class {0}
+            {{
+                static Step @ myStep;
+            }}
+            Step s @=> {0}.myStep;
+            0 => {0}.myStep.next;
+            // be quiet
+            0 => {0}.myStep.gain;
+
+            // wait until told to exit
+            {1} => now;
+        ", myStorageClass, myExitEvent ));
+
+        if( ReadyToSendData() )
+        {
+            ConnectData();
+        }
     }
 
-    public bool AcceptableChild( LanguageObject other )
+    public void CleanupLanguageObject( ChuckSubInstance chuck )
+    {
+        if( sendingData )
+        {
+            DisconnectData();
+        }
+        chuck.BroadcastEvent( myExitEvent );
+        myChuck = null;
+    }
+    
+
+    public void ParentConnected( LanguageObject parent, ILanguageObjectListener parentListener )
+    {
+        myParent = parentListener;
+    }
+
+    public void ParentDisconnected( LanguageObject parent, ILanguageObjectListener parentListener )
+    {
+        myParent = null;
+    }
+
+    public bool AcceptableChild( LanguageObject other, ILanguageObjectListener otherListener )
     {
         // accept numbers if either my min or max is empty
         if( other.GetComponent<NumberController>() != null && 
@@ -48,59 +96,10 @@ public class SimpleScalerController : MonoBehaviour , ILanguageObjectListener
         return false;
     }
 
-
-    public void GotChuck( ChuckSubInstance chuck )
+    public void ChildConnected( LanguageObject child, ILanguageObjectListener childListener )
     {
-        myChuck = chuck;
-        myStorageClass = chuck.GetUniqueVariableName();
-        myExitEvent = chuck.GetUniqueVariableName();
-
-        chuck.RunCode(string.Format(@"
-            external Event {1};
-            public class {0}
-            {{
-                static Step @ myStep;
-            }}
-            Step s @=> {0}.myStep;
-            0 => {0}.myStep.next;
-
-            // wait until told to exit
-            {1} => now;
-        ", myStorageClass, myExitEvent ));
-
-        if( ReadyToSendData() )
-        {
-            ConnectData();
-        }
-    }
-
-    public void LosingChuck( ChuckSubInstance chuck )
-    {
-        if( sendingData )
-        {
-            DisconnectData();
-        }
-        chuck.BroadcastEvent( myExitEvent );
-        myChuck = null;
-    }
-
-    public void SizeChanged( float newSize )
-    {
-        // don't care about my size
-    }
-
-    public string InputConnection( LanguageObject whoAsking )
-    {
-        return OutputConnection();
-    }
-
-    public string OutputConnection()
-    {
-        return string.Format( "{0}.myStep", myStorageClass );
-    }
-
-    public void NewChild( LanguageObject child )
-    {
+        // Don't connect any ugens: we use the numbers and IDataSource in Update(), not in chuck
+        // TODO: refactor to happen in chuck?
         if( child.GetComponent<NumberController>() != null )
         {
             // try assigning min number
@@ -150,7 +149,7 @@ public class SimpleScalerController : MonoBehaviour , ILanguageObjectListener
         }
     }
 
-    public void ChildDisconnected( LanguageObject child )
+    public void ChildDisconnected( LanguageObject child, ILanguageObjectListener childListener )
     {
         if( child.GetComponent<NumberController>() == myMinNumber )
         {
@@ -187,27 +186,22 @@ public class SimpleScalerController : MonoBehaviour , ILanguageObjectListener
         }
     }
 
-    public void NewParent( LanguageObject parent )
+    public void SizeChanged( float newSize )
     {
-        ILanguageObjectListener maybeParent = (ILanguageObjectListener) parent.GetComponent( typeof(ILanguageObjectListener) );
-        if( maybeParent == null )
-        {
-            return;
-        }
-        myParent = maybeParent;
+        // don't care about my size
     }
 
-    public void ParentDisconnected( LanguageObject parent )
+    public string InputConnection( LanguageObject whoAsking )
     {
-        myParent = null;
+        return OutputConnection();
     }
 
-    // Use this for initialization
-    void Start () {
-		myDefaultColor = myMinMaxConnection.material.color;
-	}
-	
-	// Update is called once per frame
+    public string OutputConnection()
+    {
+        return string.Format( "{0}.myStep", myStorageClass );
+    }
+
+    // Update is called once per frame
 	void Update () {
         // color of the main body
 		if( myDataSource != null && myMinNumber != null && myMaxNumber != null )
@@ -270,13 +264,15 @@ public class SimpleScalerController : MonoBehaviour , ILanguageObjectListener
 
     private void ConnectData()
     {
-        myChuck.RunCode( string.Format( "{0} => {1};", OutputConnection(), myParent.InputConnection( myLO ) ) );
+        // from now on, parent will connect me to it automatically.
+        // Maybe make this more about setting the gain of something to 0 or 1?
+        myChuck.RunCode( string.Format( "1 => {0}.gain;", OutputConnection() ) );
         sendingData = true;
     }
     
     private void DisconnectData()
     {
-        myChuck.RunCode( string.Format( "{0} =< {1};", OutputConnection(), myParent.InputConnection( myLO ) ) );
+        myChuck.RunCode( string.Format( "0 => {0}.gain;", OutputConnection() ) );
         sendingData = false;
     }
 
