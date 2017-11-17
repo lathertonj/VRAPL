@@ -43,25 +43,10 @@ public class ParamController : MonoBehaviour , ILanguageObjectListener, IControl
             // wait until told to exit
             {1} => now;
         ", myStorageClass, myExitEvent));
-
-        if( myNumChildren > 0 && myParamAcceptor != null )
-        {
-            Debug.LogError("Refactored ParamController has children during its Awake()?");
-            // if I already have some children when I get a chuck, I need to hook myself up
-            myParamAcceptor.ConnectParam( myParam, OutputConnection() );
-            amConnected = true;
-        }
     }
 
     public void CleanupLanguageObject( ChuckSubInstance chuck )
     {
-        if( myNumChildren > 0 && myParamAcceptor != null )
-        {
-            // if I still hve some children when I lose chuck, I need to disconnect myself
-            myParamAcceptor.DisconnectParam( myParam, OutputConnection() );
-            amConnected = false;
-        }
-
         chuck.BroadcastEvent( myExitEvent );
         myChuck = null;
     }
@@ -84,6 +69,13 @@ public class ParamController : MonoBehaviour , ILanguageObjectListener, IControl
             myText.GetComponent<TextMesh>().text = myParam;
             SwitchColors();
             myParent = parentListener;
+
+            if( myNumChildren > 0 )
+            {
+                // if I already have some children when I get a parent, I need to hook myself up
+                myParamAcceptor.ConnectParam( myParam, OutputConnection() );
+                amConnected = true;
+            }
         }
     }
 
@@ -91,6 +83,13 @@ public class ParamController : MonoBehaviour , ILanguageObjectListener, IControl
     {
         if( myParamAcceptor != null )
         {
+            if( amConnected )
+            {
+                // if I am still connected when I lose my parent, I need to disconnect myself
+                myParamAcceptor.DisconnectParam( myParam, OutputConnection() );
+                amConnected = false;
+            }
+
             SwitchColors();
             myParam = "param";
             myText.GetComponent<TextMesh>().text = myParam;
