@@ -638,7 +638,7 @@ public class LanguageObject : MonoBehaviour {
         LanguageObject source, LanguageObject dest )
     {
         chuck.RunCode( string.Format(@"
-            external {0} => external {1};
+            {0} => {1};
         ", source.myLOListener.OutputConnection(), dest.myLOListener.InputConnection( source ) 
         ));
     }
@@ -647,7 +647,7 @@ public class LanguageObject : MonoBehaviour {
         LanguageObject source, LanguageObject dest )
     {
         chuck.RunCode( string.Format(@"
-            external {0}; external {1}; {0} =< {1};
+            {0} =< {1};
         ", source.myLOListener.OutputConnection(), dest.myLOListener.InputConnection( source ) 
         ));
     }
