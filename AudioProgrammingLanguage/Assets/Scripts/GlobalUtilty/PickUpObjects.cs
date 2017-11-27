@@ -556,7 +556,16 @@ public class PickUpObjects : MonoBehaviour {
             if( inputAcceptor != null )
             {
                 // only send info if it's being rendered right now
-                RendererController canRender = collidingControllableObject.GetComponent<RendererController>();
+                RendererController canRender = null;
+                if( collidingObject != null ) 
+                {
+                    canRender = collidingObject.GetComponent<RendererController>(); 
+                }
+                else if( collidingControllableObject != null )
+                {
+                    canRender = collidingControllableObject.GetComponent<RendererController>();
+                } 
+
                 if( canRender == null || canRender.beingRendered )
                 {
                     return true;
