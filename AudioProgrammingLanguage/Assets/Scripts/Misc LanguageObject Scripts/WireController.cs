@@ -61,7 +61,7 @@ public class WireController : MonoBehaviour , IControllerInputAcceptor {
         }
     }
 
-    private void UndoCurrenctConnection()
+    private void UndoCurrentConnection()
     {
         if( myStartConnection != "" && myEndConnection != "" )
         {
@@ -80,13 +80,13 @@ public class WireController : MonoBehaviour , IControllerInputAcceptor {
 
     private void OnDestroy()
     {
-        UndoCurrenctConnection();
+        UndoCurrentConnection();
     }
 
     public void SetEndpoints( Transform start, Transform end )
     {
         // undo old chuck connection
-        UndoCurrenctConnection();
+        UndoCurrentConnection();
 
         // store new connection
         myStart = start;
@@ -156,7 +156,8 @@ public class WireController : MonoBehaviour , IControllerInputAcceptor {
             }
             else if( touchpadCurrentPosition.y - touchpadInitialPosition.y < -verticalThreshold )
             {
-                // TODO: switch wire direction
+                // switch wire direction
+                SetEndpoints( myEnd, myStart );
             }
             else
             {
@@ -197,11 +198,11 @@ public class WireController : MonoBehaviour , IControllerInputAcceptor {
         }
         else if( touchpadCurrentPosition.y - touchpadInitialPosition.y < -verticalThreshold )
         {
-            touchpadText.text = "switch wire direction?";
+            touchpadText.text = "reverse wire direction?";
         }
         else
         {
-            touchpadText.text = "\u2191\n\u2193";
+            touchpadText.text = "delete wire\n\u2191\n\u2193\nreverse wire direction";
         }
     }
 }
