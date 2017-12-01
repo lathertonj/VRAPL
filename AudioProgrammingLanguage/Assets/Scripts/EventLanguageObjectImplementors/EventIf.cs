@@ -87,6 +87,11 @@ public class EventIf : MonoBehaviour , IEventLanguageObjectListener , IEventLang
         // do nothing when I receive an event
     }
 
+    public void FixedTickDoAction()
+    {
+        // do nothing during FixedUpdate when I receive an event
+    }
+
     public void ShowEmit()
     {
         // show my then block when I emit an event

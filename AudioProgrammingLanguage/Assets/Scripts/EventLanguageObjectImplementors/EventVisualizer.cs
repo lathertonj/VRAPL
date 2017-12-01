@@ -32,6 +32,11 @@ public class EventVisualizer : MonoBehaviour , IEventLanguageObjectListener {
         myRenderer.material.color = Color.HSVToRGB( h, s, v );
     }
 
+    public void FixedTickDoAction()
+    {
+        // do nothing during FixedUpdate when I receive an event
+    }
+
     public void NewListenEvent( ChuckSubInstance theChuck, string incomingEvent )
     {
         // don't care

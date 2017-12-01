@@ -13,6 +13,7 @@ public class EventLanguageObject : LanguageObject {
 
     string myListeningTriggerEvent = "";
     int myIncomingTriggerCount = 0;
+    int myFixedIncomingTriggerCount = 0;
     int myOutgoingTriggerCount = 0;
 
     private new void Awake()
@@ -35,6 +36,20 @@ public class EventLanguageObject : LanguageObject {
             bool ret = TheSubChuck.Instance.StartListeningForChuckEvent( myMaybeEmitter.ExternalEventSource(),
                 myOutgoingTriggerCallback );
             Debug.Log("emitter listening successful? " + (ret?"yes":"no"));
+        }
+    }
+
+    protected void FixedUpdate()
+    {
+        // if I've received any triggers, send them out to my listener
+        // on fixed update as well as update (below)
+        while( myFixedIncomingTriggerCount > 0 )
+        {
+            myFixedIncomingTriggerCount--;
+            if( myMaybeListener != null )
+            {
+                myMaybeListener.FixedTickDoAction();
+            }
         }
     }
 
@@ -167,6 +182,7 @@ public class EventLanguageObject : LanguageObject {
     private void ListenTriggerCallback()
     {
         myIncomingTriggerCount++;
+        myFixedIncomingTriggerCount++;
     }
 
     private void EmitTriggerCallback()
@@ -179,6 +195,7 @@ public class EventLanguageObject : LanguageObject {
 public interface IEventLanguageObjectListener : ILanguageObjectListener
 {
     void TickDoAction();
+    void FixedTickDoAction();
     void NewListenEvent( ChuckSubInstance theChuck, string incomingEvent );
     void LosingListenEvent( ChuckSubInstance theChuck, string losingEvent );
 }

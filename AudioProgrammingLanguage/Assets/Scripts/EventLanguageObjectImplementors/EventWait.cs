@@ -110,6 +110,11 @@ public class EventWait : MonoBehaviour , IEventLanguageObjectListener , IEventLa
         myInputSphere.gameObject.SetActive( true );
     }
 
+    public void FixedTickDoAction()
+    {
+        // do nothing during FixedUpdate when I receive an event
+    }
+
     public void ShowEmit()
     {
         // show my output sphere when I emit an event

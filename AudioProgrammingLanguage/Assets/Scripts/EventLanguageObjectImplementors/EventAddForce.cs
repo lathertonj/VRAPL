@@ -28,10 +28,6 @@ public class EventAddForce : MonoBehaviour , IEventLanguageObjectListener , ICon
     Chuck.FloatCallback myValueFetchCallback;
     double myMostRecentValue;
 
-    // force adding
-    bool shouldAddForce = false;
-    Vector3 forceToAdd = Vector3.zero;
-
     private void ChangeForceType()
     {
         myCurrentForceDirectionIndex++;
@@ -106,23 +102,15 @@ public class EventAddForce : MonoBehaviour , IEventLanguageObjectListener , ICon
         }
     }
 
-    private void FixedUpdate()
-    {
-        if( shouldAddForce )
-        {
-            foreach( DataReporter dr in myObjectsToAddForceTo )
-            {
-                dr.myRigidbody.AddForce( forceToAdd );
-            }
-            // reset
-            shouldAddForce = false;
-            forceToAdd = Vector3.zero;
-        }
-    }
-
     public void TickDoAction()
     {
-        // add force when ticked
+        // do nothing during Update() when receive an event
+    }
+
+    public void FixedTickDoAction()
+    {
+        // compute force to add
+        Vector3 forceToAdd = Vector3.zero;
         switch( myForceDirections[myCurrentForceDirectionIndex] )
         {
             case "x":
@@ -138,7 +126,11 @@ public class EventAddForce : MonoBehaviour , IEventLanguageObjectListener , ICon
                 break;
         }
 
-        shouldAddForce = true;
+        // add force to each of my linked objects
+        foreach( DataReporter dr in myObjectsToAddForceTo )
+        {
+            dr.myRigidbody.AddForce( forceToAdd );
+        }
     }
 
     public void NewListenEvent( ChuckSubInstance theChuck, string incomingEvent )
