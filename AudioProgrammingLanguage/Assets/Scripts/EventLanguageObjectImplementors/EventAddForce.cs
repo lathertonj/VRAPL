@@ -211,7 +211,7 @@ public class EventAddForce : MonoBehaviour , IEventLanguageObjectListener , ICon
 
     public string VisibleName()
     {
-        return "event visualizer";
+        return "add force:\n" + myForceDirections[myCurrentForceDirectionIndex];
     }
 
     public string InputConnection( LanguageObject whoAsking )
