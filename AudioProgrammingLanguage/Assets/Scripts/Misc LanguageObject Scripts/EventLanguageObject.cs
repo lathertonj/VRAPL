@@ -166,13 +166,11 @@ public class EventLanguageObject : LanguageObject {
 
     private void ListenTriggerCallback()
     {
-        Debug.Log("callback called!");
         myIncomingTriggerCount++;
     }
 
     private void EmitTriggerCallback()
     {
-        Debug.Log("emit callback called!");
         myOutgoingTriggerCount++;
     }
 

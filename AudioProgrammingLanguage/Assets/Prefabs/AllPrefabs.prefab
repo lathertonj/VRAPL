@@ -120,3 +120,5 @@ MonoBehaviour:
     prefab: {fileID: 1538895659560822, guid: c36653b76b4f6a842b19f89bbac1fffc, type: 2}
   - name: wire
     prefab: {fileID: 1518017386108990, guid: 72386171870c6164c99943395e6d61d2, type: 2}
+  - name: event addforce
+    prefab: {fileID: 1958857918817802, guid: 104972e7c0969624fb7b79b32ab29fe9, type: 2}
