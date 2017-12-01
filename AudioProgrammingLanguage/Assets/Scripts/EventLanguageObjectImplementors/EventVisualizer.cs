@@ -59,7 +59,7 @@ public class EventVisualizer : MonoBehaviour , IEventLanguageObjectListener {
     
     public bool AcceptableChild( LanguageObject other, ILanguageObjectListener otherListener )
     {
-        if( other.GetComponent<EventLanguageObject>() != null )
+        if( other is EventLanguageObject )
         {
             return true;
         }

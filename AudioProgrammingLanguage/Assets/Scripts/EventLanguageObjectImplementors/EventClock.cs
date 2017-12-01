@@ -9,6 +9,7 @@ public class EventClock : MonoBehaviour , IEventLanguageObjectEmitter {
     public Transform myClockHand;
     public MeshRenderer myClockHandMesh;
 
+    private LanguageObject myLO;
     private ChuckSubInstance myChuck;
     private string myStorageClass;
     private string myTriggerEvent;
@@ -19,6 +20,7 @@ public class EventClock : MonoBehaviour , IEventLanguageObjectEmitter {
     {
         // object init
         myClockHandMesh.material.color = Color.black;
+        myLO = GetComponent<EventLanguageObject>();
 
         // chuck init
         ChuckSubInstance theChuck = chuck;
@@ -117,6 +119,9 @@ public class EventClock : MonoBehaviour , IEventLanguageObjectEmitter {
         // is it a new number source?
         if( child.GetComponent<NumberProducer>() != null )
         {
+            // add the child to my gain
+            LanguageObject.HookTogetherLanguageObjects( myChuck, child, myLO );
+            
             myNumNumberChildren++;
             // is it the first number source? --> turn off my default
             if( myNumNumberChildren == 1 )
@@ -125,6 +130,7 @@ public class EventClock : MonoBehaviour , IEventLanguageObjectEmitter {
                     "0 => {0}.myDefaultValue.gain;", myStorageClass 
                 ) );
             }
+
         }
     }
 
@@ -141,6 +147,9 @@ public class EventClock : MonoBehaviour , IEventLanguageObjectEmitter {
                     "1 => {0}.myDefaultValue.gain;", myStorageClass 
                 ) );
             }
+
+            // remove the child from my gain
+            LanguageObject.UnhookLanguageObjects( myChuck, child, myLO );
         }
     }
 

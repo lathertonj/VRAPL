@@ -155,7 +155,7 @@ public class EventAddForce : MonoBehaviour , IEventLanguageObjectListener , ICon
     
     public bool AcceptableChild( LanguageObject other, ILanguageObjectListener otherListener )
     {
-        if( other.GetComponent<EventLanguageObject>() != null ||
+        if( other is EventLanguageObject ||
             other.GetComponent<DataReporter>() != null || 
             other.GetComponent<NumberProducer>() != null ||
             other.GetComponent<SoundProducer>() != null )
