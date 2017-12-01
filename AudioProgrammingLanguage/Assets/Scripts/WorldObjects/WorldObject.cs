@@ -181,19 +181,21 @@ public class WorldObject : MonoBehaviour
     public GameObject MakeLanguageObjectDataReporter()
     {
         // make a copy of the prefab
-        Transform newLangugeObject = Instantiate( myPrefab, transform.position, transform.rotation );
+        Transform newLanguageObject = Instantiate( myPrefab, transform.position, transform.rotation );
         // make it smaller
-        newLangugeObject.localScale = newLangugeObject.localScale * 0.2f;
-        // this also adds LanguageObject which makes all colliders triggers, etc.
-        newLangugeObject.gameObject.AddComponent<DataReporter>();
+        newLanguageObject.localScale = newLanguageObject.localScale * 0.2f;
+        // this does not add LanguageObject since LanguageObject needs to have access to DataReporter on its init
+        newLanguageObject.gameObject.AddComponent<DataReporter>();
+        // this does
+        newLanguageObject.gameObject.AddComponent<LanguageObject>();
         // prevent instantiations from the new object
-        Destroy( newLangugeObject.GetComponent<WorldObject>() );
+        Destroy( newLanguageObject.GetComponent<WorldObject>() );
         // hook in the aspects of me that DataReporter will access
-        newLangugeObject.GetComponent<DataReporter>().myRigidbody = GetComponent<Rigidbody>();
+        newLanguageObject.GetComponent<DataReporter>().myRigidbody = GetComponent<Rigidbody>();
         // when I get an event, tell newLanguageObject
-        GetComponent<EventNotifyController>().AddListener( newLangugeObject.GetComponent<EventNotifyController>() );
+        GetComponent<EventNotifyController>().AddListener( newLanguageObject.GetComponent<EventNotifyController>() );
 
-        return newLangugeObject.gameObject;
+        return newLanguageObject.gameObject;
     }
 
 

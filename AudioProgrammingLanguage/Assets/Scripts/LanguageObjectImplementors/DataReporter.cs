@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-[RequireComponent(typeof(LanguageObject))]
+//[RequireComponent(typeof(LanguageObject))]
 [RequireComponent(typeof(EventNotifyController))]
 public class DataReporter : MonoBehaviour , ILanguageObjectListener , IDataSource , IControllerInputAcceptor , IEventNotifyResponder
 {
