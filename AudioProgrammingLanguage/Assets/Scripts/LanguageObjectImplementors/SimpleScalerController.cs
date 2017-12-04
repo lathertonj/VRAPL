@@ -71,10 +71,18 @@ public class SimpleScalerController : MonoBehaviour , ILanguageObjectListener
     public void ParentConnected( LanguageObject parent, ILanguageObjectListener parentListener )
     {
         myParent = parentListener;
+        if( !sendingData && ReadyToSendData() )
+        {
+            ConnectData();
+        }
     }
 
     public void ParentDisconnected( LanguageObject parent, ILanguageObjectListener parentListener )
     {
+        if( sendingData && !ReadyToSendData() )
+        {
+            DisconnectData();
+        }
         myParent = null;
     }
 
