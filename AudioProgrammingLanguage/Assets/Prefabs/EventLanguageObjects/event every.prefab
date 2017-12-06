@@ -43,7 +43,7 @@ GameObject:
   - component: {fileID: 114078961035514722}
   - component: {fileID: 114939518135276644}
   m_Layer: 0
-  m_Name: event repeat every
+  m_Name: event every
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -241,7 +241,7 @@ TextMesh:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1883107567509142}
-  m_Text: 'repeat every 3
+  m_Text: 'every 3
 
     (0/3)'
   m_OffsetZ: 0
@@ -270,7 +270,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   myChildren: []
   myParent: {fileID: 0}
-  prefabGeneratedFrom: event repeat every
+  prefabGeneratedFrom: event every
 --- !u!114 &114094008282324412
 MonoBehaviour:
   m_ObjectHideFlags: 1

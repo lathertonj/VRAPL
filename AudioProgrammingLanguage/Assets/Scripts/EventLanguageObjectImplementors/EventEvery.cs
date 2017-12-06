@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(EventLanguageObject))]
-public class EventRepeatEvery : MonoBehaviour , IEventLanguageObjectListener , IEventLanguageObjectEmitter 
+public class EventEvery : MonoBehaviour , IEventLanguageObjectListener , IEventLanguageObjectEmitter 
 {
     // object
     public MeshRenderer myBox;
@@ -96,7 +96,7 @@ public class EventRepeatEvery : MonoBehaviour , IEventLanguageObjectListener , I
     private void Update()
     {
         // set my text with gotten value of mynumrepeats
-        myText.text = string.Format("repeat every {0}\n({1}/{0})", myDisplayMaxNum, myDisplayCurrentNum );
+        myText.text = string.Format("every {0}\n({1}/{0})", myDisplayMaxNum, myDisplayCurrentNum );
         // callback for next time
         myChuck.GetInt( myMaxRepeats, myMaxNumCallback );
         myChuck.GetInt( myCurrentRepeats, myCurrentRepeatsCallback );
@@ -255,7 +255,7 @@ public class EventRepeatEvery : MonoBehaviour , IEventLanguageObjectListener , I
 
     public string VisibleName()
     {
-        return "repeat immediately";
+        return "every";
     }
 
     public void SizeChanged( float newSize )

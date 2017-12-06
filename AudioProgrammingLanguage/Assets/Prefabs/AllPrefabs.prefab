@@ -124,5 +124,5 @@ MonoBehaviour:
     prefab: {fileID: 1958857918817802, guid: 104972e7c0969624fb7b79b32ab29fe9, type: 2}
   - name: event repeat immediately
     prefab: {fileID: 1578381858413214, guid: ac3474d7ee6591448a68f946a5a2690c, type: 2}
-  - name: event repeat every
+  - name: event every
     prefab: {fileID: 1274625705419654, guid: a0db36a0bf50bd74baff8857b207cfae, type: 2}
