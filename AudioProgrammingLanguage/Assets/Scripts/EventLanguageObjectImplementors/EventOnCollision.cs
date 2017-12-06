@@ -7,11 +7,17 @@ using UnityEngine;
 [RequireComponent(typeof(EventNotifyController))]
 public class EventOnCollision : MonoBehaviour , IEventLanguageObjectEmitter , IEventNotifyResponder
 {
+    public MeshRenderer myBox;
+
     private EventNotifyController myCollisionEventNotifier;
 
     private ChuckSubInstance myChuck;
     private string myTriggerEvent;
     private int myNumNumberChildren = 0;
+
+    private int animationFrames = 16;
+    private int animationFramesLeft = 0;
+    private float targetHue;
 
     public void InitLanguageObject( ChuckSubInstance chuck )
     {
@@ -47,7 +53,25 @@ public class EventOnCollision : MonoBehaviour , IEventLanguageObjectEmitter , IE
 
     public void ShowEmit()
     {
-        // TODO: change the block's appearance when it processes a collision
+        // change the block's appearance when it processes a collision
+        animationFramesLeft = animationFrames;
+        //Debug.Log("frames left! " + animationFramesLeft );
+        targetHue = UnityEngine.Random.Range( 0.0f, 1.0f );
+    }
+
+    private void Update()
+    {
+        // set color according to recent collision
+        if( animationFramesLeft >= 0 )
+        {
+            //Debug.Log(string.Format("hue {0}, saturation {1}", targetHue, animationFramesLeft * 1.0f / animationFrames ));
+            myBox.material.color = Color.HSVToRGB(
+                targetHue,
+                animationFramesLeft * 1.0f / animationFrames,
+                1.0f
+            );
+            animationFramesLeft--;
+        }
     }
 
     public string InputConnection( LanguageObject whoAsking )

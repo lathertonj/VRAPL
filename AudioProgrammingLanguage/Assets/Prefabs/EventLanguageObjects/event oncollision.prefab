@@ -23,7 +23,7 @@ GameObject:
   - component: {fileID: 65364598977645548}
   - component: {fileID: 23904221787822266}
   m_Layer: 0
-  m_Name: addforce cube
+  m_Name: oncollision cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -103,7 +103,7 @@ Transform:
   m_GameObject: {fileID: 1047784379385964}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.28, y: 0.15, z: 0.15}
+  m_LocalScale: {x: 0.3027079, y: 0.08658365, z: 0.15}
   m_Children: []
   m_Father: {fileID: 4872176266351934}
   m_RootOrder: 1
@@ -304,6 +304,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d0d22b8ac3eef634e87b4c79d2cb59b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  myBox: {fileID: 23904221787822266}
 --- !u!114 &114961138642826702
 MonoBehaviour:
   m_ObjectHideFlags: 1
