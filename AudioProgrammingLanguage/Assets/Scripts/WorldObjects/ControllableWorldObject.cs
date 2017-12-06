@@ -5,7 +5,7 @@ using UnityEngine;
 
 
 [RequireComponent(typeof(Rigidbody))]
-[RequireComponent(typeof(WorldObject))]
+//[RequireComponent(typeof(WorldObject))]
 public class ControllableWorldObject : MonoBehaviour , IControllable
 {
     public string[] myAcceptableControls = new string[] { "force: x", "force: y", "force: z" };
