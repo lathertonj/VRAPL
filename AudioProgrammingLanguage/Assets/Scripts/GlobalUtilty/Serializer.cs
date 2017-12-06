@@ -11,6 +11,7 @@ public class Serializer : MonoBehaviour {
     private static int mySerialCounter = 0;
     
     public bool shouldLoad = true;
+    public bool shouldStore = true;
 
     private void Start()
     {
@@ -30,6 +31,12 @@ public class Serializer : MonoBehaviour {
 
     private void OnApplicationQuit()
     {
+        // don't store if flag
+        if( !shouldStore )
+        {
+            return;
+        }
+
         // make sure we're on the ground
         while( TheRoom.InAFunction() )
         {
