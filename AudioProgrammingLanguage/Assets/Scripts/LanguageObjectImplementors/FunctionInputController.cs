@@ -38,11 +38,10 @@ public class FunctionInputController : MonoBehaviour , ILanguageObjectListener
             }}
 
             Gain g @=> {0}.myGain;
-            {0}.myGain => {2};
 
             {1} => now;
 
-        ", myStorageClass, myExitEvent, myParent.InputConnection( myLO ) ));
+        ", myStorageClass, myExitEvent ));
 
         // store chuck
         myChuck = chuck;

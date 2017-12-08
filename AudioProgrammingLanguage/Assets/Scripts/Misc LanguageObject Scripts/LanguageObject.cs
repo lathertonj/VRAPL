@@ -55,6 +55,11 @@ public class LanguageObject : MonoBehaviour {
         if( c != null )
         {
             c.isTrigger = true;
+            // Change layer to LanguageObject Layer ONLY if it was previously 0 / Default (i.e. unset)
+            if( c.gameObject.layer == 0 )
+            {
+                c.gameObject.layer = LayerMask.NameToLayer("LanguageObject");
+            }
         }
         // does not use gravity, is kinematic
         Rigidbody rb = self.GetComponent<Rigidbody>();
