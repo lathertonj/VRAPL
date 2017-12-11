@@ -38,6 +38,8 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
     private int myFunctionId = -1;
 
     private ChuckSubInstance myChuck = null;
+    private string myStorageClass;
+    private string myExitEvent;
 
     private ILanguageObjectListener myParent = null;
 
@@ -56,19 +58,30 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
         defaultParams = new string[] { "no valid params" };
 
         // init chuck
-         myChuck = chuck;
-        //// tell my external params
-        //TellParamChildrenGotChuck( chuck );
-        //// tell my output, which might make it back to my external non-params 
-        //myOutput.GetComponent<LanguageObject>().TellChildrenHaveNewChuck( chuck );
+        myChuck = chuck;
+        myStorageClass = myChuck.GetUniqueVariableName();
+        myExitEvent = myChuck.GetUniqueVariableName();
+
+        chuck.RunCode( string.Format( @"
+            external Event {1};
+            public class {0} 
+            {{
+                static Gain @ myOutGain;
+                static Gain @ myInGain;
+            }}
+
+            Gain g1 @=> {0}.myOutGain;
+            Gain g2 @=> {0}.myInGain;
+
+            {1} => now;
+
+        ", myStorageClass, myExitEvent ));
     }
 
     public void CleanupLanguageObject( ChuckSubInstance chuck )
     {
-        //// tell my output
-        //myOutput.GetComponent<LanguageObject>().TellChildrenLosingChuck( chuck );
-        //// tell my external params
-        //TellParamChildrenLosingChuck( chuck );
+        // TODO: necessary to Unhook my output from me?
+        myChuck.BroadcastEvent( myExitEvent );
         myChuck = null;
 
         // cleanup object
@@ -81,6 +94,7 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
     // Use this for initialization
     void Start () {
 		HookUpOutput();
+        HookUpInput();
 	}
 	
 	private void HookUpOutput()
@@ -96,16 +110,43 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
             // output should ALWAYS be the first child
             me.myChildren.Insert( 0, output );
             myOutput.myFunction = this;
+
+            // TODO: does this need to happen inside the if block or outside it?
+            // hook up output block to MY output, so that output will be heard by outside the object
+            myChuck.RunCode( string.Format( "{0} => {1};", myOutput.OutputConnection(), OutputConnection() ) );
         }
     }
 
     private void UnhookOutput()
     {
-        // hook up output to me as a child.
+        // unhook up output to me as a child.
         LanguageObject output = myOutput.GetComponent<LanguageObject>();
         LanguageObject me = GetComponent<LanguageObject>();
         output.myParent = null;
         me.myChildren.Remove( output );
+
+        // unhook up output block from MY output, so that output will not be heard by outside the object
+        myChuck.RunCode( string.Format( "{0} =< {1};", myOutput.OutputConnection(), OutputConnection() ) );
+    }
+
+    private void HookUpInput()
+    {
+        LanguageObject input = myInput.GetComponent<LanguageObject>();
+        LanguageObject me = GetComponent<LanguageObject>();
+
+        // my input gain (which captures my args) --> my input block 
+        //                 (--> other blocks --> my output block --> my output gain)
+        myChuck.RunCode( string.Format( "{0} => {1};", InputConnection( input ), myInput.InputConnection( me ) ) );
+
+    }
+
+    private void UnhookInput()
+    {
+        LanguageObject input = myInput.GetComponent<LanguageObject>();
+        LanguageObject me = GetComponent<LanguageObject>();
+
+        // my input gain (which captures my args) --< my input block 
+        myChuck.RunCode( string.Format( "{0} =< {1};", InputConnection( input ), myInput.InputConnection( me ) ) );
     }
 
     public void ParentConnected( LanguageObject parent, ILanguageObjectListener parentListener )
@@ -264,24 +305,8 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
             // only replace ones other than myself
             if( fc != this )
             {
-                // turn off chuck?
-                LanguageObject functionLanguageObject = fc.GetComponent<LanguageObject>();
-                // TODO: fix post-refactor
-                /*ChuckSubInstance chuckOfFc = functionLanguageObject.GetChuck();
-                bool shouldResetChuck = chuckOfFc != null;
-                if( shouldResetChuck )
-                {
-                    functionLanguageObject.TellChildrenLosingChuck( chuckOfFc );
-                }
-
                 // replace inner blocks
                 fc.ReplaceInnerBlocks( myBlocks );
-                
-                // turn chuck back on?
-                if( shouldResetChuck )
-                {
-                    functionLanguageObject.TellChildrenHaveNewChuck( chuckOfFc );
-                }*/
             }
         }
     }
@@ -292,6 +317,7 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
         TheRoom.EnterFunction( this );
 
         UnhookOutput();
+        UnhookInput();
         ClearParams();
         Destroy( myBlocks );
         myBlocks = new GameObject();
@@ -315,6 +341,7 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
         FindOutput();
         HookUpOutput();
         FindInput();
+        HookUpInput();
         RectifyOuterParams();
 
         // Tell TheRoom that the user is no longer "inside" me -- done copying
@@ -416,13 +443,12 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
     
     public string InputConnection( LanguageObject whoAsking )
     {
-        // TODO: return some error if myInput doesn't have a chuck?
-        return myInput.InputConnection( whoAsking );
+        return string.Format( "{0}.myInGain", myStorageClass );
     }
 
     public string OutputConnection()
     {
-        return myOutput.OutputConnection();
+        return string.Format( "{0}.myOutGain", myStorageClass );
     }
 
     public string AddParam( FunctionParamController newParam, string name )
@@ -533,65 +559,6 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
     {
         myTeleportationFloor.enabled = enabled;
     }
-
-    //// helper functions called by my Input block
-    //public void TellUgenChildrenGotChuck( ChuckSubInstance chuck )
-    //{
-    //    List<LanguageObject> myChildren = GetComponent< LanguageObject >().myChildren;
-    //    foreach( LanguageObject child in myChildren )
-    //    {
-    //        // don't need to notify my Output block or any of my param blocks
-    //        // since they are not connected into my Input block
-    //        if( child.GetComponent< FunctionOutputController >() != null ||
-    //            child.GetComponent< ParamController >() != null )
-    //        {
-    //            continue;
-    //        }
-    //        child.TellChildrenHaveNewChuck( chuck );
-    //    }
-    //}
-
-    //public void TellUgenChildrenLosingChuck( ChuckSubInstance chuck )
-    //{
-    //    List<LanguageObject> myChildren = GetComponent< LanguageObject >().myChildren;
-    //    foreach( LanguageObject child in myChildren )
-    //    {
-    //        // don't need to notify my Output block or any of my param blocks
-    //        // since they are not connected into my Input block
-    //        if( child.GetComponent< FunctionOutputController >() != null ||
-    //            child.GetComponent< ParamController >() != null )
-    //        {
-    //            continue;
-    //        }
-    //        child.TellChildrenLosingChuck( chuck );
-    //    }
-    //}
-
-    //private void TellParamChildrenGotChuck( ChuckSubInstance chuck )
-    //{
-    //    List<LanguageObject> myChildren = GetComponent< LanguageObject >().myChildren;
-    //    foreach( LanguageObject child in myChildren )
-    //    {
-    //        // notify only paramcontroller blocks
-    //        if( child.GetComponent< ParamController >() != null )
-    //        {
-    //            child.TellChildrenHaveNewChuck( chuck );
-    //        }
-    //    }
-    //}
-
-    //private void TellParamChildrenLosingChuck( ChuckSubInstance chuck )
-    //{
-    //    List<LanguageObject> myChildren = GetComponent< LanguageObject >().myChildren;
-    //    foreach( LanguageObject child in myChildren )
-    //    {
-    //        // notify only paramcontroller blocks
-    //        if( child.GetComponent< ParamController >() != null )
-    //        {
-    //            child.TellChildrenLosingChuck( chuck );
-    //        }
-    //    }
-    //}
 
     public string[] SerializeStringParams( int version )
     {
