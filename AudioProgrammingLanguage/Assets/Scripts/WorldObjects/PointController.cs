@@ -36,13 +36,20 @@ public class PointController : MonoBehaviour , IMoveMyself , IControllerInputAcc
     float currentSaturation;
     float currentColorValue;
 
-	// Use this for initialization
-	void Start () {
+	void Awake()
+    {
 		rodOrigScale = myRod.localScale;
         myHeightControllers = new List<ControlWorldObjectController>();
         myAcceptableControls = new string[] { "height" };
 
         Color.RGBToHSV( mySphereRenderer.material.color, out currentHue, out currentSaturation, out currentColorValue );
+
+        // send to the floor
+        Vector3 myTransformPosition = transform.position;
+        myTransformPosition.y = 0;
+        transform.position = myTransformPosition;
+        // point straight up
+        transform.eulerAngles = Vector3.zero;
 	}
 
     void UpdateHue()
