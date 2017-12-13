@@ -196,8 +196,8 @@ public class PickUpObjects : MonoBehaviour {
 
         LanguageObject collidingLanguageObject = SearchFor< LanguageObject >( collidingObject.transform );
         
-        // only allow duplication if colliding language object has no chuck
-        if( collidingLanguageObject != null && collidingLanguageObject.GetChuck() == null )
+        // OLD: only allow duplication if colliding language object has no chuck
+        if( collidingLanguageObject != null )// && collidingLanguageObject.GetChuck() == null )
         {
 
             grippedObject = collidingLanguageObject.GetClone().gameObject;

@@ -20,6 +20,8 @@ public class WorldObject : MonoBehaviour
 
     private IControllable myControllable;
 
+    private int myWorldObjectID;
+
 	// Use this for initialization
 	void Start () {
         myPrograms = new Dictionary<DacController, bool>();

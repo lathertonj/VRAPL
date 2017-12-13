@@ -117,13 +117,13 @@ public class EventLanguageObject : LanguageObject {
         base.RemoveFromParent();
     }
 
-    public override ChuckSubInstance GetChuck()
+    /*public override ChuckSubInstance GetChuck()
     {
         // only connect things to TheSubChuck...
         // This might need to be here so that numbers, etc. know they are
         // properly hooked up when they are properly hooked up
         return TheSubChuck.Instance;
-    }
+    }*/
 
     private IEventLanguageObjectEmitter FindClosestEmitter()
     {

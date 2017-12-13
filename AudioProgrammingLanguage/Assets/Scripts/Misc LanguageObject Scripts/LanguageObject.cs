@@ -227,9 +227,6 @@ public class LanguageObject : MonoBehaviour {
                 return;
             }
 
-            ChuckSubInstance myChuck = GetChuck();
-            ChuckSubInstance theirChuck = entering.GetChuck();
-
             if( !entering.myLOListener.AcceptableChild( this, myLOListener ) )
             {
                 // "entering" will not consider me as a child
@@ -252,13 +249,6 @@ public class LanguageObject : MonoBehaviour {
                     entering.myLOListener.ParentConnected( this, myLOListener );
                     // Signal to outside-me that I have a new child, which is entering
                     myLOListener.ChildConnected( entering, entering.myLOListener );
-                    
-                    //// entering has become my child.
-                    //if( myChuck != null && theirChuck == null )
-                    //{
-                    //    // I will tell them they have a chuck now.
-                    //    entering.TellChildrenHaveNewChuck( myChuck );
-                    //}
                 }
             }
             // Entering will consider me as a child, but is this a valid relationship?
@@ -274,13 +264,6 @@ public class LanguageObject : MonoBehaviour {
                 myLOListener.ParentConnected( myParent, myParent.myLOListener );
                 // Signal to outside that it has a new child, me.
                 entering.myLOListener.ChildConnected( this, myLOListener );
-                
-                //// I have become entering's child
-                //if( myChuck == null && theirChuck != null )
-                //{
-                //    // I will tell my children that now we have a chuck!
-                //    TellChildrenHaveNewChuck( theirChuck );
-                //}
             }
         }
         
@@ -308,13 +291,6 @@ public class LanguageObject : MonoBehaviour {
 
     public virtual void RemoveFromParent()
     {
-        //ChuckSubInstance myChuck = GetChuck();
-        //if( !HaveOwnChuck() && myChuck != null )
-        //{
-        //    // we don't have our own chuck, and we currently have access to one through
-        //    // our parent. so, we will lose our chuck
-        //    TellChildrenLosingChuck( myChuck );
-        //}
         // remove self from parent's children
         myParent.myChildren.Remove( this );
         // signal to my parent that they are losing me as a child
@@ -363,7 +339,7 @@ public class LanguageObject : MonoBehaviour {
         return null;
     }
 
-    public virtual ChuckSubInstance GetChuck()
+    /*public virtual ChuckSubInstance GetChuck()
     {
         if( HaveOwnChuck() )
         {
@@ -396,69 +372,7 @@ public class LanguageObject : MonoBehaviour {
         {
             return gameObject.GetComponent<ChuckSubInstance>() != null;
         }
-    }
-
-    /*public void TellChildrenHaveNewChuck( ChuckSubInstance chuck )
-    {
-        // short circuit return before getting chuck if I am connecting to a function and its input doesn't have chuck
-        if( FunctionChildShouldNotGetChuck() )
-        {
-            return;
-        }
-        // tell myself
-        ((ILanguageObjectListener) GetComponent(typeof(ILanguageObjectListener))).GotChuck( chuck );
-
-        // short circuit return before telling children if I am a Function -- it already happened manually
-        if( GetComponent<FunctionController>() != null )
-        {
-            return;
-        }
-
-        // tell children
-        foreach( LanguageObject child in myChildren )
-        {
-            child.TellChildrenHaveNewChuck( chuck );
-        }
     }*/
-
-    /*public void TellChildrenLosingChuck( ChuckSubInstance chuck )
-    {
-        // short circuit return before losing chuck if I am connecting to a function and its input doesn't have chuck
-        if( FunctionChildShouldNotGetChuck() )
-        {
-            return;
-        }
-        
-        // only tell children losing chuck if I am not a function -- otherwise I'll do it manually
-        if( GetComponent<FunctionController>() == null )
-        {
-            foreach( LanguageObject child in myChildren )
-            {
-                child.TellChildrenLosingChuck( chuck );
-            }
-        }
-        
-        // tell myself
-        ((ILanguageObjectListener) GetComponent(typeof(ILanguageObjectListener))).LosingChuck( chuck );
-    }*/
-
-    /*private bool FunctionChildShouldNotGetChuck()
-    {
-        // param controllers get connected automatically if fn has chuck
-        // otherwise, if it's not a paramcontroller, and the parent is a function, and the function's
-        // input has no chuck, then we shouldn't be connecting / disconnecting it.
-        FunctionController maybeParentFunction = ( myParent != null ? myParent.GetComponent<FunctionController>() : null );
-        if( GetComponent<ParamController>() == null && // I am not a param controller
-            maybeParentFunction != null && // my parent is a function
-            GetComponent<FunctionOutputController>() == null && // I am not a function output controller
-            !maybeParentFunction.myInput.CurrentlyHaveChuck() ) // the function's input has no chuck
-        {
-            // I should not be connected / disconnected
-            return true;
-        }
-        return false;
-    }
-    */
 
     public LanguageObject GetClone()
     {
@@ -484,8 +398,6 @@ public class LanguageObject : MonoBehaviour {
         copy.prefabGeneratedFrom = prefabGeneratedFrom;
         ILanguageObjectListener copyListener = (ILanguageObjectListener) copy.GetComponent( typeof(ILanguageObjectListener) );
         
-        ChuckSubInstance parentChuck = parent != null ? parent.GetChuck() : null;
-
         // make it a child of the parent
         if( parent != null )
         {
@@ -499,14 +411,6 @@ public class LanguageObject : MonoBehaviour {
             // notify the objects
             copyListener.ParentConnected( parent, parentListener );
             parentListener.ChildConnected( copy, copy.myLOListener );
-
-            // do I have a chuck now?
-            if( parentChuck != null )
-            {
-                // I will tell myself and my children that now we have a chuck!
-                // TODO: fix serialization
-                // TellChildrenHaveNewChuck( parentChuck );
-            }
         }
 
         // clone object-specific settings
@@ -629,8 +533,6 @@ public class LanguageObject : MonoBehaviour {
         prefabGeneratedFrom = storage.prefabName;
         ILanguageObjectListener meListener = (ILanguageObjectListener) GetComponent( typeof(ILanguageObjectListener) );
         
-        ChuckSubInstance parentChuck = ( parent != null ) ? parent.GetChuck() : null;
-
         // make it a child of the parent
         if( parent != null )
         {
@@ -646,17 +548,6 @@ public class LanguageObject : MonoBehaviour {
         // clone object-specific settings
         meListener.SerializeLoad( storage.version, storage.stringParams, storage.intParams, 
             storage.floatParams, storage.objectParams );
-
-        // do I have a chuck now?
-        if( parentChuck != null )
-        {
-            // I will tell myself and my children that now we have a chuck!
-            // (children are deserialized below, so this is just really myself
-            //  and any children created via SerializeLoad(), such as
-            //  a function's FunctionOutputController)
-            // TODO: fix serialization
-            // TellChildrenHaveNewChuck( parentChuck );
-        }
         
         // clone other settings such as size from MovableController and what else?
         MovableController mc = GetComponent<MovableController>();

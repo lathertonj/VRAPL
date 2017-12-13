@@ -55,7 +55,7 @@ public class Serializer : MonoBehaviour {
         for( int i = 0; i < objects.Length; i++ )
         {
             LanguageObject maybeLanguageObject = objects[i].GetComponent<LanguageObject>();
-            if( maybeLanguageObject != null )
+            if( maybeLanguageObject != null && objects[i].activeInHierarchy )
             {
                 Serialize( maybeLanguageObject );
             }
