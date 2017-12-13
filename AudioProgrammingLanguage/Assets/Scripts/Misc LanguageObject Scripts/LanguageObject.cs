@@ -28,6 +28,8 @@ public class LanguageObject : MonoBehaviour {
 
     private ILanguageObjectListener myLOListener;
 
+    private int myLanguageObjectID = -1;
+
     protected void Awake()
     {
         // recursively make sure all my colliders are trigger colliders and that my rigidbodies do not use gravity, etc
@@ -41,6 +43,39 @@ public class LanguageObject : MonoBehaviour {
         
         myLOListener = (ILanguageObjectListener) GetComponent(typeof(ILanguageObjectListener));
         myLOListener.InitLanguageObject( TheSubChuck.Instance );
+    }
+
+    protected void Start()
+    {
+        // assign myself an ID if I didn't get one after my Awake()
+        // (i.e. I am a completely new object, not being deserialized)
+        if( myLanguageObjectID == -1 )
+        {
+            SetLanguageObjectID( APLIDSystem.GetNewID( "LanguageObject" ) );
+        }
+    }
+
+    // ID system: others can GetID() on a LanguageObject, and later on can GetLanguageObjectByID()
+    public int GetID()
+    {
+        return myLanguageObjectID;
+    }
+
+    public static LanguageObject GetLanguageObjectBYID( int id )
+    {
+        if( !allLanguageObjects.ContainsKey( id ) )
+        {
+            return null;
+        }
+        return allLanguageObjects[id];
+    }
+
+    // private: storage via dictionary
+    private static Dictionary<int, LanguageObject> allLanguageObjects = new Dictionary<int, LanguageObject>();
+    private void SetLanguageObjectID( int id )
+    {
+        myLanguageObjectID = id;
+        allLanguageObjects[id] = this;
     }
 
     protected void OnDestroy()
@@ -514,6 +549,7 @@ public class LanguageObject : MonoBehaviour {
         myStorage.objectParams = myObject.SerializeObjectParams( myStorage.version );
 
         // languageobject params
+        myStorage.languageObjectID = myLanguageObjectID;
         myStorage.prefabName = prefabGeneratedFrom;
         myStorage.transformPosition = Serializer.SerializeVector3( transform.localPosition );
         myStorage.transformRotation = Serializer.SerializeQuaternion( transform.localRotation );
@@ -586,6 +622,10 @@ public class LanguageObject : MonoBehaviour {
     private void DeserializeObjectHelper( LanguageObjectSerialStorage storage,
         LanguageObject parent, ILanguageObjectListener parentListener )
     {
+        // store my ID
+        SetLanguageObjectID( storage.languageObjectID );
+
+        // prefab
         prefabGeneratedFrom = storage.prefabName;
         ILanguageObjectListener meListener = (ILanguageObjectListener) GetComponent( typeof(ILanguageObjectListener) );
         
@@ -694,6 +734,7 @@ public struct LanguageObjectSerialStorage
 
     // populated by LanguageObject
     public int version;
+    public int languageObjectID;
     public string prefabName;
     public LanguageObjectSerialStorage[] children;
     public float[] transformScale;

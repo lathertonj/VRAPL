@@ -7,7 +7,6 @@ using UnityEngine;
 public class FunctionController : MonoBehaviour , ILanguageObjectListener, IParamAcceptor
 {
     private static Dictionary< int, List< FunctionController > > allFunctions = null;
-    private static int currentFunctionId = 0;
 
     public FunctionInputController myInput;
     public FunctionOutputController myOutput;
@@ -206,8 +205,7 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
 
         if( other.myFunctionId == -1 )
         {
-            other.myFunctionId = currentFunctionId;
-            currentFunctionId++;
+            other.myFunctionId = APLIDSystem.GetNewID( "FunctionController" );
             allFunctions[ other.myFunctionId ] = new List< FunctionController >();
             allFunctions[ other.myFunctionId ].Add( other );
         }
@@ -607,8 +605,8 @@ public class FunctionController : MonoBehaviour , ILanguageObjectListener, IPara
             allFunctions[myFunctionId].Add( this );
         }
         // in order to avoid overwriting existing function IDs,
-        // currentFunctionId needs to be AT LEAST this functionID + 1
-        FunctionController.currentFunctionId = Mathf.Max( currentFunctionId, myFunctionId + 1 );
+        // declare this function ID is used
+        APLIDSystem.DeclareIDUsed( "FunctionController", myFunctionId );
 
         // load inner blocks from serialization
         GameObject newMyBlocks = new GameObject();
