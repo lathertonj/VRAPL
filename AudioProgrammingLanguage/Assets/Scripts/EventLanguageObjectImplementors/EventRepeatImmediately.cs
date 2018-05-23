@@ -40,9 +40,9 @@ public class EventRepeatImmediately : MonoBehaviour , IEventLanguageObjectListen
         myNumRepeatsCallback = Chuck.CreateGetIntCallback( GetNumRepeats );
 
         myChuck.RunCode( string.Format( @"
-            external Event {1};
-            external Event {2};
-            external int {3};
+            global Event {1};
+            global Event {2};
+            global int {3};
 
             public class {0}
             {{
@@ -121,9 +121,9 @@ public class EventRepeatImmediately : MonoBehaviour , IEventLanguageObjectListen
         // listen for the new event
         mySmallerExitEvent = theChuck.GetUniqueVariableName();
         theChuck.RunCode( string.Format( @"
-            external Event {1};
-            external Event {2};
-            external Event {3};
+            global Event {1};
+            global Event {2};
+            global Event {3};
 
             fun void BroadcastEvents()
             {{
@@ -198,7 +198,7 @@ public class EventRepeatImmediately : MonoBehaviour , IEventLanguageObjectListen
             // is it the last number source? --> turn on my default
             if( myNumNumberChildren == 0 )
             {
-                TheSubChuck.Instance.RunCode( string.Format( 
+                TheSubChuck.instance.RunCode( string.Format( 
                     "1 => {0}.myDefaultValue.gain;", myStorageClass 
                 ) );
             }

@@ -42,7 +42,7 @@ public class LanguageObject : MonoBehaviour {
         exitingDebounceColliders = new Dictionary<LanguageObject, Collider>();
         
         myLOListener = (ILanguageObjectListener) GetComponent(typeof(ILanguageObjectListener));
-        myLOListener.InitLanguageObject( TheSubChuck.Instance );
+        myLOListener.InitLanguageObject( TheSubChuck.instance );
     }
 
     protected void Start()
@@ -80,7 +80,7 @@ public class LanguageObject : MonoBehaviour {
 
     protected void OnDestroy()
     {
-        myLOListener.CleanupLanguageObject( TheSubChuck.Instance );
+        myLOListener.CleanupLanguageObject( TheSubChuck.instance );
     }
 
     void EnsureTriggerBehavior( Transform self )

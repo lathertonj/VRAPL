@@ -38,12 +38,12 @@ public class WireController : MonoBehaviour , IControllerInputAcceptor {
         myEnd = transform;
 
         // my chuck gain
-        myChuck = TheSubChuck.Instance;
+        myChuck = TheSubChuck.instance;
         myGain = myChuck.GetUniqueVariableName();
         myExitEvent = myChuck.GetUniqueVariableName();
         myChuck.RunCode( string.Format( @"
-            external Event {1};
-            external Gain {0};
+            global Event {1};
+            global Gain {0};
         ", myGain, myExitEvent ) );
     }
 
@@ -67,7 +67,7 @@ public class WireController : MonoBehaviour , IControllerInputAcceptor {
         {
             myChuck.RunCode( string.Format( @"
                 // disconnect input from myGain
-                {0} =< external Gain {1};
+                {0} =< global Gain {1};
                 // disconnect myGain from output
                 {1} =< {2};
                 // assign null to myGain (will it crash?)
@@ -105,7 +105,7 @@ public class WireController : MonoBehaviour , IControllerInputAcceptor {
             myStartConnection = myStartLO.OutputConnection();
             myEndConnection = myEndLO.InputConnection( startLanguageObject );
             myChuck.RunCode( string.Format(
-                @"{0} => external Gain {1} => {2};", 
+                @"{0} => global Gain {1} => {2};", 
                 myStartConnection, myGain, myEndConnection
             ));
         }

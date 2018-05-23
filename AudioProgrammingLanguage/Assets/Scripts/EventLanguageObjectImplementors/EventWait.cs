@@ -38,8 +38,8 @@ public class EventWait : MonoBehaviour , IEventLanguageObjectListener , IEventLa
         myOverallExitEvent = myChuck.GetUniqueVariableName();
 
         myChuck.RunCode( string.Format( @"
-            external Event {1};
-            external Event {2};
+            global Event {1};
+            global Event {2};
 
             public class {0}
             {{
@@ -127,9 +127,9 @@ public class EventWait : MonoBehaviour , IEventLanguageObjectListener , IEventLa
         // listen for the new event
         mySmallerExitEvent = theChuck.GetUniqueVariableName();
         theChuck.RunCode( string.Format( @"
-            external Event {1};
-            external Event {2};
-            external Event {3};
+            global Event {1};
+            global Event {2};
+            global Event {3};
 
             fun void BroadcastEvents()
             {{
@@ -203,7 +203,7 @@ public class EventWait : MonoBehaviour , IEventLanguageObjectListener , IEventLa
             // is it the last number source? --> turn on my default
             if( myNumNumberChildren == 0 )
             {
-                TheSubChuck.Instance.RunCode( string.Format( 
+                TheSubChuck.instance.RunCode( string.Format( 
                     "1 => {0}.myDefaultValue.gain;", myStorageClass 
                 ) );
             }

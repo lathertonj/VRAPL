@@ -33,7 +33,7 @@ public class EventLanguageObject : LanguageObject {
         if( myMaybeEmitter != null )
         {
             // tell emitter when its trigger goes
-            bool ret = TheSubChuck.Instance.StartListeningForChuckEvent( myMaybeEmitter.ExternalEventSource(),
+            bool ret = TheSubChuck.instance.StartListeningForChuckEvent( myMaybeEmitter.ExternalEventSource(),
                 myOutgoingTriggerCallback );
             Debug.Log("emitter listening successful? " + (ret?"yes":"no"));
         }
@@ -166,16 +166,16 @@ public class EventLanguageObject : LanguageObject {
         if( myListeningTriggerEvent != "" )
         {
             // deregister
-            myMaybeListener.LosingListenEvent( TheSubChuck.Instance, myListeningTriggerEvent );
-            TheSubChuck.Instance.StopListeningForChuckEvent( myListeningTriggerEvent, myIncomingTriggerCallback );
+            myMaybeListener.LosingListenEvent( TheSubChuck.instance, myListeningTriggerEvent );
+            TheSubChuck.instance.StopListeningForChuckEvent( myListeningTriggerEvent, myIncomingTriggerCallback );
         }
         
         // register
         myListeningTriggerEvent = newTriggerEvent;
         if( myListeningTriggerEvent != "" )
         {
-            TheSubChuck.Instance.StartListeningForChuckEvent( myListeningTriggerEvent, myIncomingTriggerCallback );
-            myMaybeListener.NewListenEvent( TheSubChuck.Instance, newTriggerEvent );
+            TheSubChuck.instance.StartListeningForChuckEvent( myListeningTriggerEvent, myIncomingTriggerCallback );
+            myMaybeListener.NewListenEvent( TheSubChuck.instance, newTriggerEvent );
         }
     }
 

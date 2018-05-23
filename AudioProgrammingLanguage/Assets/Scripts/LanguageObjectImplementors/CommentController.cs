@@ -58,7 +58,7 @@ public class CommentController : MonoBehaviour, ILanguageObjectListener, IContro
         myExitEvent = chuck.GetUniqueVariableName();
 
         myChuck.RunCode( string.Format(
-            @"external Event {1};
+            @"global Event {1};
             public class {0}
             {{
                 static Gain @ myInput;
@@ -185,7 +185,7 @@ public class CommentController : MonoBehaviour, ILanguageObjectListener, IContro
         if( isPlayback )
         {
             // play back
-            TheSubChuck.Instance.RunCode( string.Format(
+            TheSubChuck.instance.RunCode( string.Format(
                 @"SndBuf s => dac;
                 ""{0}"" => s.read;
                 s.length() => now;

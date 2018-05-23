@@ -29,7 +29,7 @@ public class ComputerMusicController : MonoBehaviour , ILanguageObjectListener
 
         // run my script
         chuck.RunCode(string.Format(@"
-            external Event {0};
+            global Event {0};
             public class {1}
             {{
                 static TriOsc @ myOsc;

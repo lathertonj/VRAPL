@@ -63,7 +63,7 @@ public class UGenController : MonoBehaviour , ILanguageObjectListener, IParamAcc
         }
 
         string oscCreation = string.Format(@"
-            external Event {1};
+            global Event {1};
             public class {0}
             {{
                 static {2} @ myOsc;

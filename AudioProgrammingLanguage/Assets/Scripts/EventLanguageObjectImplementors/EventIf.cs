@@ -3,8 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(EventLanguageObject))]
-public class EventIf : MonoBehaviour , IEventLanguageObjectListener , IEventLanguageObjectEmitter {
+[RequireComponent( typeof( EventLanguageObject ) )]
+public class EventIf : MonoBehaviour, IEventLanguageObjectListener, IEventLanguageObjectEmitter
+{
 
     public MeshRenderer myThenBlock;
     private int numFramesToShowThenBlock = 0;
@@ -30,8 +31,8 @@ public class EventIf : MonoBehaviour , IEventLanguageObjectListener , IEventLang
         myOverallExitEvent = myChuck.GetUniqueVariableName();
 
         myChuck.RunCode( string.Format( @"
-            external Event {1};
-            external Event {2};
+            global Event {1};
+            global Event {2};
 
             public class {0}
             {{
@@ -44,8 +45,8 @@ public class EventIf : MonoBehaviour , IEventLanguageObjectListener , IEventLang
             // wait until told to exit
             {1} => now;
 
-            ", myStorageClass, myOverallExitEvent, myOutgoingTriggerEvent    
-        ));
+            ", myStorageClass, myOverallExitEvent, myOutgoingTriggerEvent
+        ) );
     }
 
     public void CleanupLanguageObject( ChuckSubInstance chuck )
@@ -104,9 +105,9 @@ public class EventIf : MonoBehaviour , IEventLanguageObjectListener , IEventLang
         // listen for the new event
         mySmallerExitEvent = theChuck.GetUniqueVariableName();
         theChuck.RunCode( string.Format( @"
-            external Event {1};
-            external Event {2};
-            external Event {3};
+            global Event {1};
+            global Event {2};
+            global Event {3};
 
             fun void BroadcastEvents()
             {{
@@ -122,7 +123,7 @@ public class EventIf : MonoBehaviour , IEventLanguageObjectListener , IEventLang
             // broadcast
             spork ~ BroadcastEvents();
             {3} => now;
-        ", myStorageClass, incomingEvent, myOutgoingTriggerEvent, mySmallerExitEvent ));
+        ", myStorageClass, incomingEvent, myOutgoingTriggerEvent, mySmallerExitEvent ) );
     }
 
     public void LosingListenEvent( ChuckSubInstance theChuck, string losingEvent )
@@ -130,7 +131,7 @@ public class EventIf : MonoBehaviour , IEventLanguageObjectListener , IEventLang
         // exit the shred that is listening to the old event
         theChuck.BroadcastEvent( mySmallerExitEvent );
     }
-    
+
     public void ParentConnected( LanguageObject parent, ILanguageObjectListener parentListener )
     {
         // don't care (will I ever have a parent?)
@@ -206,7 +207,7 @@ public class EventIf : MonoBehaviour , IEventLanguageObjectListener , IEventLang
         return LanguageObject.noStringParams;
     }
 
-    public void SerializeLoad( int version, string[] stringParams, int[] intParams, 
+    public void SerializeLoad( int version, string[] stringParams, int[] intParams,
         float[] floatParams, object[] objectParams )
     {
         // nothing to load

@@ -38,7 +38,7 @@ public class DurController : MonoBehaviour , ILanguageObjectListener , IControll
         myExitEvent = chuck.GetUniqueVariableName();
 
         chuck.RunCode(string.Format(@"
-            external Event {1};
+            global Event {1};
             public class {0}
             {{
                 static Gain @ myGain;

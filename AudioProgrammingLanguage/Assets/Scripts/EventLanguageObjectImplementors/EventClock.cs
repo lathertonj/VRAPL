@@ -30,8 +30,8 @@ public class EventClock : MonoBehaviour , IEventLanguageObjectEmitter {
         myExitEvent = theChuck.GetUniqueVariableName();
 
         theChuck.RunCode( string.Format( @"
-            external Event {1};
-            external Event {2};
+            global Event {1};
+            global Event {2};
 
             public class {0}
             {{

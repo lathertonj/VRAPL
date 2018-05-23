@@ -56,8 +56,8 @@ public class EventAddForce : MonoBehaviour , IEventLanguageObjectListener , ICon
         myValueFetchCallback = Chuck.CreateGetFloatCallback( GetMyValue );
 
         chuck.RunCode(string.Format(@"
-            external Event {1};
-            external float {2};
+            global Event {1};
+            global float {2};
             public class {0}
             {{
                 static Gain @ myGain;

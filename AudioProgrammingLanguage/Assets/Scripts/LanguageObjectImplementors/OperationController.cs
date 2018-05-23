@@ -41,8 +41,8 @@ public class OperationController : MonoBehaviour , ILanguageObjectListener , ICo
         myChangeOpEvent = chuck.GetUniqueVariableName();
 
         chuck.RunCode(string.Format(@"
-            external Event {1};
-            external Event {2};
+            global Event {1};
+            global Event {2};
             public class {0}
             {{
                 static Step @ myOutput;
@@ -72,7 +72,7 @@ public class OperationController : MonoBehaviour , ILanguageObjectListener , ICo
     {
         // end the last one by signaling the event at the beginning
         myChuck.RunCode( string.Format( @"
-            external Event {1};
+            global Event {1};
             {1}.broadcast();
 
             fun void DoTheOp()

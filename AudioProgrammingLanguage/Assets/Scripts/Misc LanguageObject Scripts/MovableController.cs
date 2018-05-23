@@ -1,10 +1,11 @@
-﻿    using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MovableController : MonoBehaviour {
+public class MovableController : MonoBehaviour
+{
 
-	public bool amBeingMoved = false;
+    public bool amBeingMoved = false;
     public bool amMovable = true;
     public Transform amBeingMovedBy = null;
     public Transform parentAfterMovement = null;
@@ -15,7 +16,7 @@ public class MovableController : MonoBehaviour {
     public float myMinScale = 1.0f;
 
     private ILanguageObjectListener myLanguageObject;
-    
+
     // only want to scale up and down the transforms that were part of me at the time
     // of my construction, so that inheriting language objects don't get changed too.
     private Transform[] myInitialChildren;
@@ -32,7 +33,7 @@ public class MovableController : MonoBehaviour {
             myInitialChildrenBaseScales[i] = myInitialChildren[i].localScale / myScale;
         }
 
-        myLanguageObject = (ILanguageObjectListener) GetComponent( typeof(ILanguageObjectListener) );
+        myLanguageObject = (ILanguageObjectListener) GetComponent( typeof( ILanguageObjectListener ) );
     }
 
     private void Update()

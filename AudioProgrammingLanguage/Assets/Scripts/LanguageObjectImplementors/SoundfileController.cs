@@ -67,7 +67,7 @@ public class SoundfileController : MonoBehaviour , ILanguageObjectListener, IPar
         myExitEvent = chuck.GetUniqueVariableName();
 
         string initCode = string.Format( @"
-            external Event {1};
+            global Event {1};
             public class {0}
             {{
                 static Gain @ myOutput;

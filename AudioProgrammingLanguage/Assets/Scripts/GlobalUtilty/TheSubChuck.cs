@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TheSubChuck : MonoBehaviour {
+public class TheSubChuck : MonoBehaviour
+{
+    public static ChuckSubInstance instance = null;
 
-    public static ChuckSubInstance Instance;
-
-    // Use this for initialization
-    private void Awake()
+    void Awake()
     {
-        Instance = GetComponent<ChuckSubInstance>();
-        Instance.chuckMainInstance = TheMainChuck.Instance;
+        if( instance == null )
+        {
+            instance = GetComponent<ChuckSubInstance>();
+        }
     }
 }

@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(EventLanguageObject))]
-[RequireComponent(typeof(EventNotifyController))]
-public class EventOnCollision : MonoBehaviour , IEventLanguageObjectEmitter , IEventNotifyResponder
+[RequireComponent( typeof( EventLanguageObject ) )]
+[RequireComponent( typeof( EventNotifyController ) )]
+public class EventOnCollision : MonoBehaviour, IEventLanguageObjectEmitter, IEventNotifyResponder
 {
     public MeshRenderer myBox;
 
@@ -30,9 +30,9 @@ public class EventOnCollision : MonoBehaviour , IEventLanguageObjectEmitter , IE
         myTriggerEvent = theChuck.GetUniqueVariableName();
 
         theChuck.RunCode( string.Format( @"
-            external Event {0};
-            ", myTriggerEvent    
-        ));
+            global Event {0};
+            ", myTriggerEvent
+        ) );
     }
 
     public void CleanupLanguageObject( ChuckSubInstance chuck )
@@ -94,7 +94,7 @@ public class EventOnCollision : MonoBehaviour , IEventLanguageObjectEmitter , IE
     {
         // don't care (will I ever have a parent?)
     }
-    
+
     public bool AcceptableChild( LanguageObject other, ILanguageObjectListener otherListener )
     {
         if( other.GetComponent<DataReporter>() != null ||
@@ -165,7 +165,7 @@ public class EventOnCollision : MonoBehaviour , IEventLanguageObjectEmitter , IE
         return LanguageObject.noStringParams;
     }
 
-    public void SerializeLoad( int version, string[] stringParams, int[] intParams, 
+    public void SerializeLoad( int version, string[] stringParams, int[] intParams,
         float[] floatParams, object[] objectParams )
     {
         // nothing to load
