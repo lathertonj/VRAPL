@@ -10,8 +10,9 @@ public class Serializer : MonoBehaviour {
     private static string myLanguageObjectSerialDir;
     private static int mySerialCounter = 0;
     
-    public bool shouldLoad = true;
+    public bool shouldLoad = false;
     public bool shouldStore = true;
+    public bool shouldLoadFromResources = true;
 
     private void Start()
     {
@@ -25,6 +26,20 @@ public class Serializer : MonoBehaviour {
             foreach( string file in Directory.GetFiles( myLanguageObjectSerialDir ) )
             {
                 DeserializeLanguageObject( file );
+            }
+        }
+
+        if( shouldLoadFromResources )
+        {
+            UnityEngine.Object[] savedPrograms = Resources.LoadAll( "SavedLanguageObjects" );
+            foreach( UnityEngine.Object program in savedPrograms )
+            {
+                TextAsset textAsset = program as TextAsset;
+                Stream stream = new MemoryStream( textAsset.bytes );
+                BinaryFormatter formatter = new BinaryFormatter();
+                LanguageObjectSerialStorage storage = (LanguageObjectSerialStorage) formatter.Deserialize( stream );
+                LanguageObject.DeserializeObject( storage );
+                
             }
         }
     }
@@ -65,7 +80,7 @@ public class Serializer : MonoBehaviour {
 
     public static void Serialize( LanguageObject o )
     {
-        string filenameLocation = string.Format( "{0}/{1}.dat", myLanguageObjectSerialDir, mySerialCounter );
+        string filenameLocation = string.Format( "{0}/{1}.bytes", myLanguageObjectSerialDir, mySerialCounter );
         mySerialCounter++;
         BinaryFormatter bf = new BinaryFormatter();
         FileStream file = File.Create( filenameLocation );
