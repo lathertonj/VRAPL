@@ -11,7 +11,7 @@ public class EventAddForce : MonoBehaviour , IEventLanguageObjectListener , ICon
     public TextMesh myText;
 
     // basics
-    private string[] myForceDirections = { "x", "y", "z" };
+    private string[] myForceDirections = { "y", "x", "z" };
     private int myCurrentForceDirectionIndex = 0;
 
     // storage

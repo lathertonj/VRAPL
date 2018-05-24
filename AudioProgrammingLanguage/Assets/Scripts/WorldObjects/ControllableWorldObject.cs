@@ -8,7 +8,7 @@ using UnityEngine;
 //[RequireComponent(typeof(WorldObject))]
 public class ControllableWorldObject : MonoBehaviour , IControllable
 {
-    public string[] myAcceptableControls = new string[] { "force: x", "force: y", "force: z" };
+    public string[] myAcceptableControls = new string[] { "force: y", "force: x", "force: z" };
 
     private Dictionary< string, List< ControlWorldObjectController > > myControllers;
     private Dictionary< string, float > currentControllerValues;
