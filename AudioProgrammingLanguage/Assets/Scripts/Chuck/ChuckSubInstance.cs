@@ -594,4 +594,9 @@ public class ChuckSubInstance : MonoBehaviour
         return chuckMainInstance.GetUniqueVariableName( prefix );
     }
 
+    public string GetSecretOutputUgen()
+    {
+        return myOutputUgen;
+    }
+
 }

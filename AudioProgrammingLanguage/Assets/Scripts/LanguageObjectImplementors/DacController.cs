@@ -94,7 +94,8 @@ public class DacController : MonoBehaviour , ILanguageObjectListener , IControll
 
     public string OutputConnection()
     {
-        return "dac";
+        // not "dac", because this might get run on a different subinstance if using wires
+        return "global Gain " + myChuck.GetSecretOutputUgen(); 
     }
 
     public void SizeChanged( float newSize )
