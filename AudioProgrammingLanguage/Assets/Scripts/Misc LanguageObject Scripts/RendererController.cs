@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 
-public class RendererController : MonoBehaviour {
+public class RendererController : MonoBehaviour
+{
     public static List<RendererController> allLanguageRenderers = new List<RendererController>();
     public static bool renderersCurrentlyRendering = true;
 
@@ -22,7 +23,7 @@ public class RendererController : MonoBehaviour {
 
     public void Restart()
     {
-        allLanguageRenderers.Add(this);
+        allLanguageRenderers.Add( this );
         myAutoRenderers = new List<Renderer>();
         myAutoShaders = new List<Shader>();
         myRenderersIsText = new List<bool>();
@@ -56,7 +57,7 @@ public class RendererController : MonoBehaviour {
         }
     }
 
-	public void EnableRenderers()
+    public void EnableRenderers()
     {
         foreach( Renderer r in myAutoRenderers )
         {
@@ -103,6 +104,20 @@ public class RendererController : MonoBehaviour {
             // try again
             PortalAction();
         }
+        catch( MissingReferenceException e )
+        {
+            // something went wrong. what was it? who knows?
+            myAutoRenderers = new List<Renderer>();
+            myAutoShaders = new List<Shader>();
+            myRenderersIsText = new List<bool>();
+            myRenderersIsGradient = new List<bool>();
+            myRenderersIsOutline = new List<bool>();
+
+            FindAllRenderers( transform );
+
+            // try again
+            PortalAction();
+        }
     }
 
     private void DangerousDeportalizeRenderers()
@@ -119,8 +134,7 @@ public class RendererController : MonoBehaviour {
             // cast shadows
             myAutoRenderers[i].shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
             */
-            
-            
+
             // use anti-hidden shader. text or gradient or default.
             if( myRenderersIsText[i] )
             {
@@ -211,7 +225,7 @@ public class RendererController : MonoBehaviour {
                 myAutoRenderers[i].enabled = enabled;
             }
         }
-        
+
     }
 
     public static void TurnOn()
@@ -221,6 +235,8 @@ public class RendererController : MonoBehaviour {
             // old: completely turn on the component
             // r.EnableRenderers();
             // new: become completely visible
+            // TODO why are some null?
+            if( r == null ) continue;
             r.DeportalizeRenderers();
         }
         renderersCurrentlyRendering = true;
@@ -233,6 +249,8 @@ public class RendererController : MonoBehaviour {
             // old: completely turn off the component
             // r.DisableRenderers();
             // new: become visible only through portal
+            // TODO why are some null?
+            if( r == null ) continue;
             r.PortalizeRenderers();
         }
         renderersCurrentlyRendering = false;

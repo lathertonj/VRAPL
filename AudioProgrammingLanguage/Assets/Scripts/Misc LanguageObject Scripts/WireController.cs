@@ -3,7 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WireController : MonoBehaviour , IControllerInputAcceptor {
+[RequireComponent( typeof( RendererController ) )]
+public class WireController : MonoBehaviour, IControllerInputAcceptor
+{
 
     public Transform myCylinder;
     public Color textColor;
@@ -72,9 +74,9 @@ public class WireController : MonoBehaviour , IControllerInputAcceptor {
                 {1} =< {2};
                 // assign null to myGain (will it crash?)
 //                null @=> {1};
-                ", 
+                ",
                 myStartConnection, myGain, myEndConnection
-            ));
+            ) );
         }
     }
 
@@ -93,8 +95,8 @@ public class WireController : MonoBehaviour , IControllerInputAcceptor {
         myEnd = end;
 
         // maybe hook up to chuck
-        myStartLO = (ILanguageObjectListener) start.GetComponent(typeof(ILanguageObjectListener));
-        myEndLO = (ILanguageObjectListener) end.GetComponent(typeof(ILanguageObjectListener));
+        myStartLO = (ILanguageObjectListener) start.GetComponent( typeof( ILanguageObjectListener ) );
+        myEndLO = (ILanguageObjectListener) end.GetComponent( typeof( ILanguageObjectListener ) );
         LanguageObject startLanguageObject = start.GetComponent<LanguageObject>();
 
         // if they both have language objects, and the end object would accept the start one as a child,
@@ -105,9 +107,9 @@ public class WireController : MonoBehaviour , IControllerInputAcceptor {
             myStartConnection = myStartLO.OutputConnection();
             myEndConnection = myEndLO.InputConnection( startLanguageObject );
             myChuck.RunCode( string.Format(
-                @"{0} => global Gain {1} => {2};", 
+                @"{0} => global Gain {1} => {2};",
                 myStartConnection, myGain, myEndConnection
-            ));
+            ) );
         }
     }
 
@@ -140,8 +142,8 @@ public class WireController : MonoBehaviour , IControllerInputAcceptor {
 
     public void TouchpadDown()
     {
-        touchpadJustPressed = true;  
-        Debug.Log("TOUCHPAD PRESSED~");
+        touchpadJustPressed = true;
+        Debug.Log( "TOUCHPAD PRESSED~" );
     }
 
     public void TouchpadUp()
@@ -179,8 +181,8 @@ public class WireController : MonoBehaviour , IControllerInputAcceptor {
         {
             touchpadJustPressed = false;
             touchpadInitialPosition = touchpad.position;
-            touchpadText = Instantiate( 
-                BasicTextHolder.basicTextPrefab, touchpadInitialPosition, 
+            touchpadText = Instantiate(
+                BasicTextHolder.basicTextPrefab, touchpadInitialPosition,
                 Quaternion.identity, transform
             ).GetComponent<TextMesh>();
             // move it up a bit
@@ -188,7 +190,7 @@ public class WireController : MonoBehaviour , IControllerInputAcceptor {
             // color it green
             touchpadText.color = textColor;
             // face it toward my head
-            touchpadText.transform.rotation = Quaternion.LookRotation( 
+            touchpadText.transform.rotation = Quaternion.LookRotation(
                 touchpadText.transform.position - TheRoom.theEye.position );
         }
 

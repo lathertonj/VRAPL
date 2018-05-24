@@ -39,6 +39,7 @@ GameObject:
   - component: {fileID: 4357255040458714}
   - component: {fileID: 54225669137826352}
   - component: {fileID: 114701007020214762}
+  - component: {fileID: 114267908909257024}
   - component: {fileID: 114346397278528632}
   m_Layer: 0
   m_Name: wire
@@ -83,9 +84,11 @@ MeshRenderer:
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RenderingLayerMask: 4294967295
   m_Materials:
   - {fileID: 2100000, guid: b681c83e88ade1c418e342fe30ecc5e3, type: 2}
   m_StaticBatchInfo:
@@ -98,6 +101,7 @@ MeshRenderer:
   m_PreserveUVs: 1
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
+  m_StitchLightmapSeams: 0
   m_SelectedEditorRenderState: 3
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
@@ -128,6 +132,18 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &114267908909257024
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1518017386108990}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fcdd58e60ed361148abb423204a0c1a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  beingRendered: 1
 --- !u!114 &114346397278528632
 MonoBehaviour:
   m_ObjectHideFlags: 1
