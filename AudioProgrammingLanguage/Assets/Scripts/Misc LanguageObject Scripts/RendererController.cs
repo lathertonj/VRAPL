@@ -258,6 +258,7 @@ public class RendererController : MonoBehaviour
 
     public void OnDestroy()
     {
+        // apparently this doesn't always happen :(
         allLanguageRenderers.Remove( this );
     }
 }
