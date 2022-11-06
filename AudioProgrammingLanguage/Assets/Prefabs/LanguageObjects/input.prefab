@@ -41,6 +41,7 @@ GameObject:
   - component: {fileID: 114134437478692006}
   - component: {fileID: 114578132029992292}
   - component: {fileID: 54700116533903022}
+  - component: {fileID: 114132050985709146}
   m_Layer: 0
   m_Name: input
   m_TagString: Untagged
@@ -255,6 +256,17 @@ TextMesh:
   m_Color:
     serializedVersion: 2
     rgba: 4278240255
+--- !u!114 &114132050985709146
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1382745005631692}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df74945bd0f8f0849b43b46320da45c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114134437478692006
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -267,6 +279,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myParent: {fileID: 0}
+  prefabGeneratedFrom: {fileID: 1382745005631692}
 --- !u!114 &114578132029992292
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -279,8 +292,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myFunction: {fileID: 0}
-  myBox: {fileID: 0}
-  myText: {fileID: 0}
+  myBox: {fileID: 23662785071903064}
+  myText: {fileID: 102550038741685844}
 --- !u!114 &114717408941727274
 MonoBehaviour:
   m_ObjectHideFlags: 1

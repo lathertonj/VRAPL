@@ -53,7 +53,7 @@
 }
 */
 
-Shader "Custom/Hidden"
+Shader "Custom/AntiHidden"
 {
     Properties
     {

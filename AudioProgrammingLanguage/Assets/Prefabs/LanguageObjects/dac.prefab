@@ -69,7 +69,7 @@ GameObject:
   - component: {fileID: 4813561473918156}
   - component: {fileID: 54135922083843282}
   - component: {fileID: 82929230815065138}
-  - component: {fileID: 114774347921490006}
+  - component: {fileID: 114631967017197604}
   - component: {fileID: 114107608885569482}
   - component: {fileID: 114561008674479184}
   - component: {fileID: 114827087729424290}
@@ -595,7 +595,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 859de76def956da44ad684b7b3338603, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  myChildren: []
   myParent: {fileID: 0}
+  prefabGeneratedFrom: 
 --- !u!114 &114562678484041474
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -608,7 +610,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   beingRendered: 1
---- !u!114 &114774347921490006
+--- !u!114 &114631967017197604
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -616,9 +618,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1740051879864970}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3f367c82a5e715545bfa5d614845ed04, type: 3}
+  m_Script: {fileID: 11500000, guid: 248646dc0fc011c459742eab749abe77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  chuckMainInstance: {fileID: 0}
   spatialize: 1
 --- !u!114 &114827087729424290
 MonoBehaviour:

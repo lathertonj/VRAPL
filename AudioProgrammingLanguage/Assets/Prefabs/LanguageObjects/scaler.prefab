@@ -96,7 +96,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &1525922598911798
 GameObject:
   m_ObjectHideFlags: 0
@@ -170,7 +170,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4087147650861516
 Transform:
   m_ObjectHideFlags: 1
@@ -696,8 +696,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 420f5ee3d1524cd449802227a5069c3b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  myMinCollider: {fileID: 65353143926144578}
-  myMaxCollider: {fileID: 65696252986167130}
   myMinText: {fileID: 102771722501517150}
   myMaxText: {fileID: 102008426976955196}
   myParentConnections:
@@ -716,6 +714,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myParent: {fileID: 0}
+  prefabGeneratedFrom: {fileID: 0}
 --- !u!114 &114787695854298038
 MonoBehaviour:
   m_ObjectHideFlags: 1

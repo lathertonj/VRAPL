@@ -310,6 +310,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myParent: {fileID: 0}
+  prefabGeneratedFrom: {fileID: 0}
 --- !u!114 &114918637090599280
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -318,7 +319,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1558441570059900}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b5a9fd948d0dcc4b852591f830c6548, type: 3}
+  m_Script: {fileID: 11500000, guid: a6da3d7fe83d06e428ef29d7e2f667b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   myShape: {fileID: 23385401294480736}

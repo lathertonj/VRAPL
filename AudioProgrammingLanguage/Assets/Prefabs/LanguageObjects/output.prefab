@@ -267,6 +267,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   myParent: {fileID: 0}
+  prefabGeneratedFrom: {fileID: 1885784124361458}
 --- !u!114 &114596917242813546
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -309,6 +310,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6feb79661ae12c46bdb873a4b373369, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  myBox: {fileID: 0}
-  myText: {fileID: 0}
+  myBox: {fileID: 23332624316662736}
+  myText: {fileID: 102189065941710344}
   myFunction: {fileID: 0}
